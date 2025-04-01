@@ -1,7 +1,6 @@
 
 import { Invoice } from "@/lib/types";
 import { format } from "date-fns";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { formatCurrency } from "@/lib/currency-utils";
 
 interface PrintableInvoiceProps {
@@ -9,8 +8,6 @@ interface PrintableInvoiceProps {
 }
 
 export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
-  const isMobile = useIsMobile();
-
   const InvoiceTemplate = () => (
     <div className="border-2 border-gray-200 p-4 max-w-[210mm] mx-auto">
       <div className="flex justify-between items-start mb-4">
@@ -101,50 +98,7 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
 
   return (
     <div className="p-4 bg-white print:p-0 print:m-0">
-      <div className="flex flex-col">
-        {/* First invoice - Customer Copy */}
-        <div className={`${isMobile ? 'mb-4' : 'mb-8'} pb-1 border-b print:mb-0 print:pb-8`}>
-          <div className="text-xs font-bold mb-1 text-center print:block">CUSTOMER COPY</div>
-          <InvoiceTemplate />
-        </div>
-        
-        {/* Second invoice - Device Copy (only show on print, not on mobile preview) */}
-        <div className="page-break-before print:block">
-          <div className="text-xs font-bold mb-1 text-center">DEVICE COPY</div>
-          <InvoiceTemplate />
-        </div>
-      </div>
-      
-      <style>
-        {`
-          @media print {
-            body {
-              margin: 0;
-              padding: 0;
-            }
-            
-            .page-break-before {
-              page-break-before: always;
-            }
-            
-            @page {
-              size: A4;
-              margin: 10mm;
-            }
-            
-            /* Hide everything except the printable invoice when printing */
-            html, body, div#root {
-              height: auto !important;
-              overflow: visible !important;
-            }
-            
-            /* Hide all UI elements except the invoice */
-            header, nav, footer, .print-hide {
-              display: none !important;
-            }
-          }
-        `}
-      </style>
+      <InvoiceTemplate />
     </div>
   );
 };

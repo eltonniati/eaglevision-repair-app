@@ -2,25 +2,17 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { useInvoiceDetails } from "@/hooks/use-invoice-details";
-import { InvoiceActions } from "@/components/invoice/InvoiceActions";
-import { InvoiceDetails } from "@/components/invoice/InvoiceDetails";
 import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
-import { PrintDialog } from "@/components/invoice/PrintDialog";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const navigate = useNavigate();
-  const { invoice, loading, getInvoice, updateInvoice } = useInvoiceDetails();
-  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const { invoice, loading, getInvoice } = useInvoiceDetails();
+  const [isPrinting, setIsPrinting] = useState(false);
   const printableInvoiceRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (invoiceId) {
@@ -32,15 +24,14 @@ const InvoiceDetail = () => {
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
     contentRef: printableInvoiceRef,
     onAfterPrint: () => {
-      setIsPreviewMode(false);
+      setIsPrinting(false);
       toast.success("Invoice printed/saved successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
       toast.error("Failed to print invoice");
-      setIsPreviewMode(false);
+      setIsPrinting(false);
     },
-    // Customize print options to ensure only the invoice is printed
     pageStyle: `
       @page {
         size: A4;
@@ -63,38 +54,6 @@ const InvoiceDetail = () => {
     `,
   });
 
-  const handleStatusChange = async (status: "Draft" | "Sent" | "Paid" | "Overdue") => {
-    if (!invoice || !invoiceId) return;
-    
-    try {
-      await updateInvoice(invoiceId, { status });
-      toast.success(`Status updated to ${status}`);
-    } catch (error) {
-      toast.error("Failed to update status");
-      console.error(error);
-    }
-  };
-
-  const handlePrint = () => {
-    setIsPrintDialogOpen(false);
-    setIsPreviewMode(true);
-    
-    // Small delay to ensure the print content is ready
-    setTimeout(() => {
-      if (printableInvoiceRef.current) {
-        handlePrintOrPDF();
-      } else {
-        toast.error("Print content not ready");
-        setIsPreviewMode(false);
-      }
-    }, 200);
-  };
-
-  const handlePreview = () => {
-    setIsPrintDialogOpen(false);
-    setIsPreviewMode(true);
-  };
-
   if (loading) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -111,66 +70,13 @@ const InvoiceDetail = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-      {!isPreviewMode && (
-        <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6 print-hide">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Job Cards
-        </Button>
-      )}
-
-      {isPreviewMode ? (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4 print-hide">
-            <h2 className="text-2xl font-bold">Invoice Preview</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setIsPreviewMode(false)} className="print-hide">
-                Back to Details
-              </Button>
-              <Button onClick={() => handlePrintOrPDF()} className="print-hide">
-                <Printer className="mr-2 h-4 w-4" />
-                Print Now
-              </Button>
-            </div>
-          </div>
-          
-          <div 
-            ref={printableInvoiceRef} 
-            id="print-content"
-            className="print-content border rounded-lg shadow-sm bg-white"
-          >
-            <PrintableInvoice invoice={invoice} />
-          </div>
-        </div>
-      ) : (
-        <div className={`grid gap-8 ${isMobile ? '' : 'md:grid-cols-3'}`}>
-          <div className={isMobile ? 'order-2' : 'md:col-span-1'}>
-            <InvoiceActions 
-              invoice={invoice} 
-              onPrint={() => setIsPrintDialogOpen(true)} 
-              onStatusChange={handleStatusChange} 
-            />
-          </div>
-
-          <div className={isMobile ? 'order-1' : 'md:col-span-2'}>
-            <InvoiceDetails invoice={invoice} />
-          </div>
-        </div>
-      )}
-
-      <PrintDialog 
-        open={isPrintDialogOpen} 
-        onOpenChange={setIsPrintDialogOpen} 
-        onPrint={handlePrint}
-        onPreview={handlePreview}
-        showPreviewOption={true}
-      />
-
-      {/* Hidden printable content when not in preview mode */}
-      {!isPreviewMode && (
-        <div ref={printableInvoiceRef} id="print-content" className="hidden">
-          <PrintableInvoice invoice={invoice} />
-        </div>
-      )}
+      <div 
+        ref={printableInvoiceRef} 
+        id="print-content"
+        className="print-content border rounded-lg shadow-sm bg-white"
+      >
+        <PrintableInvoice invoice={invoice} />
+      </div>
     </div>
   );
 };
