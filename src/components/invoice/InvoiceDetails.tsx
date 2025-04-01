@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { Invoice } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
-import { formatCurrency } from "./InvoiceActions";
+import { formatCurrency } from "@/lib/currency-utils";
 
 interface InvoiceDetailsProps {
   invoice: Invoice;

@@ -2,23 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "./StatusBadge";
-import { Badge } from "@/components/ui/badge";
 import { Printer, Send, CheckCircle, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { Invoice } from "@/lib/types";
+import { formatCurrency } from "@/lib/currency-utils";
 
 interface InvoiceActionsProps {
   invoice: Invoice;
   onPrint: () => void;
   onStatusChange: (status: "Draft" | "Sent" | "Paid" | "Overdue") => void;
 }
-
-export const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-ZA", {
-    style: 'currency',
-    currency: 'ZAR',
-  }).format(amount);
-};
 
 export const InvoiceActions = ({ invoice, onPrint, onStatusChange }: InvoiceActionsProps) => {
   return (

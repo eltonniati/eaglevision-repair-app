@@ -1,8 +1,8 @@
 
 import { Invoice } from "@/lib/types";
 import { format } from "date-fns";
-import { formatCurrency } from "./InvoiceActions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatCurrency } from "@/lib/currency-utils";
 
 interface PrintableInvoiceProps {
   invoice: Invoice;
