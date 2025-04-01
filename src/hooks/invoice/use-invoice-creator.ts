@@ -19,7 +19,7 @@ export function useInvoiceCreator() {
     try {
       setLoading(true);
 
-      // Create a single line item with proper quantity of 1 (not 10)
+      // Create a single line item with the correct quantity from the job
       const lineItems = [
         createLineItem("Handling Fees", 1, job.details.handling_fees)
       ];
