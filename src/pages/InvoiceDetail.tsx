@@ -11,7 +11,7 @@ import { InvoiceDetails } from "@/components/invoice/InvoiceDetails";
 import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
-import { Card } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -20,6 +20,7 @@ const InvoiceDetail = () => {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const printableInvoiceRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (invoiceId) {
@@ -39,6 +40,27 @@ const InvoiceDetail = () => {
       toast.error("Failed to print invoice");
       setIsPreviewMode(false);
     },
+    // Customize print options to ensure only the invoice is printed
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #print-content, #print-content * {
+          visibility: visible;
+        }
+        #print-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    `,
   });
 
   const handleStatusChange = async (status: "Draft" | "Sent" | "Paid" | "Overdue") => {
@@ -89,33 +111,39 @@ const InvoiceDetail = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-      <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Job Cards
-      </Button>
+      {!isPreviewMode && (
+        <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6 print-hide">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Job Cards
+        </Button>
+      )}
 
       {isPreviewMode ? (
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 print-hide">
             <h2 className="text-2xl font-bold">Invoice Preview</h2>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
+              <Button variant="outline" onClick={() => setIsPreviewMode(false)} className="print-hide">
                 Back to Details
               </Button>
-              <Button onClick={() => handlePrintOrPDF()}>
+              <Button onClick={() => handlePrintOrPDF()} className="print-hide">
                 <Printer className="mr-2 h-4 w-4" />
                 Print Now
               </Button>
             </div>
           </div>
           
-          <div ref={printableInvoiceRef} className="print-content border rounded-lg shadow-sm bg-white">
+          <div 
+            ref={printableInvoiceRef} 
+            id="print-content"
+            className="print-content border rounded-lg shadow-sm bg-white"
+          >
             <PrintableInvoice invoice={invoice} />
           </div>
         </div>
       ) : (
-        <div className="grid gap-8 md:grid-cols-3">
-          <div className="md:col-span-1">
+        <div className={`grid gap-8 ${isMobile ? '' : 'md:grid-cols-3'}`}>
+          <div className={isMobile ? 'order-2' : 'md:col-span-1'}>
             <InvoiceActions 
               invoice={invoice} 
               onPrint={() => setIsPrintDialogOpen(true)} 
@@ -123,7 +151,7 @@ const InvoiceDetail = () => {
             />
           </div>
 
-          <div className="md:col-span-2">
+          <div className={isMobile ? 'order-1' : 'md:col-span-2'}>
             <InvoiceDetails invoice={invoice} />
           </div>
         </div>
@@ -139,7 +167,7 @@ const InvoiceDetail = () => {
 
       {/* Hidden printable content when not in preview mode */}
       {!isPreviewMode && (
-        <div ref={printableInvoiceRef} className="hidden">
+        <div ref={printableInvoiceRef} id="print-content" className="hidden">
           <PrintableInvoice invoice={invoice} />
         </div>
       )}
