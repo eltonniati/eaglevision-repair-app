@@ -1,209 +1,126 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Search, FileText, Filter } from "lucide-react";
-import { useInvoices } from "@/hooks/use-invoices";
-import { Invoice } from "@/lib/types";
+import { ChevronLeft, Printer } from "lucide-react";
+import { useInvoiceDetails } from "@/hooks/use-invoice-details";
+import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
+import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
+import { PrintDialog } from "@/components/invoice/PrintDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-// Helper function for currency formatting
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-ZA", {
-    style: 'currency',
-    currency: 'ZAR',
-  }).format(amount);
-};
-
-// Helper function to get status color
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Draft":
-      return "bg-gray-100 text-gray-800";
-    case "Sent":
-      return "bg-blue-100 text-blue-800";
-    case "Paid":
-      return "bg-green-100 text-green-800";
-    case "Overdue":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const Invoices = () => {
+const InvoiceDetail = () => {
+  const { invoiceId } = useParams<{ invoiceId: string }>();
   const navigate = useNavigate();
-  const { invoices, loading } = useInvoices();
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const { invoice, loading, getInvoice } = useInvoiceDetails();
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const printableInvoiceRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Apply filters whenever search query or status filter changes
-    let filtered = [...invoices];
-    
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        invoice => 
-          invoice.invoice_number?.toLowerCase().includes(query) || 
-          invoice.bill_description.toLowerCase().includes(query)
-      );
+    if (invoiceId) {
+      getInvoice(invoiceId);
     }
-    
-    if (statusFilter) {
-      filtered = filtered.filter(invoice => invoice.status === statusFilter);
-    }
-    
-    setFilteredInvoices(filtered);
-  }, [searchQuery, statusFilter, invoices]);
+  }, [invoiceId]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const handlePrintOrPDF = useReactToPrint({
+    documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
+    content: () => printableInvoiceRef.current, // Changed from contentRef to content
+    onBeforePrint: () => { // Changed from onBeforeGetContent to onBeforePrint
+      setIsPrinting(true);
+      return new Promise<void>((resolve) => {
+        setTimeout(resolve, 100);
+      });
+    },
+    onAfterPrint: () => {
+      setIsPrinting(false);
+      setShowPrintDialog(false);
+      toast.success("Invoice printed/saved successfully");
+    },
+    onPrintError: (error) => {
+      console.error("Print error:", error);
+      toast.error("Failed to print invoice");
+      setIsPrinting(false);
+      setShowPrintDialog(false);
+    },
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #print-content, #print-content * {
+          visibility: visible;
+        }
+        #print-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    `,
+  });
+
+  const handleBackToList = () => {
+    navigate("/job-cards");
   };
 
-  const handleStatusFilter = (status: string) => {
-    if (statusFilter === status) {
-      setStatusFilter("");
-    } else {
-      setStatusFilter(status);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-muted-foreground">Loading invoice...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!invoice) {
+    return <InvoiceNotFound onBack={handleBackToList} />;
+  }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-      <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-6">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Dashboard
-      </Button>
+    <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
+      <div className="flex flex-col space-y-4">
+        <div className="flex justify-between items-center mb-4">
+          <Button variant="outline" size="sm" onClick={handleBackToList}>
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            Back to Job Cards
+          </Button>
+          
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={() => setShowPrintDialog(true)}
+          >
+            <Printer className="mr-1 h-4 w-4" />
+            {isMobile ? "Save as PDF" : "Print Invoice"}
+          </Button>
+        </div>
+        
+        <div 
+          ref={printableInvoiceRef} 
+          id="print-content"
+          className={`print-content rounded-lg shadow-sm bg-white ${isPrinting ? 'printing' : ''}`}
+        >
+          <PrintableInvoice invoice={invoice} />
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <CardTitle>Invoices</CardTitle>
-              <CardDescription>Manage and track all your invoices</CardDescription>
-            </div>
-            <div className="w-full md:w-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search invoices..."
-                  className="pl-10 w-full md:w-[300px]"
-                  value={searchQuery}
-                  onChange={handleSearch}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-4">
-            <Button
-              variant={statusFilter === "Draft" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("Draft")}
-              className="flex items-center gap-1"
-            >
-              <Filter className="h-3 w-3" />
-              Draft
-            </Button>
-            <Button
-              variant={statusFilter === "Sent" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("Sent")}
-              className="flex items-center gap-1"
-            >
-              <Filter className="h-3 w-3" />
-              Sent
-            </Button>
-            <Button
-              variant={statusFilter === "Paid" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("Paid")}
-              className="flex items-center gap-1"
-            >
-              <Filter className="h-3 w-3" />
-              Paid
-            </Button>
-            <Button
-              variant={statusFilter === "Overdue" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("Overdue")}
-              className="flex items-center gap-1"
-            >
-              <Filter className="h-3 w-3" />
-              Overdue
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex justify-center items-center h-32">
-              <p className="text-muted-foreground">Loading invoices...</p>
-            </div>
-          ) : filteredInvoices.length === 0 ? (
-            <div className="text-center py-6">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">No invoices found</h3>
-              <p className="text-muted-foreground mt-1">
-                {searchQuery || statusFilter
-                  ? "Try a different search or filter"
-                  : "Create your first invoice from a job card"}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredInvoices.map((invoice) => (
-                    <TableRow 
-                      key={invoice.id}
-                      className="cursor-pointer"
-                      onClick={() => navigate(`/invoices/${invoice.id}`)}
-                    >
-                      <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                      <TableCell>{format(new Date(invoice.issue_date), "MMM d, yyyy")}</TableCell>
-                      <TableCell className="max-w-[200px] truncate">{invoice.bill_description}</TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(invoice.status)}>
-                          {invoice.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">{formatCurrency(invoice.total)}</TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/invoices/${invoice.id}`);
-                          }}
-                        >
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <PrintDialog 
+        open={showPrintDialog} 
+        onOpenChange={setShowPrintDialog}
+        onPrint={handlePrintOrPDF}
+        // Remove isMobile if it's not needed in PrintDialog
+      />
     </div>
   );
 };
 
-export default Invoices;
+export default InvoiceDetail;
