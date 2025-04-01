@@ -69,6 +69,8 @@ export function useInvoiceCreator() {
 
       if (error) throw error;
       
+      if (!data) throw new Error("No data returned from insert operation");
+      
       // Manually construct the full invoice object
       const formattedInvoice: Invoice = {
         ...newInvoice,

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -276,7 +277,9 @@ export function useJobs() {
         .eq("id", id)
         .single();
 
-      if (fetchError || jobData?.user_id !== user.id) {
+      if (fetchError) throw fetchError;
+      
+      if (!jobData || jobData.user_id !== user.id) {
         throw new Error("Job not found or unauthorized");
       }
 
