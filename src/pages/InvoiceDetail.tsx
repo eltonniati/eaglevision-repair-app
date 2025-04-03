@@ -31,27 +31,38 @@ const InvoiceDetail = () => {
     content: () => printableInvoiceRef.current,
     onBeforePrint: () => {
       setIsPrinting(true);
+      // Add printing class to body to help with CSS styles
+      document.body.classList.add('is-printing');
       return new Promise<void>((resolve) => {
         setTimeout(resolve, 100);
       });
     },
     onAfterPrint: () => {
       setIsPrinting(false);
+      document.body.classList.remove('is-printing');
       setShowPrintDialog(false);
       toast.success("Invoice printed/saved successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
+      document.body.classList.remove('is-printing');
       toast.error("Failed to print invoice");
       setIsPrinting(false);
       setShowPrintDialog(false);
     },
+    // Improved print styling to ensure only the invoice is visible
     pageStyle: `
       @page {
         size: A4;
         margin: 10mm;
       }
       @media print {
+        html, body {
+          height: 100%;
+          margin: 0 !important;
+          padding: 0 !important;
+          background-color: white !important;
+        }
         body * {
           visibility: hidden;
         }
@@ -63,6 +74,7 @@ const InvoiceDetail = () => {
           left: 0;
           top: 0;
           width: 100%;
+          height: auto;
           margin: 0;
           padding: 0;
         }

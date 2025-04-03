@@ -19,13 +19,17 @@ export const PrintDialog = ({
   showPreviewOption = false
 }: PrintDialogProps) => {
   const handlePrint = () => {
-    // Call the onPrint function passed as a prop
-    onPrint();
+    // Close the dialog first then print to avoid dialog showing in the print
+    onOpenChange(false);
+    // Small timeout to ensure dialog is closed before printing starts
+    setTimeout(() => {
+      onPrint();
+    }, 100);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="no-print">
         <DialogHeader>
           <DialogTitle>Print Document</DialogTitle>
           <DialogDescription>Print or save this document as PDF</DialogDescription>

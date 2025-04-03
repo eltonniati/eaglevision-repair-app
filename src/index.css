@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -178,6 +177,7 @@
     padding: 0;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    background-color: white !important;
   }
   
   .print-content {
@@ -186,6 +186,9 @@
     margin: 0 auto !important;
     padding: 0 !important;
     box-shadow: none !important;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
   
   .page-break-avoid {
@@ -200,13 +203,24 @@
     page-break-after: always;
   }
   
-  .no-print {
+  .no-print, .no-print * {
     display: none !important;
+    visibility: hidden !important;
   }
   
-  /* Hide toast notifications during print */
+  body * {
+    visibility: hidden;
+  }
+  
+  #print-content, #print-content * {
+    visibility: visible;
+  }
+  
+  [role="dialog"],
   [role="status"],
+  button,
   .sonner-toast-container {
     display: none !important;
+    visibility: hidden !important;
   }
 }
