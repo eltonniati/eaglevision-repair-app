@@ -63,6 +63,11 @@ const InvoiceDetail = () => {
           left: 0;
           top: 0;
           width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        .no-print {
+          display: none !important;
         }
       }
     `,
@@ -89,8 +94,8 @@ const InvoiceDetail = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
       <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-center mb-4">
-          <Button variant="outline" size="sm" onClick={handleBackToList}>
+        <div className="flex justify-between items-center mb-4 no-print">
+          <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
             <ChevronLeft className="mr-1 h-4 w-4" />
             Back to Job Cards
           </Button>
@@ -99,6 +104,7 @@ const InvoiceDetail = () => {
             variant="default" 
             size="sm" 
             onClick={() => setShowPrintDialog(true)}
+            className="no-print"
           >
             <Printer className="mr-1 h-4 w-4" />
             {isMobile ? "Save as PDF" : "Print Invoice"}
@@ -108,7 +114,7 @@ const InvoiceDetail = () => {
         <div 
           ref={printableInvoiceRef} 
           id="print-content"
-          className={`print-content rounded-lg shadow-sm bg-white ${isPrinting ? 'printing' : ''}`}
+          className="print-content rounded-lg shadow-sm bg-white"
         >
           <PrintableInvoice invoice={invoice} />
         </div>

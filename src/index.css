@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -182,7 +183,9 @@
   .print-content {
     width: 100%;
     max-width: 210mm;
-    margin: 0 auto;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
   }
   
   .page-break-avoid {
@@ -195,5 +198,15 @@
   
   .page-break-after {
     page-break-after: always;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Hide toast notifications during print */
+  [role="status"],
+  .sonner-toast-container {
+    display: none !important;
   }
 }
