@@ -28,8 +28,8 @@ const InvoiceDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
-    contentRef: printableInvoiceRef,
-    onBeforeGetContent: () => {
+    content: () => printableInvoiceRef.current,
+    onBeforePrint: () => {
       setIsPrinting(true);
       return new Promise<void>((resolve) => {
         setTimeout(resolve, 100);
@@ -118,7 +118,7 @@ const InvoiceDetail = () => {
         open={showPrintDialog} 
         onOpenChange={setShowPrintDialog}
         onPrint={handlePrintOrPDF}
-        isMobile={isMobile}
+        showPreviewOption={false}
       />
     </div>
   );
