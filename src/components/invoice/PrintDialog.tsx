@@ -19,12 +19,13 @@ export const PrintDialog = ({
   showPreviewOption = false
 }: PrintDialogProps) => {
   const handlePrint = () => {
-    // Close the dialog first then print to avoid dialog showing in the print
+    // Close the dialog first
     onOpenChange(false);
-    // Small timeout to ensure dialog is closed before printing starts
+    
+    // Short delay to ensure dialog is closed before print
     setTimeout(() => {
       onPrint();
-    }, 100);
+    }, 300);
   };
 
   return (

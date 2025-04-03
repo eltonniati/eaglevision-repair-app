@@ -26,61 +26,46 @@ const InvoiceDetail = () => {
     }
   }, [invoiceId]);
 
+  const prepareForPrinting = () => {
+    // Add classes to help with print styling
+    document.body.classList.add('is-printing');
+    // Hide all dialogs and unnecessary elements
+    const dialogs = document.querySelectorAll('[role="dialog"]');
+    dialogs.forEach(dialog => {
+      dialog.classList.add('no-print');
+    });
+  };
+
+  const cleanupAfterPrinting = () => {
+    document.body.classList.remove('is-printing');
+    setIsPrinting(false);
+    setShowPrintDialog(false);
+  };
+
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
     content: () => printableInvoiceRef.current,
-    onBeforePrint: () => {
+    onBeforeGetContent: () => {
       setIsPrinting(true);
-      // Add printing class to body to help with CSS styles
-      document.body.classList.add('is-printing');
       return new Promise<void>((resolve) => {
-        setTimeout(resolve, 100);
+        prepareForPrinting();
+        setTimeout(resolve, 300);
       });
     },
     onAfterPrint: () => {
-      setIsPrinting(false);
-      document.body.classList.remove('is-printing');
-      setShowPrintDialog(false);
+      cleanupAfterPrinting();
       toast.success("Invoice printed/saved successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
-      document.body.classList.remove('is-printing');
+      cleanupAfterPrinting();
       toast.error("Failed to print invoice");
-      setIsPrinting(false);
-      setShowPrintDialog(false);
     },
-    // Improved print styling to ensure only the invoice is visible
+    removeAfterPrint: true,
     pageStyle: `
       @page {
         size: A4;
         margin: 10mm;
-      }
-      @media print {
-        html, body {
-          height: 100%;
-          margin: 0 !important;
-          padding: 0 !important;
-          background-color: white !important;
-        }
-        body * {
-          visibility: hidden;
-        }
-        #print-content, #print-content * {
-          visibility: visible;
-        }
-        #print-content {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: auto;
-          margin: 0;
-          padding: 0;
-        }
-        .no-print {
-          display: none !important;
-        }
       }
     `,
   });
