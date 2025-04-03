@@ -18,6 +18,11 @@ export const PrintDialog = ({
   onPreview,
   showPreviewOption = false
 }: PrintDialogProps) => {
+  const handlePrint = () => {
+    // Call the onPrint function passed as a prop
+    onPrint();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -36,7 +41,7 @@ export const PrintDialog = ({
                 Preview
               </Button>
             )}
-            <Button onClick={onPrint}>
+            <Button onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print
             </Button>
