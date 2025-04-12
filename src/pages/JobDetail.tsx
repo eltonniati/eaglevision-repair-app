@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -11,6 +12,9 @@ import { JobNotFound } from "@/components/job/JobNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PrintableJobCard } from "@/components/job/PrintableJobCard";
+import { JobDetailHeader } from "@/components/job/JobDetailHeader";
+import { JobDetailContent } from "@/components/job/JobDetailContent";
+import { JobDetailSkeleton } from "@/components/job/JobDetailSkeleton";
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-ZA", {
@@ -65,7 +69,7 @@ const JobDetail = () => {
 
     loadJob();
     fetchCompanies();
-  }, [id]);
+  }, [id, getJob, fetchCompanies]);
 
   useEffect(() => {
     if (job) {
@@ -136,7 +140,7 @@ const JobDetail = () => {
   };
 
   const handleSave = async () => {
-    if (!job) return;
+    if (!job) return false;
     
     const updatedJob = {
       ...job,
@@ -170,13 +174,7 @@ const JobDetail = () => {
   };
 
   if (loading) {
-    return (
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-        <div className="flex justify-center items-center h-64">
-          <p className="text-muted-foreground">Loading job card...</p>
-        </div>
-      </div>
-    );
+    return <JobDetailSkeleton />;
   }
 
   if (!job) {
@@ -185,66 +183,20 @@ const JobDetail = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
-      <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-center mb-4 no-print">
-          <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Job Cards
-          </Button>
-          
-          <div className="flex gap-2">
-            {isEditMode ? (
-              <>
-                <Button variant="default" size="sm" onClick={handleSave}>
-                  Save Changes
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setIsEditMode(false)}>
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={() => setShowPrintDialog(true)}
-                  className="no-print"
-                >
-                  <Printer className="mr-1 h-4 w-4" />
-                  {isMobile ? "Save as PDF" : "Print Job Card"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setIsEditMode(true)}
-                  className="no-print"
-                >
-                  Edit Job Card
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-        
-        <div 
-          ref={printableJobRef} 
-          id="print-content"
-          className="print-content rounded-lg shadow-sm bg-white"
-        >
-          <PrintableJobCard 
-            job={job}
-            customerName={editedJob.customer.name}
-            customerPhone={editedJob.customer.phone}
-            customerEmail={editedJob.customer.email}
-            deviceName={editedJob.device.name}
-            deviceModel={editedJob.device.model}
-            deviceCondition={editedJob.device.condition}
-            problem={editedJob.problem}
-            handlingFees={editedJob.handling_fees}
-            companyName={editedJob.company.name}
-          />
-        </div>
-      </div>
+      <JobDetailHeader 
+        onBack={handleBackToList}
+        isEditMode={isEditMode}
+        setIsEditMode={setIsEditMode}
+        handleSave={handleSave}
+        handlePrint={() => setShowPrintDialog(true)}
+        isMobile={isMobile}
+      />
+      
+      <JobDetailContent 
+        job={job}
+        editedJob={editedJob}
+        printableRef={printableJobRef}
+      />
 
       <PrintDialog 
         open={showPrintDialog} 
