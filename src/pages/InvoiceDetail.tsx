@@ -46,7 +46,7 @@ const InvoiceDetail = () => {
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
     // Fix: Use contentRef as a RefObject instead of a function
     contentRef: printableInvoiceRef,
-    onBeforeGetContent: () => {
+    onBeforePrint: () => {
       setIsPrinting(true);
       return new Promise<void>((resolve) => {
         prepareForPrinting();
