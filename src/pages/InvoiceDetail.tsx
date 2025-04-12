@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -27,9 +26,7 @@ const InvoiceDetail = () => {
   }, [invoiceId]);
 
   const prepareForPrinting = () => {
-    // Add classes to help with print styling
     document.body.classList.add('is-printing');
-    // Hide all dialogs and unnecessary elements
     const dialogs = document.querySelectorAll('[role="dialog"]');
     dialogs.forEach(dialog => {
       dialog.classList.add('no-print');
@@ -44,7 +41,6 @@ const InvoiceDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
-    // Fix: Use contentRef as a RefObject instead of a function
     contentRef: printableInvoiceRef,
     onBeforePrint: () => {
       setIsPrinting(true);
@@ -62,7 +58,6 @@ const InvoiceDetail = () => {
       cleanupAfterPrinting();
       toast.error("Failed to print invoice");
     },
-    removeAfterPrint: true,
     pageStyle: `
       @page {
         size: A4;
