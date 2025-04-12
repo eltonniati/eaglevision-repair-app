@@ -44,8 +44,8 @@ const InvoiceDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
-    // Changed from content to contentRef to match the expected property
-    contentRef: () => printableInvoiceRef.current,
+    // Fix: Use contentRef as a RefObject instead of a function
+    contentRef: printableInvoiceRef,
     onBeforeGetContent: () => {
       setIsPrinting(true);
       return new Promise<void>((resolve) => {
