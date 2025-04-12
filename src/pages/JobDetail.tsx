@@ -242,15 +242,15 @@ const JobDetail = () => {
     setIsPreviewMode(false);
   };
 
+  // Fix: Create a stable ref that doesn't change during rendering
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    contentRef: jobCardRef,
+    content: () => contentRef.current,
     onBeforePrint: () => {
       setIsPrinting(true);
-      return new Promise<void>((resolve) => {
-        prepareForPrinting();
-        setTimeout(resolve, 300);
-      });
+      prepareForPrinting();
     },
     onAfterPrint: () => {
       cleanupAfterPrinting();
@@ -266,6 +266,15 @@ const JobDetail = () => {
         size: A4;
         margin: 10mm;
       }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
     `,
   });
 
@@ -274,7 +283,7 @@ const JobDetail = () => {
     setIsPreviewMode(true);
     
     setTimeout(() => {
-      if (jobCardRef.current) {
+      if (contentRef.current) {
         handlePrintOrPDF();
       } else {
         toast.error("Print content not ready");
@@ -336,14 +345,14 @@ const JobDetail = () => {
               <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
                 Back to Details
               </Button>
-              <Button onClick={() => handlePrintOrPDF()}>
+              <Button onClick={handlePrintOrPDF}>
                 <Printer className="mr-2 h-4 w-4" />
                 Print Now
               </Button>
             </div>
           </div>
           
-          <div ref={jobCardRef} className="print-content rounded-lg shadow-sm bg-white">
+          <div ref={contentRef} className="print-content rounded-lg shadow-sm bg-white">
             <PrintableJobCard 
               job={job}
               customerName={editedCustomerName}
@@ -594,20 +603,23 @@ const JobDetail = () => {
         showPreviewOption={true}
       />
 
+      {/* Fix: Remove the hidden ref and just use the visible one in preview mode */}
       {!isPreviewMode && (
-        <div ref={jobCardRef} className="hidden print-content">
-          <PrintableJobCard 
-            job={job}
-            customerName={editedCustomerName}
-            customerPhone={editedCustomerPhone}
-            customerEmail={editedCustomerEmail}
-            deviceName={editedDeviceName}
-            deviceModel={editedDeviceModel}
-            deviceCondition={editedDeviceCondition}
-            problem={editedProblem}
-            handlingFees={editedHandlingFees}
-            companyName={editedCompanyName}
-          />
+        <div style={{ display: 'none' }}>
+          <div ref={contentRef} className="print-content">
+            <PrintableJobCard 
+              job={job}
+              customerName={editedCustomerName}
+              customerPhone={editedCustomerPhone}
+              customerEmail={editedCustomerEmail}
+              deviceName={editedDeviceName}
+              deviceModel={editedDeviceModel}
+              deviceCondition={editedDeviceCondition}
+              problem={editedProblem}
+              handlingFees={editedHandlingFees}
+              companyName={editedCompanyName}
+            />
+          </div>
         </div>
       )}
     </div>
