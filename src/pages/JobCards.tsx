@@ -30,6 +30,7 @@ import {
 import { ArrowLeft, PlusCircle, Search, Calendar, Printer } from "lucide-react";
 import { format } from "date-fns";
 import type { JobStatus } from "@/lib/types";
+import { toast } from "sonner";
 
 const PrintableJobCards = ({ jobs }: { jobs: any[] }) => {
   const formatCurrency = (amount: number = 0) => {
@@ -53,24 +54,29 @@ const PrintableJobCards = ({ jobs }: { jobs: any[] }) => {
   };
 
   return (
-    <div className="p-4 hidden print:block">
-      <div className="grid grid-cols-2 gap-4 print:grid-cols-2">
+    <div className="p-4" id="printable-content">
+      <h1 className="text-2xl font-bold mb-6 text-center">Job Cards Report</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {jobs.map((job) => (
-          <div key={job.id} className="print-card">
-            <h2 className="text-xl font-bold mb-2">Job Card #{job.job_card_number}</h2>
-            <div className="space-y-1">
+          <div key={job.id} className="border border-gray-200 p-4 rounded-lg">
+            <h2 className="text-lg font-bold mb-2">Job Card #{job.job_card_number}</h2>
+            <div className="space-y-2">
               <p><strong>Customer:</strong> {job.customer.name}</p>
               <p><strong>Device:</strong> {job.device.name} {job.device.model}</p>
               <p><strong>Date:</strong> {format(new Date(job.created_at!), "MMM d, yyyy")}</p>
               <p><strong>Price:</strong> {formatCurrency(job.details.handling_fees)}</p>
-              <p><strong>Status:</strong> 
-                <Badge className={`${getStatusColor(job.details.status as JobStatus)} ml-2`}>
+              <p className="flex items-center">
+                <strong>Status:</strong> 
+                <span className={`${getStatusColor(job.details.status as JobStatus)} ml-2 px-2 py-1 rounded-full text-xs`}>
                   {job.details.status}
-                </Badge>
+                </span>
               </p>
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-6 text-sm text-center">
+        <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
       </div>
     </div>
   );
@@ -81,7 +87,7 @@ export default function JobCards() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<JobStatus | "all">("all");
-  const componentRef = useRef(null);
+  const componentRef = useRef<HTMLDivElement>(null);
 
   const formatCurrency = (amount: number = 0) => {
     return new Intl.NumberFormat('en-ZA', {
@@ -91,25 +97,30 @@ export default function JobCards() {
   };
 
   const handlePrint = useReactToPrint({
-    documentTitle: "Job Cards Report",
+    documentTitle: "Job_Cards_Report",
+    content: () => componentRef.current,
     pageStyle: `
       @page {
         size: A4;
         margin: 10mm;
       }
       @media print {
-        body {
-          -webkit-print-color-adjust: exact;
+        body * {
+          visibility: hidden;
         }
-        .print-card {
-          break-inside: avoid;
-          margin-bottom: 20px;
-          padding: 15px;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
+        #printable-content, #printable-content * {
+          visibility: visible;
+        }
+        #printable-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 20px;
         }
       }
     `,
+    onAfterPrint: () => toast.success("Job cards printed successfully"),
   });
 
   const filteredJobs = jobs.filter((job) => {
@@ -306,7 +317,7 @@ export default function JobCards() {
         </CardContent>
       </Card>
 
-      <div style={{ display: "none" }}>
+      <div style={{ position: 'absolute', left: '-9999px' }}>
         <div ref={componentRef}>
           <PrintableJobCards jobs={filteredJobs} />
         </div>
