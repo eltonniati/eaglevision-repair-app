@@ -246,7 +246,7 @@ const JobDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    content: () => contentRef.current,
+    getPrintableContent: () => contentRef.current,
     onBeforePrint: prepareForPrinting,
     onAfterPrint: () => {
       cleanupAfterPrinting();
