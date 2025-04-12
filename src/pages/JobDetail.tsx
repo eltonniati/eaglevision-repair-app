@@ -15,6 +15,7 @@ import { PrintableJobCard } from "@/components/job/PrintableJobCard";
 import { JobDetailHeader } from "@/components/job/JobDetailHeader";
 import { JobDetailContent } from "@/components/job/JobDetailContent";
 import { JobDetailSkeleton } from "@/components/job/JobDetailSkeleton";
+import { JobStatus } from "@/lib/types";
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-ZA", {
@@ -35,7 +36,7 @@ const JobDetail = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedJob, setEditedJob] = useState({
     problem: "",
-    status: "In Progress" as const,
+    status: "In Progress" as JobStatus, // Update the type to accept all JobStatus values
     handling_fees: 0,
     customer: {
       name: "",
