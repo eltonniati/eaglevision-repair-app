@@ -87,7 +87,7 @@ export default function JobCards() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<JobStatus | "all">("all");
-  const componentRef = useRef<HTMLDivElement>(null);
+  const componentRef = useRef(null);
 
   const formatCurrency = (amount: number = 0) => {
     return new Intl.NumberFormat('en-ZA', {
@@ -101,26 +101,41 @@ export default function JobCards() {
     content: () => componentRef.current,
     pageStyle: `
       @page {
-        size: A4;
-        margin: 10mm;
+        size: A4 portrait;
+        margin: 15mm;
       }
       @media print {
-        body * {
+        body {
+          background: white !important;
+          color: black !important;
           visibility: hidden;
         }
         #printable-content, #printable-content * {
           visibility: visible;
+        }
+        .no-print {
+          display: none !important;
+        }
+        a {
+          text-decoration: none !important;
         }
         #printable-content {
           position: absolute;
           left: 0;
           top: 0;
           width: 100%;
-          padding: 20px;
+          padding: 0;
         }
       }
     `,
-    onAfterPrint: () => toast.success("Job cards printed successfully"),
+    onBeforeGetContent: () => {
+      document.body.classList.add('printing');
+      return Promise.resolve();
+    },
+    onAfterPrint: () => {
+      document.body.classList.remove('printing');
+      toast.success("Job cards printed successfully");
+    },
   });
 
   const filteredJobs = jobs.filter((job) => {
@@ -161,25 +176,26 @@ export default function JobCards() {
       <Button
         variant="ghost"
         onClick={() => navigate("/dashboard")}
-        className="mb-6"
+        className="mb-6 no-print"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Dashboard
       </Button>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 no-print">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Job Cards</h1>
           <p className="text-gray-500">Manage and track all your repair jobs</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => navigate("/job-cards/new")}>
+          <Button onClick={() => navigate("/job-cards/new")} className="no-print">
             <PlusCircle className="mr-2 h-4 w-4" />
             New Job Card
           </Button>
           <Button 
             onClick={printJobs} 
             variant="outline"
+            className="no-print"
           >
             <Printer className="mr-2 h-4 w-4" />
             Print All
@@ -187,7 +203,7 @@ export default function JobCards() {
         </div>
       </div>
 
-      <Card className="mb-8">
+      <Card className="mb-8 no-print">
         <CardHeader className="pb-3">
           <CardTitle>Job Search</CardTitle>
           <CardDescription>
@@ -223,7 +239,7 @@ export default function JobCards() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="no-print">
         <CardHeader>
           <CardTitle>All Jobs</CardTitle>
           <CardDescription>
@@ -317,6 +333,7 @@ export default function JobCards() {
         </CardContent>
       </Card>
 
+      {/* Hidden printable content */}
       <div style={{ position: 'absolute', left: '-9999px' }}>
         <div ref={componentRef}>
           <PrintableJobCards jobs={filteredJobs} />
