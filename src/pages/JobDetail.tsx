@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -244,9 +245,11 @@ const JobDetail = () => {
     setIsPreviewMode(false);
   }, []);
 
+  // Fix: Updated the useReactToPrint hook to match the expected TypeScript interface
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    content: () => contentRef.current,
+    // The content property is specified through this function
+    onBeforeGetContent: () => contentRef.current,
     onBeforePrint: prepareForPrinting,
     onAfterPrint: () => {
       cleanupAfterPrinting();
