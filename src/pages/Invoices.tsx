@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -27,8 +28,9 @@ const InvoiceDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
-    content: () => printableInvoiceRef.current, // Changed from contentRef to content
-    onBeforePrint: () => { // Changed from onBeforeGetContent to onBeforePrint
+    // Changed from content to contentRef to match the expected property
+    contentRef: () => printableInvoiceRef.current,
+    onBeforePrint: () => {
       setIsPrinting(true);
       return new Promise<void>((resolve) => {
         setTimeout(resolve, 100);
