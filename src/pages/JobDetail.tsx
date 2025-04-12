@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Edit, Printer, Trash2
 } from "lucide-react";
-import { toast } from "sonner";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
 import { JobStatus } from "@/lib/types";
@@ -134,6 +134,7 @@ const JobDetail = () => {
   const [editedDeviceCondition, setEditedDeviceCondition] = useState("");
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   const jobCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -227,18 +228,45 @@ const JobDetail = () => {
     setIsDeleteDialogOpen(false);
   };
 
+  const prepareForPrinting = () => {
+    document.body.classList.add('is-printing');
+    const dialogs = document.querySelectorAll('[role="dialog"]');
+    dialogs.forEach(dialog => {
+      dialog.classList.add('no-print');
+    });
+  };
+
+  const cleanupAfterPrinting = () => {
+    document.body.classList.remove('is-printing');
+    setIsPrinting(false);
+    setIsPreviewMode(false);
+  };
+
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
     contentRef: jobCardRef,
+    onBeforePrint: () => {
+      setIsPrinting(true);
+      return new Promise<void>((resolve) => {
+        prepareForPrinting();
+        setTimeout(resolve, 300);
+      });
+    },
     onAfterPrint: () => {
-      setIsPreviewMode(false);
-      toast.success("Job card printed successfully");
+      cleanupAfterPrinting();
+      toast.success("Job card printed/saved successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
+      cleanupAfterPrinting();
       toast.error("Failed to print job card");
-      setIsPreviewMode(false);
     },
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+    `,
   });
 
   const handlePrint = () => {
@@ -252,7 +280,7 @@ const JobDetail = () => {
         toast.error("Print content not ready");
         setIsPreviewMode(false);
       }
-    }, 200);
+    }, 300);
   };
 
   const handlePreview = () => {
@@ -295,14 +323,14 @@ const JobDetail = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-      <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6">
+      <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6 no-print">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Job Cards
       </Button>
 
       {isPreviewMode ? (
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 no-print">
             <h2 className="text-2xl font-bold">Job Card Preview</h2>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
@@ -315,7 +343,7 @@ const JobDetail = () => {
             </div>
           </div>
           
-          <div ref={jobCardRef} className="print-content p-4 border rounded-lg shadow-sm bg-white">
+          <div ref={jobCardRef} className="print-content rounded-lg shadow-sm bg-white">
             <PrintableJobCard 
               job={job}
               customerName={editedCustomerName}
@@ -567,7 +595,7 @@ const JobDetail = () => {
       />
 
       {!isPreviewMode && (
-        <div ref={jobCardRef} className="hidden">
+        <div ref={jobCardRef} className="hidden print-content">
           <PrintableJobCard 
             job={job}
             customerName={editedCustomerName}
