@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
@@ -5,6 +6,7 @@ import { useReactToPrint } from "react-to-print";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, PlusCircle, Printer } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -19,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search } from "lucide-react";
 import { PrintableJobCards } from "@/components/job/PrintableJobCards";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PrintDialog } from "@/components/invoice/PrintDialog";
 
 const formatCurrency = (amount: number = 0) => {
   return new Intl.NumberFormat('en-ZA', {
