@@ -1,25 +1,20 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useJobs } from "@/hooks/use-jobs";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import { format } from "date-fns";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -27,78 +22,213 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, PlusCircle, Search, Calendar, Printer } from "lucide-react";
-import { format } from "date-fns";
-import type { JobStatus } from "@/lib/types";
-import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Edit, Printer, Trash2 } from "lucide-react";
+import { useJobs } from "@/hooks/use-jobs";
+import { useCompanies } from "@/hooks/use-companies";
+import { JobStatus } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { PrintDialog } from "@/components/invoice/PrintDialog";
 
-const PrintableJobCards = ({ jobs }: { jobs: any[] }) => {
-  const formatCurrency = (amount: number = 0) => {
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency: 'ZAR',
-    }).format(amount);
-  };
-  
-  const getStatusColor = (status: JobStatus) => {
-    switch (status) {
-      case "In Progress":
-        return "bg-blue-100 text-blue-800";
-      case "Finished":
-        return "bg-green-100 text-green-800";
-      case "Waiting for Parts":
-        return "bg-amber-100 text-amber-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-ZA", {
+    style: 'currency',
+    currency: 'ZAR',
+  }).format(amount);
+};
 
-  return (
-    <div className="p-4" id="printable-content">
-      <h1 className="text-2xl font-bold mb-6 text-center">Job Cards Report</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {jobs.map((job) => (
-          <div key={job.id} className="border border-gray-200 p-4 rounded-lg">
-            <h2 className="text-lg font-bold mb-2">Job Card #{job.job_card_number}</h2>
-            <div className="space-y-2">
-              <p><strong>Customer:</strong> {job.customer.name}</p>
-              <p><strong>Device:</strong> {job.device.name} {job.device.model}</p>
-              <p><strong>Date:</strong> {format(new Date(job.created_at!), "MMM d, yyyy")}</p>
-              <p><strong>Price:</strong> {formatCurrency(job.details.handling_fees)}</p>
-              <p className="flex items-center">
-                <strong>Status:</strong> 
-                <span className={`${getStatusColor(job.details.status as JobStatus)} ml-2 px-2 py-1 rounded-full text-xs`}>
-                  {job.details.status}
-                </span>
-              </p>
-            </div>
-          </div>
-        ))}
+const PrintableJobCard = ({ 
+  job, 
+  customerName, 
+  customerPhone, 
+  customerEmail, 
+  deviceName, 
+  deviceModel, 
+  deviceCondition, 
+  problem,
+  handlingFees,
+  companyName
+}: { 
+  job: any, 
+  customerName: string,
+  customerPhone: string,
+  customerEmail: string,
+  deviceName: string,
+  deviceModel: string,
+  deviceCondition: string,
+  problem: string,
+  handlingFees: number,
+  companyName: string
+}) => (
+  <div className="p-6" id="printable-content">
+    <div className="border-2 border-gray-200 p-6">
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">JOB CARD</h1>
+          <p className="text-lg font-medium">#{job?.job_card_number}</p>
+        </div>
+        <div className="text-right">
+          <p><strong>Created Date:</strong> {format(new Date(job?.created_at || new Date()), "MMMM d, yyyy")}</p>
+          <p><strong>Status:</strong> {job?.details.status}</p>
+        </div>
       </div>
-      <div className="mt-6 text-sm text-center">
+
+      <div className="grid grid-cols-2 gap-6 mb-8">
+        <div>
+          <h2 className="text-lg font-semibold border-b mb-2">Company</h2>
+          <p>{companyName}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold border-b mb-2">Customer</h2>
+          <p>{customerName}</p>
+          <p>{customerPhone}</p>
+          <p>{customerEmail}</p>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold border-b mb-2">Device</h2>
+        <p><strong>Name:</strong> {deviceName}</p>
+        <p><strong>Model:</strong> {deviceModel}</p>
+        <p><strong>Condition:</strong> {deviceCondition}</p>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold border-b mb-2">Details</h2>
+        <p><strong>Problem:</strong> {problem}</p>
+        <p><strong>Handling Fees:</strong> {formatCurrency(handlingFees)}</p>
+      </div>
+
+      <div className="mt-6 text-sm text-center border-t pt-2">
         <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
-export default function JobCards() {
-  const { jobs, loading } = useJobs();
+const JobDetail = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<JobStatus | "all">("all");
-  const componentRef = useRef(null);
+  const { job, loading, error, getJob, updateJob, deleteJob } = useJobs();
+  const { companies, fetchCompanies } = useCompanies();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const printableRef = useRef<HTMLDivElement>(null);
 
-  const formatCurrency = (amount: number = 0) => {
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency: 'ZAR',
-    }).format(amount);
+  // Form state
+  const [editedProblem, setEditedProblem] = useState("");
+  const [editedStatus, setEditedStatus] = useState<JobStatus>("In Progress");
+  const [editedHandlingFees, setEditedHandlingFees] = useState(0);
+  const [editedCompanyName, setEditedCompanyName] = useState("");
+  const [editedCustomerName, setEditedCustomerName] = useState("");
+  const [editedCustomerPhone, setEditedCustomerPhone] = useState("");
+  const [editedCustomerEmail, setEditedCustomerEmail] = useState("");
+  const [editedDeviceName, setEditedDeviceName] = useState("");
+  const [editedDeviceModel, setEditedDeviceModel] = useState("");
+  const [editedDeviceCondition, setEditedDeviceCondition] = useState("");
+
+  useEffect(() => {
+    const loadJob = async () => {
+      if (id) {
+        try {
+          const jobData = await getJob(id);
+          if (!jobData) {
+            toast.error("Job card not found");
+          }
+        } catch (error) {
+          console.error("Error fetching job:", error);
+          toast.error("Failed to load job card");
+        }
+      }
+    };
+    loadJob();
+    fetchCompanies();
+  }, [id]);
+
+  useEffect(() => {
+    if (job) {
+      setEditedProblem(job.details.problem);
+      setEditedStatus(job.details.status);
+      setEditedHandlingFees(job.details.handling_fees);
+      setEditedCompanyName(companies.find(c => c.id === job.company_id)?.name || "");
+      setEditedCustomerName(job.customer.name);
+      setEditedCustomerPhone(job.customer.phone);
+      setEditedCustomerEmail(job.customer.email || "");
+      setEditedDeviceName(job.device.name);
+      setEditedDeviceModel(job.device.model);
+      setEditedDeviceCondition(job.device.condition);
+    }
+  }, [job, companies]);
+
+  const handleEditToggle = () => {
+    setIsEditMode(!isEditMode);
   };
 
-  const handlePrint = useReactToPrint({
-    documentTitle: "Job_Cards_Report",
-    content: () => componentRef.current,
+  const handleStatusChange = (status: JobStatus) => {
+    setEditedStatus(status);
+  };
+
+  const handleSave = async () => {
+    if (!job) return;
+
+    const updatedJob = {
+      ...job,
+      customer: {
+        name: editedCustomerName,
+        phone: editedCustomerPhone,
+        email: editedCustomerEmail,
+      },
+      device: {
+        name: editedDeviceName,
+        model: editedDeviceModel,
+        condition: editedDeviceCondition,
+      },
+      details: {
+        ...job.details,
+        problem: editedProblem,
+        status: editedStatus,
+        handling_fees: editedHandlingFees,
+      },
+    };
+
+    const success = await updateJob(job.id!, updatedJob);
+    
+    if (success) {
+      toast.success("Job card updated successfully");
+      setIsEditMode(false);
+      return true;
+    } else {
+      toast.error("Failed to update job card");
+      return false;
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!job) return;
+
+    const success = await deleteJob(job.id!);
+    
+    if (success) {
+      toast.success("Job card deleted successfully");
+      navigate("/job-cards");
+    } else {
+      toast.error("Failed to delete job card");
+    }
+    setIsDeleteDialogOpen(false);
+  };
+
+  const handlePrintOrPDF = useReactToPrint({
+    documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
+    content: () => printableRef.current,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -134,211 +264,340 @@ export default function JobCards() {
     },
     onAfterPrint: () => {
       document.body.classList.remove('printing');
-      toast.success("Job cards printed successfully");
+      setIsPreviewMode(false);
+      toast.success("Job card printed successfully");
+    },
+    onPrintError: (error) => {
+      console.error("Print error:", error);
+      document.body.classList.remove('printing');
+      toast.error("Failed to print job card");
+      setIsPreviewMode(false);
     },
   });
 
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      job.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.job_card_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.device.model.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" || job.details.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusColor = (status: JobStatus) => {
-    switch (status) {
-      case "In Progress":
-        return "bg-blue-100 text-blue-800";
-      case "Finished":
-        return "bg-green-100 text-green-800";
-      case "Waiting for Parts":
-        return "bg-amber-100 text-amber-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const handlePrint = () => {
+    setIsPrintDialogOpen(false);
+    handlePrintOrPDF();
   };
 
-  const printJobs = () => {
-    if (componentRef.current) {
-      handlePrint();
-    }
+  const handlePreview = () => {
+    setIsPrintDialogOpen(false);
+    setIsPreviewMode(true);
   };
+
+  const handlePrintNow = () => {
+    handlePrintOrPDF();
+  };
+
+  if (error) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6 no-print">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Job Cards
+        </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>Error</CardTitle>
+            <CardDescription>There was an error loading the job card</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-destructive">{error}</p>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={() => navigate("/job-cards")}>Return to Job Cards</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  if (loading || !job) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-muted-foreground">Loading job card...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
-      <Button
-        variant="ghost"
-        onClick={() => navigate("/dashboard")}
+    <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate("/job-cards")} 
         className="mb-6 no-print"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Dashboard
+        Back to Job Cards
       </Button>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 no-print">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Job Cards</h1>
-          <p className="text-gray-500">Manage and track all your repair jobs</p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={() => navigate("/job-cards/new")} className="no-print">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Job Card
-          </Button>
-          <Button 
-            onClick={printJobs} 
-            variant="outline"
-            className="no-print"
-          >
-            <Printer className="mr-2 h-4 w-4" />
-            Print All
-          </Button>
-        </div>
-      </div>
-
-      <Card className="mb-8 no-print">
-        <CardHeader className="pb-3">
-          <CardTitle>Job Search</CardTitle>
-          <CardDescription>
-            Filter and search through your job cards
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search by customer, job number or device..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      {isPreviewMode ? (
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4 no-print">
+            <h2 className="text-2xl font-bold">Job Card Preview</h2>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
+                Back to Details
+              </Button>
+              <Button onClick={handlePrintNow}>
+                <Printer className="mr-2 h-4 w-4" />
+                Print Now
+              </Button>
             </div>
-            <Select
-              value={statusFilter}
-              onValueChange={(value: JobStatus | "all") => setStatusFilter(value)}
-            >
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Finished">Finished</SelectItem>
-                <SelectItem value="Waiting for Parts">Waiting for Parts</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="no-print">
-        <CardHeader>
-          <CardTitle>All Jobs</CardTitle>
-          <CardDescription>
-            Showing {filteredJobs.length} of {jobs.length} jobs
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 bg-gray-100 animate-pulse rounded-md"></div>
-              ))}
-            </div>
-          ) : filteredJobs.length > 0 ? (
-            <div className="border rounded-md overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Job Card #</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredJobs.map((job) => (
-                    <TableRow
-                      key={job.id}
-                      className="cursor-pointer hover:bg-gray-50"
-                      onClick={() => navigate(`/job-cards/${job.id}`)}
-                    >
-                      <TableCell className="font-medium">{job.job_card_number}</TableCell>
-                      <TableCell>{job.customer.name}</TableCell>
-                      <TableCell>
-                        {job.device.name} {job.device.model}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-2 text-gray-400" />
-                          {format(new Date(job.created_at!), "MMM d, yyyy")}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(job.details.handling_fees)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(job.details.status as JobStatus)}>
-                          {job.details.status}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-gray-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No jobs found</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {jobs.length === 0
-                  ? "Get started by creating a new job card"
-                  : "Try adjusting your search or filter"}
-              </p>
-              {jobs.length === 0 && (
-                <div className="mt-6">
-                  <Button onClick={() => navigate("/job-cards/new")}>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New Job Card
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Hidden printable content */}
-      <div style={{ position: 'absolute', left: '-9999px' }}>
-        <div ref={componentRef}>
-          <PrintableJobCards jobs={filteredJobs} />
+          
+          <div ref={printableRef} className="border rounded-lg shadow-sm bg-white">
+            <PrintableJobCard 
+              job={job}
+              customerName={editedCustomerName}
+              customerPhone={editedCustomerPhone}
+              customerEmail={editedCustomerEmail}
+              deviceName={editedDeviceName}
+              deviceModel={editedDeviceModel}
+              deviceCondition={editedDeviceCondition}
+              problem={editedProblem}
+              handlingFees={editedHandlingFees}
+              companyName={editedCompanyName}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid gap-8 md:grid-cols-3">
+          <Card className="md:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Job Card #{job.job_card_number}</CardTitle>
+                <CardDescription>
+                  Created on {format(new Date(job.created_at!), "MMMM d, yyyy")}
+                </CardDescription>
+              </div>
+              <div className="no-print">
+                {isEditMode ? (
+                  <div className="flex gap-2">
+                    <Button variant="secondary" onClick={handleSave}>
+                      Save
+                    </Button>
+                    <Button variant="ghost" onClick={handleEditToggle}>
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={handleEditToggle}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="company-name">Company</Label>
+                  {isEditMode ? (
+                    <Input
+                      id="company-name"
+                      value={editedCompanyName}
+                      onChange={(e) => setEditedCompanyName(e.target.value)}
+                    />
+                  ) : (
+                    <p>{editedCompanyName}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer-name">Customer Name</Label>
+                  {isEditMode ? (
+                    <Input
+                      id="customer-name"
+                      value={editedCustomerName}
+                      onChange={(e) => setEditedCustomerName(e.target.value)}
+                    />
+                  ) : (
+                    <p>{editedCustomerName}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="customer-phone">Customer Phone</Label>
+                  {isEditMode ? (
+                    <Input
+                      id="customer-phone"
+                      value={editedCustomerPhone}
+                      onChange={(e) => setEditedCustomerPhone(e.target.value)}
+                    />
+                  ) : (
+                    <p>{editedCustomerPhone}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer-email">Customer Email</Label>
+                  {isEditMode ? (
+                    <Input
+                      id="customer-email"
+                      type="email"
+                      value={editedCustomerEmail}
+                      onChange={(e) => setEditedCustomerEmail(e.target.value)}
+                    />
+                  ) : (
+                    <p>{editedCustomerEmail || "N/A"}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="device-name">Device Name</Label>
+                  {isEditMode ? (
+                    <Input
+                      id="device-name"
+                      value={editedDeviceName}
+                      onChange={(e) => setEditedDeviceName(e.target.value)}
+                    />
+                  ) : (
+                    <p>{editedDeviceName}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="device-model">Device Model</Label>
+                  {isEditMode ? (
+                    <Input
+                      id="device-model"
+                      value={editedDeviceModel}
+                      onChange={(e) => setEditedDeviceModel(e.target.value)}
+                    />
+                  ) : (
+                    <p>{editedDeviceModel}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="device-condition">Device Condition</Label>
+                {isEditMode ? (
+                  <Input
+                    id="device-condition"
+                    value={editedDeviceCondition}
+                    onChange={(e) => setEditedDeviceCondition(e.target.value)}
+                  />
+                ) : (
+                  <p>{editedDeviceCondition}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="problem-description">Problem Description</Label>
+                {isEditMode ? (
+                  <Textarea
+                    id="problem-description"
+                    value={editedProblem}
+                    onChange={(e) => setEditedProblem(e.target.value)}
+                  />
+                ) : (
+                  <p>{editedProblem}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="md:col-span-1 no-print">
+            <CardHeader>
+              <CardTitle>Job Card Actions</CardTitle>
+              <CardDescription>Manage this job card</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="status">Status</Label>
+                {isEditMode ? (
+                  <Select value={editedStatus} onValueChange={handleStatusChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Finished">Finished</SelectItem>
+                      <SelectItem value="Waiting for Parts">Waiting for Parts</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Badge>{editedStatus}</Badge>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="handling-fees">Handling Fees</Label>
+                {isEditMode ? (
+                  <Input
+                    id="handling-fees"
+                    type="number"
+                    value={editedHandlingFees}
+                    onChange={(e) => setEditedHandlingFees(Number(e.target.value))}
+                  />
+                ) : (
+                  <p>{formatCurrency(editedHandlingFees)}</p>
+                )}
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col items-stretch gap-2">
+              <Button 
+                className="w-full" 
+                variant="outline" 
+                onClick={() => setIsPrintDialogOpen(true)}
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                Print Job Card
+              </Button>
+              <Link to={`/invoices/new/${job.id}`} className="w-full">
+                <Button className="w-full">
+                  Create Invoice
+                </Button>
+              </Link>
+              <Button
+                className="w-full"
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Job Card
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] no-print">
+          <DialogHeader>
+            <DialogTitle>Delete Job Card</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this job card? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-between space-x-2">
+            <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <PrintDialog 
+        open={isPrintDialogOpen} 
+        onOpenChange={setIsPrintDialogOpen} 
+        onPrint={handlePrint}
+        onPreview={handlePreview}
+        showPreviewOption={true}
+      />
     </div>
   );
-}
+};
+
+export default JobDetail;
