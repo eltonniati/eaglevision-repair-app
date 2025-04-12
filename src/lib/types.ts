@@ -1,3 +1,4 @@
+
 export type JobStatus = "In Progress" | "Finished" | "Waiting for Parts";
 
 export interface Company {
@@ -36,7 +37,6 @@ export interface Job {
   created_at?: string;
   updated_at?: string;
   price?: number; // This matches handling_fees for backward compatibility
-  company_id?: string; // Added the company_id field
 }
 
 export interface InvoiceLineItem {
