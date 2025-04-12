@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { format } from "date-fns";
@@ -135,7 +134,7 @@ const JobDetail = () => {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const jobCardRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadJob = async () => {
@@ -228,30 +227,27 @@ const JobDetail = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const prepareForPrinting = () => {
-    document.body.classList.add('is-printing');
-    const dialogs = document.querySelectorAll('[role="dialog"]');
-    dialogs.forEach(dialog => {
-      dialog.classList.add('no-print');
+  const prepareForPrinting = useCallback((): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      document.body.classList.add('is-printing');
+      const dialogs = document.querySelectorAll('[role="dialog"]');
+      dialogs.forEach(dialog => {
+        dialog.classList.add('no-print');
+      });
+      resolve();
     });
-  };
+  }, []);
 
-  const cleanupAfterPrinting = () => {
+  const cleanupAfterPrinting = useCallback(() => {
     document.body.classList.remove('is-printing');
     setIsPrinting(false);
     setIsPreviewMode(false);
-  };
-
-  // Fix: Create a stable ref that doesn't change during rendering
-  const contentRef = useRef<HTMLDivElement>(null);
+  }, []);
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
     content: () => contentRef.current,
-    onBeforePrint: () => {
-      setIsPrinting(true);
-      prepareForPrinting();
-    },
+    onBeforePrint: prepareForPrinting,
     onAfterPrint: () => {
       cleanupAfterPrinting();
       toast.success("Job card printed/saved successfully");
@@ -295,6 +291,10 @@ const JobDetail = () => {
   const handlePreview = () => {
     setIsPrintDialogOpen(false);
     setIsPreviewMode(true);
+  };
+
+  const handlePrintButtonClick = () => {
+    handlePrintOrPDF();
   };
 
   if (error) {
@@ -345,7 +345,7 @@ const JobDetail = () => {
               <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
                 Back to Details
               </Button>
-              <Button onClick={handlePrintOrPDF}>
+              <Button onClick={handlePrintButtonClick}>
                 <Printer className="mr-2 h-4 w-4" />
                 Print Now
               </Button>
@@ -603,7 +603,6 @@ const JobDetail = () => {
         showPreviewOption={true}
       />
 
-      {/* Fix: Remove the hidden ref and just use the visible one in preview mode */}
       {!isPreviewMode && (
         <div style={{ display: 'none' }}>
           <div ref={contentRef} className="print-content">
