@@ -134,6 +134,7 @@ const JobDetail = () => {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -182,6 +183,8 @@ const JobDetail = () => {
 
   const handleSave = async () => {
     if (!job) return;
+    
+    setIsSaving(true);
 
     const updatedJob = {
       ...job,
@@ -203,12 +206,16 @@ const JobDetail = () => {
     };
 
     const success = await updateJob(job.id!, updatedJob);
+    
+    setIsSaving(false);
 
     if (success) {
       toast.success("Job card updated successfully");
       setIsEditMode(false);
+      return true;
     } else {
       toast.error("Failed to update job card");
+      return false;
     }
   };
 
@@ -246,7 +253,7 @@ const JobDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    getPrintableContent: () => contentRef.current,
+    content: () => contentRef.current,
     onBeforePrint: prepareForPrinting,
     onAfterPrint: () => {
       cleanupAfterPrinting();
@@ -274,27 +281,56 @@ const JobDetail = () => {
     `,
   });
 
-  const handlePrint = () => {
-    setIsPrintDialogOpen(false);
-    setIsPreviewMode(true);
+  const handleSaveAndPrint = async () => {
+    setIsSaving(true);
     
-    setTimeout(() => {
-      if (contentRef.current) {
-        handlePrintOrPDF();
-      } else {
-        toast.error("Print content not ready");
-        setIsPreviewMode(false);
-      }
-    }, 300);
+    const saveSuccess = await handleSave();
+    
+    setIsSaving(false);
+    
+    if (saveSuccess) {
+      handlePrintOrPDF();
+    }
   };
 
-  const handlePreview = () => {
+  const handlePrint = () => {
     setIsPrintDialogOpen(false);
-    setIsPreviewMode(true);
+    
+    if (isEditMode) {
+      handleSaveAndPrint();
+    } else {
+      setIsPreviewMode(true);
+      
+      setTimeout(() => {
+        if (contentRef.current) {
+          handlePrintOrPDF();
+        } else {
+          toast.error("Print content not ready");
+          setIsPreviewMode(false);
+        }
+      }, 300);
+    }
+  };
+
+  const handlePreview = async () => {
+    setIsPrintDialogOpen(false);
+    
+    if (isEditMode) {
+      const saveSuccess = await handleSave();
+      if (saveSuccess) {
+        setIsPreviewMode(true);
+      }
+    } else {
+      setIsPreviewMode(true);
+    }
   };
 
   const handlePrintButtonClick = () => {
-    handlePrintOrPDF();
+    if (isEditMode) {
+      handleSaveAndPrint();
+    } else {
+      handlePrintOrPDF();
+    }
   };
 
   if (error) {
@@ -345,9 +381,13 @@ const JobDetail = () => {
               <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
                 Back to Details
               </Button>
-              <Button onClick={handlePrintButtonClick}>
-                <Printer className="mr-2 h-4 w-4" />
-                Print Now
+              <Button onClick={handlePrintButtonClick} disabled={isSaving}>
+                {isSaving ? "Saving..." : (
+                  <>
+                    <Printer className="mr-2 h-4 w-4" />
+                    Print Now
+                  </>
+                )}
               </Button>
             </div>
           </div>
