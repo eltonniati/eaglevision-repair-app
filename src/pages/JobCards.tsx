@@ -109,10 +109,11 @@ const JobCards = () => {
     return companies.find(c => c.id === companyId)?.name || "";
   };
 
+  // Updated useReactToPrint with correct prop types
   const handlePrintOrPDF = useReactToPrint({
-    // Fix: Use documentTitle instead of content
+    // Use documentTitle instead of content
     documentTitle: `JobCard_${selectedJob?.job_card_number || "unknown"}`,
-    // Fix: Use contentRef properly as a RefObject
+    // Use contentRef properly as a RefObject
     contentRef: jobCardRef,
     pageStyle: `
       @page {
@@ -143,23 +144,21 @@ const JobCards = () => {
         }
       }
     `,
-    onBeforeGetContent: () => {
-      document.body.classList.add('printing');
-      return new Promise((resolve) => {
-        // Small delay to ensure content is ready
-        setTimeout(resolve, 300);
-      });
+    // Using v3 API callbacks
+    onPrintError: (error) => {
+      console.error("Print error:", error);
+      document.body.classList.remove('printing');
+      toast.error("Failed to print job card");
+      setIsPreviewMode(false);
     },
     onAfterPrint: () => {
       document.body.classList.remove('printing');
       setIsPreviewMode(false);
       toast.success("Job card printed successfully");
     },
-    onPrintError: (error) => {
-      console.error("Print error:", error);
-      document.body.classList.remove('printing');
-      toast.error("Failed to print job card");
-      setIsPreviewMode(false);
+    preparingBeforePrint: true, // Enable preparing phase
+    onBeforePrint: () => {
+      document.body.classList.add('printing');
     },
   });
 

@@ -238,19 +238,6 @@ const JobDetail = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const prepareForPrinting = () => {
-    document.body.classList.add('printing');
-    const dialogs = document.querySelectorAll('[role="dialog"]');
-    dialogs.forEach(dialog => {
-      dialog.classList.add('no-print');
-    });
-  };
-
-  const cleanupAfterPrinting = () => {
-    document.body.classList.remove('printing');
-    setIsPreviewMode(false);
-  };
-
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
     contentRef: jobCardRef,
@@ -283,18 +270,24 @@ const JobDetail = () => {
         }
       }
     `,
-    onBeforeGetContent: () => {
-      prepareForPrinting();
-      return Promise.resolve();
+    preparingBeforePrint: true,
+    onBeforePrint: () => {
+      document.body.classList.add('printing');
+      const dialogs = document.querySelectorAll('[role="dialog"]');
+      dialogs.forEach(dialog => {
+        dialog.classList.add('no-print');
+      });
     },
     onAfterPrint: () => {
-      cleanupAfterPrinting();
+      document.body.classList.remove('printing');
+      setIsPreviewMode(false);
       toast.success("Job card printed successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
-      cleanupAfterPrinting();
+      document.body.classList.remove('printing');
       toast.error("Failed to print job card");
+      setIsPreviewMode(false);
     },
   });
 
