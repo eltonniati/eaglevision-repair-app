@@ -253,7 +253,7 @@ const JobDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    contentRef: () => jobCardRef.current,
+    contentRef: jobCardRef,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -544,24 +544,6 @@ const JobDetail = () => {
         onPreview={handlePreview}
         showPreviewOption={true}
       />
-
-      {/* Hidden printable content for direct printing */}
-      <div style={{ position: 'absolute', left: '-9999px', visibility: 'hidden' }}>
-        <div ref={jobCardRef}>
-          <PrintableJobCard 
-            job={job}
-            customerName={editedCustomerName}
-            customerPhone={editedCustomerPhone}
-            customerEmail={editedCustomerEmail}
-            deviceName={editedDeviceName}
-            deviceModel={editedDeviceModel}
-            deviceCondition={editedDeviceCondition}
-            problem={editedProblem}
-            handlingFees={editedHandlingFees}
-            companyName={editedCompanyName}
-          />
-        </div>
-      </div>
     </div>
   );
 };

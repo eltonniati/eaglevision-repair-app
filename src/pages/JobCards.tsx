@@ -112,8 +112,8 @@ const JobCards = () => {
   const handlePrintOrPDF = useReactToPrint({
     // Fix: Use documentTitle instead of content
     documentTitle: `JobCard_${selectedJob?.job_card_number || "unknown"}`,
-    // Correct property is contentRef in react-to-print
-    contentRef: () => jobCardRef.current,
+    // Fix: Use contentRef properly as a RefObject
+    contentRef: jobCardRef,
     pageStyle: `
       @page {
         size: A4 portrait;
