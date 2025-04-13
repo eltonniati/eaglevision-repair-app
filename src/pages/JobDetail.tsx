@@ -6,39 +6,40 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
-import { JobStatus } from "@/lib/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { JobDetails } from "@/components/job/JobDetails";
-import { PrintPreview } from "@/components/job/PrintPreview";
+import { PrintDialog } from "@/components/invoice/PrintDialog";
+import { JobPreviewMode } from "@/components/job/JobPreviewMode";
+import { JobDeleteDialog } from "@/components/job/JobDeleteDialog";
+import { useJobEditor } from "@/hooks/use-job-editor";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { job, loading, error, getJob, updateJob, deleteJob } = useJobs();
+  const { job, loading, error, getJob, deleteJob } = useJobs();
   const { companies, fetchCompanies } = useCompanies();
-  const [isEditMode, setIsEditMode] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const [editedProblem, setEditedProblem] = useState("");
-  const [editedStatus, setEditedStatus] = useState<JobStatus>("In Progress");
-  const [editedHandlingFees, setEditedHandlingFees] = useState(0);
-  const [editedCompanyName, setEditedCompanyName] = useState("");
-  const [editedCustomerName, setEditedCustomerName] = useState("");
-  const [editedCustomerPhone, setEditedCustomerPhone] = useState("");
-  const [editedCustomerEmail, setEditedCustomerEmail] = useState("");
-  const [editedDeviceName, setEditedDeviceName] = useState("");
-  const [editedDeviceModel, setEditedDeviceModel] = useState("");
-  const [editedDeviceCondition, setEditedDeviceCondition] = useState("");
+  
+  const {
+    isEditMode,
+    isSaving,
+    editedProblem,
+    editedStatus,
+    editedHandlingFees,
+    editedCompanyName,
+    editedCustomerName,
+    editedCustomerPhone,
+    editedCustomerEmail,
+    editedDeviceName,
+    editedDeviceModel,
+    editedDeviceCondition,
+    setEditedHandlingFees,
+    initializeFormData,
+    handleEditToggle,
+    handleStatusChange,
+    handleSave
+  } = useJobEditor(job);
 
   useEffect(() => {
     const loadJob = async () => {
@@ -60,72 +61,10 @@ const JobDetail = () => {
 
   useEffect(() => {
     if (job) {
-      setEditedProblem(job.details.problem);
-      setEditedStatus(job.details.status);
-      setEditedHandlingFees(job.details.handling_fees);
-      setEditedCompanyName(companies.find(c => c.id === job.company_id)?.name || "");
-      setEditedCustomerName(job.customer.name);
-      setEditedCustomerPhone(job.customer.phone);
-      setEditedCustomerEmail(job.customer.email || "");
-      setEditedDeviceName(job.device.name);
-      setEditedDeviceModel(job.device.model);
-      setEditedDeviceCondition(job.device.condition);
+      const companyName = companies.find(c => c.id === job.company_id)?.name || "";
+      initializeFormData(job, companyName);
     }
   }, [job, companies]);
-
-  const handleEditToggle = () => {
-    setIsEditMode(!isEditMode);
-  };
-
-  const handleStatusChange = (status: JobStatus) => {
-    setEditedStatus(status);
-  };
-
-  const handleSave = async () => {
-    if (!job) return false;
-
-    setIsSaving(true);
-    
-    const updatedJob = {
-      ...job,
-      customer: {
-        name: editedCustomerName,
-        phone: editedCustomerPhone,
-        email: editedCustomerEmail,
-      },
-      device: {
-        name: editedDeviceName,
-        model: editedDeviceModel,
-        condition: editedDeviceCondition,
-      },
-      details: {
-        ...job.details,
-        problem: editedProblem,
-        status: editedStatus,
-        handling_fees: editedHandlingFees,
-      },
-    };
-
-    try {
-      const success = await updateJob(job.id!, updatedJob);
-      
-      if (success) {
-        toast.success("Job card updated successfully");
-        setIsEditMode(false);
-        setIsSaving(false);
-        return true;
-      } else {
-        toast.error("Failed to update job card");
-        setIsSaving(false);
-        return false;
-      }
-    } catch (error) {
-      console.error("Error saving job:", error);
-      toast.error("Failed to save job card");
-      setIsSaving(false);
-      return false;
-    }
-  };
 
   const handleDelete = async () => {
     if (!job) return;
@@ -208,7 +147,7 @@ const JobDetail = () => {
       </Button>
 
       {isPreviewMode ? (
-        <PrintPreview
+        <JobPreviewMode
           job={job}
           customerName={editedCustomerName}
           customerPhone={editedCustomerPhone}
@@ -237,24 +176,11 @@ const JobDetail = () => {
         />
       )}
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] no-print">
-          <DialogHeader>
-            <DialogTitle>Delete Job Card</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this job card? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center justify-between space-x-2">
-            <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <JobDeleteDialog 
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDelete={handleDelete}
+      />
 
       <PrintDialog 
         open={isPrintDialogOpen} 
