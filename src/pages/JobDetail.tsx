@@ -125,7 +125,6 @@ const JobDetail = () => {
   const [isSaving, setIsSaving] = useState(false);
   const jobCardRef = useRef<HTMLDivElement>(null);
 
-  // Form state
   const [editedProblem, setEditedProblem] = useState("");
   const [editedStatus, setEditedStatus] = useState<JobStatus>("In Progress");
   const [editedHandlingFees, setEditedHandlingFees] = useState(0);
@@ -277,6 +276,7 @@ const JobDetail = () => {
       dialogs.forEach(dialog => {
         dialog.classList.add('no-print');
       });
+      return Promise.resolve();
     },
     onAfterPrint: () => {
       document.body.classList.remove('printing');
@@ -294,7 +294,6 @@ const JobDetail = () => {
   const handlePrint = async () => {
     setIsPrintDialogOpen(false);
     
-    // Save before printing if in edit mode
     if (isEditMode) {
       const saveSuccess = await handleSave();
       if (!saveSuccess) {
@@ -303,16 +302,13 @@ const JobDetail = () => {
       }
     }
     
-    // Short delay to ensure any DOM updates have completed
     setTimeout(() => {
       setIsPreviewMode(true);
-      // Another short delay to ensure the preview is rendered before printing
       setTimeout(() => handlePrintOrPDF(), 300);
     }, 100);
   };
 
   const handlePreview = async () => {
-    // Save before preview if in edit mode
     if (isEditMode) {
       const saveSuccess = await handleSave();
       if (!saveSuccess) {

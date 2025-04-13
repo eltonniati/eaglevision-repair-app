@@ -159,6 +159,8 @@ const JobCards = () => {
     preparingBeforePrint: true, // Enable preparing phase
     onBeforePrint: () => {
       document.body.classList.add('printing');
+      // Return a Promise to satisfy the TypeScript requirement
+      return Promise.resolve();
     },
   });
 
