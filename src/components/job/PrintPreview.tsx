@@ -85,7 +85,6 @@ export const PrintPreview = ({
       document.body.classList.remove('printing');
       toast.error("Failed to print job card");
     },
-    removeAfterPrint: true
   });
 
   return (
@@ -96,7 +95,7 @@ export const PrintPreview = ({
           <Button variant="outline" onClick={onBack}>
             Back
           </Button>
-          <Button onClick={() => handlePrint()}>
+          <Button onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Print Now
           </Button>
@@ -122,3 +121,4 @@ export const PrintPreview = ({
     </div>
   );
 };
+
