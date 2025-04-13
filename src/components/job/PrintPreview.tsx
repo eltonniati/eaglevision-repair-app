@@ -38,7 +38,7 @@ export const PrintPreview = ({
 
   const handlePrint = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    content: () => jobCardRef.current,
+    contentRef: jobCardRef,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -91,7 +91,7 @@ export const PrintPreview = ({
           <Button variant="outline" onClick={onBack}>
             Back
           </Button>
-          <Button onClick={handlePrint}>
+          <Button onClick={() => handlePrint()}>
             <Printer className="mr-2 h-4 w-4" />
             Print Now
           </Button>
