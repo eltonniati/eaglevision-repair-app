@@ -87,6 +87,11 @@ export const PrintPreview = ({
     },
   });
 
+  // Create a proper click handler function that calls handlePrint
+  const onPrintButtonClick = () => {
+    handlePrint();
+  };
+
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-4 no-print">
@@ -95,7 +100,7 @@ export const PrintPreview = ({
           <Button variant="outline" onClick={onBack}>
             Back
           </Button>
-          <Button onClick={handlePrint}>
+          <Button onClick={onPrintButtonClick}>
             <Printer className="mr-2 h-4 w-4" />
             Print Now
           </Button>
@@ -121,4 +126,3 @@ export const PrintPreview = ({
     </div>
   );
 };
-
