@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -254,7 +253,7 @@ const JobDetail = () => {
 
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    content: () => jobCardRef.current,
+    contentRef: () => jobCardRef.current,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -333,6 +332,10 @@ const JobDetail = () => {
     setIsPreviewMode(true);
   };
 
+  const handlePrintNow = () => {
+    handlePrintOrPDF();
+  };
+
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -385,7 +388,7 @@ const JobDetail = () => {
               <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
                 Back to Details
               </Button>
-              <Button onClick={handlePrintOrPDF}>
+              <Button onClick={handlePrintNow}>
                 <Printer className="mr-2 h-4 w-4" />
                 Print Now
               </Button>
