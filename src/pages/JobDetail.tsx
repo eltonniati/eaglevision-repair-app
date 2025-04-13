@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -57,14 +56,14 @@ const JobDetail = () => {
     };
     loadJob();
     fetchCompanies();
-  }, [id]);
+  }, [id, getJob, fetchCompanies]);
 
   useEffect(() => {
     if (job) {
       const companyName = companies.find(c => c.id === job.company_id)?.name || "";
       initializeFormData(job, companyName);
     }
-  }, [job, companies]);
+  }, [job, companies, initializeFormData]);
 
   const handleDelete = async () => {
     if (!job) return;

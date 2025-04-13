@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { Job, JobStatus } from "@/lib/types";
-import { useJobs } from "./use-jobs";
+import { useJobs } from "@/hooks/use-jobs";
 
 export function useJobEditor(job: Job | null) {
   const { updateJob } = useJobs();

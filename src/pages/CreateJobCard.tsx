@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
@@ -63,7 +62,8 @@ export default function CreateJobCard() {
           problem,
           status: "In Progress" as JobStatus,
           handling_fees: handlingFees
-        }
+        },
+        company_id: ""
       };
 
       const result = await createJob(newJobData);
