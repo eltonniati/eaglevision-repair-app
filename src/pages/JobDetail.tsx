@@ -1,29 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
-import { format } from "date-fns";
+
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Printer, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
 import { JobStatus } from "@/lib/types";
@@ -31,87 +11,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-ZA", {
-    style: 'currency',
-    currency: 'ZAR',
-  }).format(amount);
-};
-
-const PrintableJobCard = ({ 
-  job, 
-  customerName, 
-  customerPhone, 
-  customerEmail, 
-  deviceName, 
-  deviceModel, 
-  deviceCondition, 
-  problem,
-  handlingFees,
-  companyName
-}: { 
-  job: any, 
-  customerName: string,
-  customerPhone: string,
-  customerEmail: string,
-  deviceName: string,
-  deviceModel: string,
-  deviceCondition: string,
-  problem: string,
-  handlingFees: number,
-  companyName: string
-}) => (
-  <div className="p-6" id="printable-jobcard">
-    <div className="border-2 border-gray-200 p-6">
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">JOB CARD</h1>
-          <p className="text-lg font-medium">#{job?.job_card_number}</p>
-        </div>
-        <div className="text-right">
-          <p><strong>Created Date:</strong> {format(new Date(job?.created_at || new Date()), "MMMM d, yyyy")}</p>
-          <p><strong>Status:</strong> {job?.details.status}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div>
-          <h2 className="text-lg font-semibold border-b mb-2">Company</h2>
-          <p>{companyName}</p>
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold border-b mb-2">Customer</h2>
-          <p>{customerName}</p>
-          <p>{customerPhone}</p>
-          <p>{customerEmail}</p>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold border-b mb-2">Device</h2>
-        <p><strong>Name:</strong> {deviceName}</p>
-        <p><strong>Model:</strong> {deviceModel}</p>
-        <p><strong>Condition:</strong> {deviceCondition}</p>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold border-b mb-2">Details</h2>
-        <p><strong>Problem:</strong> {problem}</p>
-        <p><strong>Handling Fees:</strong> {formatCurrency(handlingFees)}</p>
-      </div>
-
-      <div className="mt-6 text-sm text-center border-t pt-2">
-        <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
-      </div>
-    </div>
-  </div>
-);
+import { JobDetails } from "@/components/job/JobDetails";
+import { PrintPreview } from "@/components/job/PrintPreview";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,7 +28,6 @@ const JobDetail = () => {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const jobCardRef = useRef<HTMLDivElement>(null);
 
   const [editedProblem, setEditedProblem] = useState("");
   const [editedStatus, setEditedStatus] = useState<JobStatus>("In Progress");
@@ -237,60 +141,6 @@ const JobDetail = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const handlePrintOrPDF = useReactToPrint({
-    documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    contentRef: jobCardRef,
-    pageStyle: `
-      @page {
-        size: A4 portrait;
-        margin: 15mm;
-      }
-      @media print {
-        body {
-          background: white !important;
-          color: black !important;
-          visibility: hidden;
-        }
-        #printable-jobcard, #printable-jobcard * {
-          visibility: visible;
-        }
-        .no-print {
-          display: none !important;
-        }
-        a {
-          text-decoration: none !important;
-        }
-        #printable-jobcard {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          padding: 0;
-        }
-      }
-    `,
-    preparingBeforePrint: true,
-    onBeforePrint: () => {
-      document.body.classList.add('printing');
-      const dialogs = document.querySelectorAll('[role="dialog"]');
-      dialogs.forEach(dialog => {
-        dialog.classList.add('no-print');
-      });
-      return Promise.resolve();
-    },
-    onAfterPrint: () => {
-      document.body.classList.remove('printing');
-      setIsPreviewMode(false);
-      toast.success("Job card printed successfully");
-    },
-    onPrintError: (error) => {
-      console.error("Print error:", error);
-      document.body.classList.remove('printing');
-      toast.error("Failed to print job card");
-      setIsPreviewMode(false);
-    },
-  });
-
   const handlePrint = async () => {
     setIsPrintDialogOpen(false);
     
@@ -304,7 +154,6 @@ const JobDetail = () => {
     
     setTimeout(() => {
       setIsPreviewMode(true);
-      setTimeout(() => handlePrintOrPDF(), 300);
     }, 100);
   };
 
@@ -321,10 +170,6 @@ const JobDetail = () => {
     setIsPreviewMode(true);
   };
 
-  const handlePrintNow = () => {
-    handlePrintOrPDF();
-  };
-
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -332,18 +177,11 @@ const JobDetail = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Job Cards
         </Button>
-        <Card>
-          <CardHeader>
-            <CardTitle>Error</CardTitle>
-            <CardDescription>There was an error loading the job card</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-destructive">{error}</p>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => navigate("/job-cards")}>Return to Job Cards</Button>
-          </CardFooter>
-        </Card>
+        <div className="text-center p-6">
+          <h2 className="text-2xl font-semibold text-destructive">Error</h2>
+          <p className="text-muted-foreground mt-2">{error}</p>
+          <Button onClick={() => navigate("/job-cards")} className="mt-4">Return to Job Cards</Button>
+        </div>
       </div>
     );
   }
@@ -370,141 +208,33 @@ const JobDetail = () => {
       </Button>
 
       {isPreviewMode ? (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4 no-print">
-            <h2 className="text-2xl font-bold">Job Card Preview</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
-                Back to Details
-              </Button>
-              <Button onClick={handlePrintNow}>
-                <Printer className="mr-2 h-4 w-4" />
-                Print Now
-              </Button>
-            </div>
-          </div>
-          
-          <div ref={jobCardRef} className="border rounded-lg shadow-sm bg-white">
-            <PrintableJobCard 
-              job={job}
-              customerName={editedCustomerName}
-              customerPhone={editedCustomerPhone}
-              customerEmail={editedCustomerEmail}
-              deviceName={editedDeviceName}
-              deviceModel={editedDeviceModel}
-              deviceCondition={editedDeviceCondition}
-              problem={editedProblem}
-              handlingFees={editedHandlingFees}
-              companyName={editedCompanyName}
-            />
-          </div>
-        </div>
+        <PrintPreview
+          job={job}
+          customerName={editedCustomerName}
+          customerPhone={editedCustomerPhone}
+          customerEmail={editedCustomerEmail}
+          deviceName={editedDeviceName}
+          deviceModel={editedDeviceModel}
+          deviceCondition={editedDeviceCondition}
+          problem={editedProblem}
+          handlingFees={editedHandlingFees}
+          companyName={editedCompanyName}
+          onBack={() => setIsPreviewMode(false)}
+        />
       ) : (
-        <div className="grid gap-8 md:grid-cols-3">
-          <Card className="md:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Job Card #{job.job_card_number}</CardTitle>
-                <CardDescription>
-                  Created on {format(new Date(job.created_at!), "MMMM d, yyyy")}
-                </CardDescription>
-              </div>
-              <div className="no-print">
-                {isEditMode ? (
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="secondary" 
-                      onClick={handleSave}
-                      disabled={isSaving}
-                    >
-                      {isSaving ? "Saving..." : "Save"}
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      onClick={handleEditToggle}
-                      disabled={isSaving}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <Button onClick={handleEditToggle}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* ... (keep all your existing form fields) ... */}
-            </CardContent>
-          </Card>
-
-          <Card className="md:col-span-1 no-print">
-            <CardHeader>
-              <CardTitle>Job Card Actions</CardTitle>
-              <CardDescription>Manage this job card</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="status">Status</Label>
-                {isEditMode ? (
-                  <Select value={editedStatus} onValueChange={handleStatusChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="Finished">Finished</SelectItem>
-                      <SelectItem value="Waiting for Parts">Waiting for Parts</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Badge>{editedStatus}</Badge>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="handling-fees">Handling Fees</Label>
-                {isEditMode ? (
-                  <Input
-                    id="handling-fees"
-                    type="number"
-                    value={editedHandlingFees}
-                    onChange={(e) => setEditedHandlingFees(Number(e.target.value))}
-                  />
-                ) : (
-                  <p>{formatCurrency(editedHandlingFees)}</p>
-                )}
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col items-stretch gap-2">
-              <Button 
-                className="w-full" 
-                variant="outline" 
-                onClick={() => setIsPrintDialogOpen(true)}
-                disabled={isEditMode}
-              >
-                <Printer className="mr-2 h-4 w-4" />
-                Print Job Card
-              </Button>
-              <Link to={`/invoices/new/${job.id}`} className="w-full">
-                <Button className="w-full">
-                  Create Invoice
-                </Button>
-              </Link>
-              <Button
-                className="w-full"
-                variant="destructive"
-                onClick={() => setIsDeleteDialogOpen(true)}
-                disabled={isEditMode}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Job Card
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+        <JobDetails 
+          job={job}
+          isEditMode={isEditMode}
+          isSaving={isSaving}
+          editedStatus={editedStatus}
+          editedHandlingFees={editedHandlingFees}
+          onEditToggle={handleEditToggle}
+          onSave={handleSave}
+          onStatusChange={handleStatusChange}
+          onHandlingFeesChange={setEditedHandlingFees}
+          onPrintDialogOpen={() => setIsPrintDialogOpen(true)}
+          onDeleteDialogOpen={() => setIsDeleteDialogOpen(true)}
+        />
       )}
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

@@ -1,0 +1,81 @@
+
+import { format } from "date-fns";
+import { Job } from "@/lib/types";
+
+interface PrintableJobCardProps { 
+  job: Job, 
+  customerName: string,
+  customerPhone: string,
+  customerEmail: string,
+  deviceName: string,
+  deviceModel: string,
+  deviceCondition: string,
+  problem: string,
+  handlingFees: number,
+  companyName: string
+}
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-ZA", {
+    style: 'currency',
+    currency: 'ZAR'
+  }).format(amount);
+};
+
+export const PrintableJobCard = ({ 
+  job, 
+  customerName, 
+  customerPhone, 
+  customerEmail, 
+  deviceName, 
+  deviceModel, 
+  deviceCondition, 
+  problem,
+  handlingFees,
+  companyName
+}: PrintableJobCardProps) => (
+  <div className="p-6" id="printable-content">
+    <div className="border-2 border-gray-200 p-6">
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">JOB CARD</h1>
+          <p className="text-lg font-medium">#{job?.job_card_number}</p>
+        </div>
+        <div className="text-right">
+          <p><strong>Created Date:</strong> {format(new Date(job?.created_at || new Date()), "MMMM d, yyyy")}</p>
+          <p><strong>Status:</strong> {job?.details.status}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-6 mb-8">
+        <div>
+          <h2 className="text-lg font-semibold border-b mb-2">Company</h2>
+          <p>{companyName}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold border-b mb-2">Customer</h2>
+          <p>{customerName}</p>
+          <p>{customerPhone}</p>
+          <p>{customerEmail}</p>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold border-b mb-2">Device</h2>
+        <p><strong>Name:</strong> {deviceName}</p>
+        <p><strong>Model:</strong> {deviceModel}</p>
+        <p><strong>Condition:</strong> {deviceCondition}</p>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold border-b mb-2">Details</h2>
+        <p><strong>Problem:</strong> {problem}</p>
+        <p><strong>Handling Fees:</strong> {formatCurrency(handlingFees)}</p>
+      </div>
+
+      <div className="mt-6 text-sm text-center border-t pt-2">
+        <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
+      </div>
+    </div>
+  </div>
+);
