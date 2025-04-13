@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -122,6 +123,7 @@ const JobDetail = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const jobCardRef = useRef<HTMLDivElement>(null);
 
   // Form state
@@ -178,8 +180,10 @@ const JobDetail = () => {
   };
 
   const handleSave = async () => {
-    if (!job) return;
+    if (!job) return false;
 
+    setIsSaving(true);
+    
     const updatedJob = {
       ...job,
       customer: {
@@ -200,14 +204,23 @@ const JobDetail = () => {
       },
     };
 
-    const success = await updateJob(job.id!, updatedJob);
-    
-    if (success) {
-      toast.success("Job card updated successfully");
-      setIsEditMode(false);
-      return true;
-    } else {
-      toast.error("Failed to update job card");
+    try {
+      const success = await updateJob(job.id!, updatedJob);
+      
+      if (success) {
+        toast.success("Job card updated successfully");
+        setIsEditMode(false);
+        setIsSaving(false);
+        return true;
+      } else {
+        toast.error("Failed to update job card");
+        setIsSaving(false);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error saving job:", error);
+      toast.error("Failed to save job card");
+      setIsSaving(false);
       return false;
     }
   };
@@ -224,6 +237,19 @@ const JobDetail = () => {
       toast.error("Failed to delete job card");
     }
     setIsDeleteDialogOpen(false);
+  };
+
+  const prepareForPrinting = () => {
+    document.body.classList.add('printing');
+    const dialogs = document.querySelectorAll('[role="dialog"]');
+    dialogs.forEach(dialog => {
+      dialog.classList.add('no-print');
+    });
+  };
+
+  const cleanupAfterPrinting = () => {
+    document.body.classList.remove('printing');
+    setIsPreviewMode(false);
   };
 
   const handlePrintOrPDF = useReactToPrint({
@@ -259,29 +285,50 @@ const JobDetail = () => {
       }
     `,
     onBeforeGetContent: () => {
-      document.body.classList.add('printing');
+      prepareForPrinting();
       return Promise.resolve();
     },
     onAfterPrint: () => {
-      document.body.classList.remove('printing');
-      setIsPreviewMode(false);
+      cleanupAfterPrinting();
       toast.success("Job card printed successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
-      document.body.classList.remove('printing');
+      cleanupAfterPrinting();
       toast.error("Failed to print job card");
-      setIsPreviewMode(false);
     },
   });
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     setIsPrintDialogOpen(false);
-    setIsPreviewMode(true);
-    setTimeout(() => handlePrintOrPDF(), 200);
+    
+    // Save before printing if in edit mode
+    if (isEditMode) {
+      const saveSuccess = await handleSave();
+      if (!saveSuccess) {
+        toast.error("Please save your changes before printing");
+        return;
+      }
+    }
+    
+    // Short delay to ensure any DOM updates have completed
+    setTimeout(() => {
+      setIsPreviewMode(true);
+      // Another short delay to ensure the preview is rendered before printing
+      setTimeout(() => handlePrintOrPDF(), 300);
+    }, 100);
   };
 
-  const handlePreview = () => {
+  const handlePreview = async () => {
+    // Save before preview if in edit mode
+    if (isEditMode) {
+      const saveSuccess = await handleSave();
+      if (!saveSuccess) {
+        toast.error("Please save your changes before previewing");
+        return;
+      }
+    }
+    
     setIsPrintDialogOpen(false);
     setIsPreviewMode(true);
   };
@@ -373,10 +420,18 @@ const JobDetail = () => {
               <div className="no-print">
                 {isEditMode ? (
                   <div className="flex gap-2">
-                    <Button variant="secondary" onClick={handleSave}>
-                      Save
+                    <Button 
+                      variant="secondary" 
+                      onClick={handleSave}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? "Saving..." : "Save"}
                     </Button>
-                    <Button variant="ghost" onClick={handleEditToggle}>
+                    <Button 
+                      variant="ghost" 
+                      onClick={handleEditToggle}
+                      disabled={isSaving}
+                    >
                       Cancel
                     </Button>
                   </div>
@@ -436,6 +491,7 @@ const JobDetail = () => {
                 className="w-full" 
                 variant="outline" 
                 onClick={() => setIsPrintDialogOpen(true)}
+                disabled={isEditMode}
               >
                 <Printer className="mr-2 h-4 w-4" />
                 Print Job Card
@@ -449,6 +505,7 @@ const JobDetail = () => {
                 className="w-full"
                 variant="destructive"
                 onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={isEditMode}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Job Card
@@ -485,8 +542,8 @@ const JobDetail = () => {
         showPreviewOption={true}
       />
 
-      {/* Hidden printable content */}
-      <div style={{ position: 'absolute', left: '-9999px' }}>
+      {/* Hidden printable content for direct printing */}
+      <div style={{ position: 'absolute', left: '-9999px', visibility: 'hidden' }}>
         <div ref={jobCardRef}>
           <PrintableJobCard 
             job={job}
