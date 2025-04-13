@@ -45,26 +45,30 @@ export const PrintPreview = ({
         margin: 15mm;
       }
       @media print {
-        body {
+        html, body {
+          height: 100%;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden;
           background: white !important;
-          color: black !important;
+        }
+        body * {
           visibility: hidden;
         }
         #printable-content, #printable-content * {
-          visibility: visible;
+          visibility: visible !important;
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
         .no-print {
           display: none !important;
-        }
-        a {
-          text-decoration: none !important;
         }
         #printable-content {
           position: absolute;
           left: 0;
           top: 0;
           width: 100%;
-          padding: 0;
         }
       }
     `,
@@ -81,6 +85,7 @@ export const PrintPreview = ({
       document.body.classList.remove('printing');
       toast.error("Failed to print job card");
     },
+    removeAfterPrint: true
   });
 
   return (
@@ -98,19 +103,21 @@ export const PrintPreview = ({
         </div>
       </div>
       
-      <div ref={jobCardRef} className="border rounded-lg shadow-sm bg-white">
-        <PrintableJobCard 
-          job={job}
-          customerName={customerName}
-          customerPhone={customerPhone}
-          customerEmail={customerEmail}
-          deviceName={deviceName}
-          deviceModel={deviceModel}
-          deviceCondition={deviceCondition}
-          problem={problem}
-          handlingFees={handlingFees}
-          companyName={companyName}
-        />
+      <div id="printable-content" className="border rounded-lg shadow-sm bg-white p-0">
+        <div ref={jobCardRef}>
+          <PrintableJobCard 
+            job={job}
+            customerName={customerName}
+            customerPhone={customerPhone}
+            customerEmail={customerEmail}
+            deviceName={deviceName}
+            deviceModel={deviceModel}
+            deviceCondition={deviceCondition}
+            problem={problem}
+            handlingFees={handlingFees}
+            companyName={companyName}
+          />
+        </div>
       </div>
     </div>
   );

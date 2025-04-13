@@ -34,7 +34,7 @@ export const PrintableJobCard = ({
   handlingFees,
   companyName
 }: PrintableJobCardProps) => (
-  <div className="p-6" id="printable-content">
+  <div className="p-6">
     <div className="border-2 border-gray-200 p-6">
       <div className="flex justify-between items-start mb-8">
         <div>
