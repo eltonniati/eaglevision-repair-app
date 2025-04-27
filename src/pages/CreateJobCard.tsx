@@ -45,7 +45,7 @@ export default function CreateJobCard() {
   // Job details
   const [problem, setProblem] = useState("");
   const [handlingFees, setHandlingFees] = useState<number>(0);
-  const [companyId, setCompanyId] = useState<string>("");
+  const [companyId, setCompanyId] = useState<string>("none");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,7 +74,7 @@ export default function CreateJobCard() {
           status: "In Progress" as JobStatus,
           handling_fees: handlingFees
         },
-        company_id: companyId || undefined
+        company_id: companyId === "none" ? undefined : companyId
       };
 
       const result = await createJob(newJobData);
@@ -229,7 +229,7 @@ export default function CreateJobCard() {
                     <SelectValue placeholder="Select a company" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No company</SelectItem>
+                    <SelectItem value="none">No company</SelectItem>
                     {companies.map(company => (
                       <SelectItem key={company.id} value={company.id || ""}>
                         {company.name}
