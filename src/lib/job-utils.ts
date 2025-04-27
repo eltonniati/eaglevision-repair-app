@@ -80,7 +80,7 @@ export const prepareJobForDatabase = async (
     handling_fees: Number(job.details.handling_fees) || 0,
     job_card_number: await generateJobCardNumber(userId, supabase),
     user_id: userId,
-    company_id: job.company_id
+    company_id: job.company_id || null
   };
 };
 

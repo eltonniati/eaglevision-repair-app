@@ -1,6 +1,8 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
+import { useCompanies } from "@/hooks/use-companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,11 +16,19 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import type { Job, JobStatus } from "@/lib/types";
 
 export default function CreateJobCard() {
   const { createJob } = useJobs();
+  const { companies, loading: loadingCompanies } = useCompanies();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,6 +45,7 @@ export default function CreateJobCard() {
   // Job details
   const [problem, setProblem] = useState("");
   const [handlingFees, setHandlingFees] = useState<number>(0);
+  const [companyId, setCompanyId] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,7 +74,7 @@ export default function CreateJobCard() {
           status: "In Progress" as JobStatus,
           handling_fees: handlingFees
         },
-        company_id: ""
+        company_id: companyId || undefined
       };
 
       const result = await createJob(newJobData);
@@ -210,6 +221,22 @@ export default function CreateJobCard() {
                   onChange={(e) => setHandlingFees(parseFloat(e.target.value) || 0)}
                   placeholder="0.00"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company">Company (Optional)</Label>
+                <Select value={companyId} onValueChange={setCompanyId}>
+                  <SelectTrigger id="company">
+                    <SelectValue placeholder="Select a company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No company</SelectItem>
+                    {companies.map(company => (
+                      <SelectItem key={company.id} value={company.id || ""}>
+                        {company.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
             <CardFooter className="flex justify-end">

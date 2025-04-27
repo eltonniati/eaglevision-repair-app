@@ -106,6 +106,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          company_id: string | null
           created_at: string
           customer_email: string | null
           customer_name: string
@@ -122,6 +123,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name: string
@@ -138,6 +140,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name?: string
@@ -153,7 +156,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
