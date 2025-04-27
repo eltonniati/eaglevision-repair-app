@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Job } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, Share } from "lucide-react";
 import { PrintableJobCard } from "./PrintableJobCard";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ interface PrintPreviewProps {
   handlingFees: number;
   companyName: string;
   onBack: () => void;
+  onShare?: () => void;
 }
 
 export const PrintPreview = ({
@@ -32,7 +33,8 @@ export const PrintPreview = ({
   problem,
   handlingFees,
   companyName,
-  onBack
+  onBack,
+  onShare
 }: PrintPreviewProps) => {
   const jobCardRef = useRef<HTMLDivElement>(null);
 
@@ -100,6 +102,12 @@ export const PrintPreview = ({
           <Button variant="outline" onClick={onBack}>
             Back
           </Button>
+          {onShare && (
+            <Button variant="outline" onClick={onShare}>
+              <Share className="mr-2 h-4 w-4" />
+              Share
+            </Button>
+          )}
           <Button onClick={onPrintButtonClick}>
             <Printer className="mr-2 h-4 w-4" />
             Print Now
