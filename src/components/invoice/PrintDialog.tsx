@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Share, Mail, Printer } from "lucide-react";
+import { Share, Mail, Printer, Eye } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PrintDialogProps {
@@ -10,6 +10,7 @@ interface PrintDialogProps {
   onPrint: () => void;
   onShare?: () => void;
   onEmail?: () => void;
+  onPreview?: () => void;
   showPreviewOption?: boolean;
   invoiceNumber?: string;
 }
@@ -20,6 +21,8 @@ export const PrintDialog = ({
   onPrint,
   onShare,
   onEmail,
+  onPreview,
+  showPreviewOption = false,
   invoiceNumber = ""
 }: PrintDialogProps) => {
   const isMobile = useIsMobile();
@@ -65,6 +68,15 @@ export const PrintDialog = ({
               <Printer className="mr-2 h-4 w-4" />
               Print/Save PDF
             </Button>
+            {showPreviewOption && onPreview && (
+              <Button onClick={() => {
+                onOpenChange(false);
+                onPreview();
+              }} variant="outline" className="w-full">
+                <Eye className="mr-2 h-4 w-4" />
+                Preview
+              </Button>
+            )}
             <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
               Cancel
             </Button>
@@ -85,6 +97,15 @@ export const PrintDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
+          {showPreviewOption && onPreview && (
+            <Button variant="outline" onClick={() => {
+              onOpenChange(false);
+              onPreview();
+            }}>
+              <Eye className="mr-2 h-4 w-4" />
+              Preview
+            </Button>
+          )}
           <Button onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Print
