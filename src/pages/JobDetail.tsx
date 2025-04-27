@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -10,6 +11,7 @@ import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { JobPreviewMode } from "@/components/job/JobPreviewMode";
 import { JobDeleteDialog } from "@/components/job/JobDeleteDialog";
 import { useJobEditor } from "@/hooks/use-job-editor";
+import { JobCardNotFound } from "@/components/job/JobCardNotFound";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +21,7 @@ const JobDetail = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
   
   const {
     isEditMode,
@@ -51,6 +54,8 @@ const JobDetail = () => {
         } catch (error) {
           console.error("Error fetching job:", error);
           toast.error("Failed to load job card");
+        } finally {
+          setLoadingComplete(true);
         }
       }
     };
@@ -59,7 +64,7 @@ const JobDetail = () => {
   }, [id, getJob, fetchCompanies]);
 
   useEffect(() => {
-    if (job) {
+    if (job && companies.length > 0) {
       const companyName = companies.find(c => c.id === job.company_id)?.name || "";
       initializeFormData(job, companyName);
     }
@@ -124,7 +129,21 @@ const JobDetail = () => {
     );
   }
 
-  if (loading || !job) {
+  if (loading && !loadingComplete) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-muted-foreground">Loading job card...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingComplete && !job) {
+    return <JobCardNotFound onBack={() => navigate("/job-cards")} />;
+  }
+
+  if (!job) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="flex justify-center items-center h-64">
