@@ -1,9 +1,10 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Printer } from "lucide-react";
+import { ChevronLeft, Share } from "lucide-react";
 import { useInvoiceDetails } from "@/hooks/use-invoice-details";
 import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
@@ -25,38 +26,25 @@ const InvoiceDetail = () => {
     }
   }, [invoiceId]);
 
-  const prepareForPrinting = () => {
-    document.body.classList.add('is-printing');
-    const dialogs = document.querySelectorAll('[role="dialog"]');
-    dialogs.forEach(dialog => {
-      dialog.classList.add('no-print');
-    });
-  };
-
-  const cleanupAfterPrinting = () => {
-    document.body.classList.remove('is-printing');
-    setIsPrinting(false);
-    setShowPrintDialog(false);
-  };
-
   const handlePrintOrPDF = useReactToPrint({
     documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
     contentRef: printableInvoiceRef,
     onBeforePrint: () => {
       setIsPrinting(true);
       return new Promise<void>((resolve) => {
-        prepareForPrinting();
-        setTimeout(resolve, 300);
+        setTimeout(resolve, 100);
       });
     },
     onAfterPrint: () => {
-      cleanupAfterPrinting();
+      setIsPrinting(false);
+      setShowPrintDialog(false);
       toast.success("Invoice printed/saved successfully");
     },
     onPrintError: (error) => {
       console.error("Print error:", error);
-      cleanupAfterPrinting();
       toast.error("Failed to print invoice");
+      setIsPrinting(false);
+      setShowPrintDialog(false);
     },
     pageStyle: `
       @page {
@@ -68,6 +56,38 @@ const InvoiceDetail = () => {
 
   const handleBackToList = () => {
     navigate("/job-cards");
+  };
+
+  const handleShare = async () => {
+    if (!invoice) return;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Invoice #${invoice.invoice_number}`,
+          text: `Invoice details for #${invoice.invoice_number}`,
+        });
+        toast.success("Invoice shared successfully");
+      } else {
+        // Fallback for WhatsApp
+        const text = `Invoice #${invoice.invoice_number} - Total: ${invoice.total}`;
+        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`;
+        window.location.href = whatsappUrl;
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+      toast.error("Failed to share invoice");
+    }
+    setShowPrintDialog(false);
+  };
+
+  const handleEmail = () => {
+    if (!invoice) return;
+    
+    const subject = encodeURIComponent(`Invoice #${invoice.invoice_number}`);
+    const body = encodeURIComponent(`Please find attached Invoice #${invoice.invoice_number}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    setShowPrintDialog(false);
   };
 
   if (loading) {
@@ -87,7 +107,7 @@ const InvoiceDetail = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
       <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-center mb-4 no-print">
+        <div className="flex justify-between items-center mb-4">
           <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
             <ChevronLeft className="mr-1 h-4 w-4" />
             Back to Job Cards
@@ -99,8 +119,17 @@ const InvoiceDetail = () => {
             onClick={() => setShowPrintDialog(true)}
             className="no-print"
           >
-            <Printer className="mr-1 h-4 w-4" />
-            {isMobile ? "Save as PDF" : "Print Invoice"}
+            {isMobile ? (
+              <>
+                <Share className="mr-1 h-4 w-4" />
+                Share
+              </>
+            ) : (
+              <>
+                <Share className="mr-1 h-4 w-4" />
+                Print/Share
+              </>
+            )}
           </Button>
         </div>
         
@@ -117,7 +146,9 @@ const InvoiceDetail = () => {
         open={showPrintDialog} 
         onOpenChange={setShowPrintDialog}
         onPrint={handlePrintOrPDF}
-        showPreviewOption={false}
+        onShare={handleShare}
+        onEmail={handleEmail}
+        invoiceNumber={invoice.invoice_number}
       />
     </div>
   );
