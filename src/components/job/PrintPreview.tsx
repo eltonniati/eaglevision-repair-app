@@ -64,19 +64,18 @@ export const PrintPreview = ({
     content: () => jobCardRef.current,
   });
 
-  const onPrintButtonClick = useCallback((): Promise<void> => {
+  // Simplified implementation that directly returns a Promise
+  const onPrintButtonClick = useCallback(() => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     
     if (!jobCardRef.current) {
       console.error("Print reference not available");
       toast.error("Print preparation failed. Please try again.");
-      return Promise.reject(new Error("Print reference not available"));
+      return Promise.resolve(); // Return a resolved promise even for errors
     }
     
-    return new Promise<void>((resolve) => {
-      handlePrint();
-      resolve();
-    });
+    handlePrint();
+    return Promise.resolve(); // Return a resolved promise after triggering print
   }, [handlePrint]);
 
   return (
