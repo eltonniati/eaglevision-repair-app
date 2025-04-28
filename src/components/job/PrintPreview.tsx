@@ -1,15 +1,16 @@
-import { useRef, useCallback, useState } from "react";
-import { useReactToPrint } from "react-to-print";
+import { useRef, useState } from "react";
 import { Job } from "@/lib/types";
+import { PrintableJobCard } from "./PrintableJobCard";
 import { Button } from "@/components/ui/button";
 import { Printer, Share, Loader2 } from "lucide-react";
-import { PrintableJobCard } from "./PrintableJobCard";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useReactToPrint } from "react-to-print";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { ShareDialog } from "@/components/invoice/ShareDialog";
 
-interface PrintPreviewProps {
+interface JobPreviewModeProps {
   job: Job;
   customerName: string;
   customerPhone: string;
@@ -23,7 +24,7 @@ interface PrintPreviewProps {
   onBack: () => void;
 }
 
-export const PrintPreview = ({
+export const JobPreviewMode = ({
   job,
   customerName,
   customerPhone,
@@ -35,52 +36,39 @@ export const PrintPreview = ({
   handlingFees,
   companyName,
   onBack,
-}: PrintPreviewProps) => {
-  const jobCardRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
+}: JobPreviewModeProps) => {
+  const printRef = useRef<HTMLDivElement>(null);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
+  const isMobile = useIsMobile();
 
+  // Print functionality
   const handlePrint = useReactToPrint({
-    documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    onBeforeGetContent: () => {
-      setIsPrinting(true);
-      return Promise.resolve();
-    },
-    onBeforePrint: () => {
-      document.body.classList.add('printing');
-    },
-    onAfterPrint: () => {
-      document.body.classList.remove('printing');
-      setIsPrinting(false);
-      toast.success("Job card printed successfully");
-    },
-    onPrintError: () => {
-      document.body.classList.remove('printing');
-      setIsPrinting(false);
-      toast.error("Failed to print job card");
-    },
-    removeAfterPrint: true,
-    content: () => jobCardRef.current,
+    content: () => printRef.current,
+    documentTitle: `JobCard_${job.job_card_number || "unknown"}`,
+    onBeforeGetContent: () => toast.info("Preparing document for printing..."),
+    onAfterPrint: () => toast.success("Printed successfully"),
+    onPrintError: () => toast.error("Failed to print"),
   });
 
-  const generatePdf = useCallback(async () => {
-    if (!jobCardRef.current) return null;
-
+  // PDF generation
+  const generatePdf = async () => {
+    if (!printRef.current) return null;
+    
     setIsGeneratingPdf(true);
     try {
-      const canvas = await html2canvas(jobCardRef.current, {
+      const canvas = await html2canvas(printRef.current, {
         scale: 2,
         useCORS: true,
         logging: false,
       });
 
-      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
       });
 
+      const imgData = canvas.toDataURL('image/png');
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
@@ -94,9 +82,10 @@ export const PrintPreview = ({
     } finally {
       setIsGeneratingPdf(false);
     }
-  }, []);
+  };
 
-  const handleShare = useCallback(async () => {
+  // Share functionality
+  const handleShare = async () => {
     const pdf = await generatePdf();
     if (!pdf) return;
 
@@ -116,35 +105,41 @@ export const PrintPreview = ({
         // Fallback for browsers that don't support sharing files
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
-        toast.info("PDF downloaded as sharing isn't supported");
+        toast.info("PDF opened in new tab");
       }
     } catch (error) {
       console.error("Sharing error:", error);
       toast.error("Failed to share job card");
     }
-  }, [generatePdf, job.job_card_number, customerName]);
+  };
 
-  const handlePrintClick = useCallback(async () => {
-    if (!jobCardRef.current) {
-      toast.error("Print preparation failed. Please try again.");
-      return;
-    }
-    
+  // Email functionality
+  const handleEmail = async () => {
+    const pdf = await generatePdf();
+    if (!pdf) return;
+
     try {
-      await handlePrint();
+      const pdfBlob = pdf.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      const subject = `Job Card #${job.job_card_number} - ${customerName}`;
+      const body = `Please find attached the job card details.\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nDevice: ${deviceName} ${deviceModel}`;
+      
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&attachment=${pdfUrl}`;
     } catch (error) {
-      console.error("Print error:", error);
-      toast.error("Failed to print job card");
+      console.error("Email error:", error);
+      toast.error("Failed to prepare email");
     }
-  }, [handlePrint]);
+  };
 
-  const handleDownloadPdf = useCallback(async () => {
+  // PDF download
+  const handleDownloadPdf = async () => {
     const pdf = await generatePdf();
     if (pdf) {
       pdf.save(`JobCard_${job.job_card_number}.pdf`);
       toast.success("PDF downloaded successfully");
     }
-  }, [generatePdf, job.job_card_number]);
+  };
 
   return (
     <div className="mb-6">
@@ -156,7 +151,7 @@ export const PrintPreview = ({
           </Button>
           <Button 
             variant="outline" 
-            onClick={handleShare}
+            onClick={() => setIsShareDialogOpen(true)}
             disabled={isGeneratingPdf}
           >
             {isGeneratingPdf ? (
@@ -167,32 +162,17 @@ export const PrintPreview = ({
             {isMobile ? "Share" : "Share Job Card"}
           </Button>
           <Button 
-            onClick={handlePrintClick}
-            disabled={isPrinting}
-          >
-            {isPrinting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Printer className="mr-2 h-4 w-4" />
-            )}
-            {isMobile ? "Print" : "Print Now"}
-          </Button>
-          <Button 
-            variant="secondary" 
-            onClick={handleDownloadPdf}
+            onClick={handlePrint}
             disabled={isGeneratingPdf}
           >
-            {isGeneratingPdf ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <span>Download PDF</span>
-            )}
+            <Printer className="mr-2 h-4 w-4" />
+            {isMobile ? "Print" : "Print Now"}
           </Button>
         </div>
       </div>
       
-      <div id="printable-content" className="border rounded-lg shadow-sm bg-white p-0">
-        <div ref={jobCardRef} id="print-content">
+      <div className="border rounded-lg shadow-sm bg-white p-0">
+        <div ref={printRef}>
           <PrintableJobCard 
             job={job}
             customerName={customerName}
@@ -207,6 +187,17 @@ export const PrintPreview = ({
           />
         </div>
       </div>
+
+      <ShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
+        onShare={handleShare}
+        onEmail={handleEmail}
+        onDownloadPdf={handleDownloadPdf}
+        isGeneratingPdf={isGeneratingPdf}
+        invoiceNumber={job.job_card_number || ""}
+        invoiceName={`${customerName}'s ${deviceName}`}
+      />
     </div>
   );
 };
