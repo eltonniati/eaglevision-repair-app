@@ -1,10 +1,12 @@
-import { useRef } from "react";
+
+import { useRef, useCallback } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Job } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Printer, Share } from "lucide-react";
 import { PrintableJobCard } from "./PrintableJobCard";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PrintPreviewProps {
   job: Job;
@@ -36,14 +38,13 @@ export const PrintPreview = ({
   onShare
 }: PrintPreviewProps) => {
   const jobCardRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const handlePrint = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    onBeforeGetContent: () => {
+    onBeforeGetContent: async () => {
       console.log("Preparing content for printing...");
-      return new Promise<void>((resolve) => {
-        resolve();
-      });
+      return Promise.resolve();
     },
     onBeforePrint: () => {
       document.body.classList.add('printing');
@@ -60,36 +61,36 @@ export const PrintPreview = ({
       toast.error("Failed to print job card");
     },
     removeAfterPrint: true,
-    contentRef: () => jobCardRef.current,
+    content: () => jobCardRef.current,
   });
 
-  const onPrintButtonClick = () => {
+  const onPrintButtonClick = useCallback(async () => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     if (jobCardRef.current) {
-      handlePrint();
+      await handlePrint();
     } else {
       console.error("Print reference not available");
       toast.error("Print preparation failed. Please try again.");
     }
-  };
+  }, [handlePrint]);
 
   return (
     <div className="mb-6">
-      <div className="flex justify-between items-center mb-4 no-print">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2 no-print">
         <h2 className="text-2xl font-bold">Job Card Preview</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={onBack}>
             Back
           </Button>
           {onShare && (
             <Button variant="outline" onClick={onShare}>
               <Share className="mr-2 h-4 w-4" />
-              Share
+              {isMobile ? "Share" : "Share Job Card"}
             </Button>
           )}
           <Button onClick={onPrintButtonClick}>
             <Printer className="mr-2 h-4 w-4" />
-            Print Now
+            {isMobile ? "Print" : "Print Now"}
           </Button>
         </div>
       </div>

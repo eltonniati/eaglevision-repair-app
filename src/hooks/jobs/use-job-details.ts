@@ -33,7 +33,7 @@ export function useJobDetails() {
         console.error("Job fetch error:", error);
         setError(error.message || "Failed to load job");
         setJob(null);
-        toast.error("Failed to load job card");
+        toast.error(`Failed to load job card: ${error.message}`);
         return null;
       }
       
@@ -61,11 +61,16 @@ export function useJobDetails() {
     }
   }, []);
 
+  const clearJobError = useCallback(() => {
+    setError(null);
+  }, []);
+
   return {
     job,
     loading,
     error,
     getJob,
-    setJob
+    setJob,
+    clearJobError
   };
 }

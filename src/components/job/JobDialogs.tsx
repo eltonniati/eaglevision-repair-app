@@ -16,6 +16,7 @@ interface JobDialogsProps {
   onEmail: () => void;
   onPreview: () => void;
   jobCardNumber?: string;
+  jobCardName?: string;
 }
 
 export const JobDialogs = ({
@@ -30,7 +31,8 @@ export const JobDialogs = ({
   onShare,
   onEmail,
   onPreview,
-  jobCardNumber
+  jobCardNumber,
+  jobCardName
 }: JobDialogsProps) => {
   return (
     <>
@@ -54,6 +56,7 @@ export const JobDialogs = ({
         onShare={onShare}
         onEmail={onEmail}
         invoiceNumber={jobCardNumber || ""}
+        invoiceName={jobCardName || ""}
       />
     </>
   );

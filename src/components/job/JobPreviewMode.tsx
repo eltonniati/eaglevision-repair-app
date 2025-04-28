@@ -4,6 +4,7 @@ import { PrintPreview } from "./PrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface JobPreviewModeProps {
   job: Job;
@@ -33,6 +34,7 @@ export const JobPreviewMode = ({
   onBack
 }: JobPreviewModeProps) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   const handleShare = () => {
     try {
@@ -42,16 +44,19 @@ export const JobPreviewMode = ({
         navigator.share({
           title: `Job Card #${job.job_card_number}`,
           text: text
+        }).then(() => {
+          toast.success("Job card shared successfully");
         }).catch(err => {
           console.error('Error sharing:', err);
           // Fallback if share fails
           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+          toast.success("Opening share options");
         });
       } else {
         // Fallback for browsers that don't support Web Share API
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+        toast.success("Opening share options");
       }
-      toast.success("Job card shared successfully");
     } catch (error) {
       console.error("Share error:", error);
       toast.error("Failed to share job card");
@@ -96,6 +101,7 @@ export const JobPreviewMode = ({
         onShare={handleShare}
         onEmail={handleEmail}
         invoiceNumber={job.job_card_number || ""}
+        invoiceName={`${customerName}'s ${deviceName}`}
       />
     </>
   );
