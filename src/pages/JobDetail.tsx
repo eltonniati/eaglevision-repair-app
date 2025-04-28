@@ -7,11 +7,12 @@ import { ArrowLeft } from "lucide-react";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
 import { JobDetails } from "@/components/job/JobDetails";
-import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { JobPreviewMode } from "@/components/job/JobPreviewMode";
-import { JobDeleteDialog } from "@/components/job/JobDeleteDialog";
-import { useJobEditor } from "@/hooks/use-job-editor";
+import { JobLoading } from "@/components/job/JobLoading";
+import { JobError } from "@/components/job/JobError";
+import { JobDialogs } from "@/components/job/JobDialogs";
 import { JobCardNotFound } from "@/components/job/JobCardNotFound";
+import { useJobEditor } from "@/hooks/use-job-editor";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,9 +21,10 @@ const JobDetail = () => {
   const { companies, fetchCompanies } = useCompanies();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
-  
+
   const {
     isEditMode,
     isSaving,
@@ -84,6 +86,35 @@ const JobDetail = () => {
     setIsDeleteDialogOpen(false);
   };
 
+  const handleShare = () => {
+    if (!job) return;
+    
+    const text = `Job Card #${job.job_card_number} for ${editedCustomerName}\nDevice: ${editedDeviceName} ${editedDeviceModel}\nProblem: ${editedProblem}\nContact: ${editedCustomerPhone}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Job Card #${job.job_card_number}`,
+        text: text
+      }).catch(err => {
+        console.error('Error sharing:', err);
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+      });
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    }
+    setIsShareDialogOpen(false);
+  };
+  
+  const handleEmail = () => {
+    if (!job) return;
+    
+    const subject = `Job Card #${job.job_card_number} for ${editedCustomerName}`;
+    const body = `Job Card #${job.job_card_number}\n\nCustomer: ${editedCustomerName}\nPhone: ${editedCustomerPhone}\nEmail: ${editedCustomerEmail}\n\nDevice: ${editedDeviceName} ${editedDeviceModel}\nCondition: ${editedDeviceCondition}\n\nProblem: ${editedProblem}\n\nHandling Fees: ${editedHandlingFees}\n\nCompany: ${editedCompanyName}`;
+    
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setIsShareDialogOpen(false);
+  };
+
   const handlePrint = async () => {
     setIsPrintDialogOpen(false);
     
@@ -100,43 +131,12 @@ const JobDetail = () => {
     }, 100);
   };
 
-  const handlePreview = async () => {
-    if (isEditMode) {
-      const saveSuccess = await handleSave();
-      if (!saveSuccess) {
-        toast.error("Please save your changes before previewing");
-        return;
-      }
-    }
-    
-    setIsPrintDialogOpen(false);
-    setIsPreviewMode(true);
-  };
-
   if (error) {
-    return (
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-        <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-6 no-print">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Job Cards
-        </Button>
-        <div className="text-center p-6">
-          <h2 className="text-2xl font-semibold text-destructive">Error</h2>
-          <p className="text-muted-foreground mt-2">{error}</p>
-          <Button onClick={() => navigate("/job-cards")} className="mt-4">Return to Job Cards</Button>
-        </div>
-      </div>
-    );
+    return <JobError error={error} />;
   }
 
   if (loading && !loadingComplete) {
-    return (
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-        <div className="flex justify-center items-center h-64">
-          <p className="text-muted-foreground">Loading job card...</p>
-        </div>
-      </div>
-    );
+    return <JobLoading />;
   }
 
   if (loadingComplete && !job) {
@@ -144,13 +144,7 @@ const JobDetail = () => {
   }
 
   if (!job) {
-    return (
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-        <div className="flex justify-center items-center h-64">
-          <p className="text-muted-foreground">Loading job card...</p>
-        </div>
-      </div>
-    );
+    return <JobLoading />;
   }
 
   return (
@@ -194,18 +188,19 @@ const JobDetail = () => {
         />
       )}
 
-      <JobDeleteDialog 
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
+      <JobDialogs 
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        isPrintDialogOpen={isPrintDialogOpen}
+        setIsPrintDialogOpen={setIsPrintDialogOpen}
+        isShareDialogOpen={isShareDialogOpen}
+        setIsShareDialogOpen={setIsShareDialogOpen}
         onDelete={handleDelete}
-      />
-
-      <PrintDialog 
-        open={isPrintDialogOpen} 
-        onOpenChange={setIsPrintDialogOpen} 
         onPrint={handlePrint}
-        onPreview={handlePreview}
-        showPreviewOption={true}
+        onShare={handleShare}
+        onEmail={handleEmail}
+        onPreview={() => setIsPreviewMode(true)}
+        jobCardNumber={job.job_card_number}
       />
     </div>
   );

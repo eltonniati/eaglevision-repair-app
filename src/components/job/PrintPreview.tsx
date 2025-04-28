@@ -1,4 +1,3 @@
-
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Job } from "@/lib/types";
@@ -40,48 +39,15 @@ export const PrintPreview = ({
 
   const handlePrint = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    content: () => jobCardRef.current,
-    pageStyle: `
-      @page {
-        size: A4 portrait;
-        margin: 15mm;
-      }
-      @media print {
-        html, body {
-          height: 100%;
-          margin: 0 !important;
-          padding: 0 !important;
-          overflow: hidden;
-          background: white !important;
-        }
-        body * {
-          visibility: hidden;
-        }
-        #printable-content, #printable-content * {
-          visibility: visible !important;
-          -webkit-print-color-adjust: exact !important;
-          color-adjust: exact !important;
-          print-color-adjust: exact !important;
-        }
-        .no-print {
-          display: none !important;
-        }
-        #printable-content {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-        }
-      }
-    `,
     onBeforeGetContent: () => {
       console.log("Preparing content for printing...");
-      return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        resolve();
+      });
     },
     onBeforePrint: () => {
       document.body.classList.add('printing');
       console.log("Print started...");
-      return Promise.resolve();
     },
     onAfterPrint: () => {
       document.body.classList.remove('printing');
@@ -93,9 +59,10 @@ export const PrintPreview = ({
       document.body.classList.remove('printing');
       toast.error("Failed to print job card");
     },
+    removeAfterPrint: true,
+    contentRef: () => jobCardRef.current,
   });
 
-  // Create a proper click handler function that calls handlePrint
   const onPrintButtonClick = () => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     if (jobCardRef.current) {
