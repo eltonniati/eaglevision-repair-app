@@ -18,12 +18,16 @@ export const ShareDialog = ({
   onEmail,
   invoiceNumber
 }: ShareDialogProps) => {
+  // Determine if we're sharing an invoice or job card
+  const isJobCard = invoiceNumber && invoiceNumber.includes("-");
+  const itemType = isJobCard ? "Job Card" : "Invoice";
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="no-print">
         <DialogHeader>
-          <DialogTitle>Share Invoice #{invoiceNumber}</DialogTitle>
-          <DialogDescription>Share this invoice via WhatsApp or email</DialogDescription>
+          <DialogTitle>Share {itemType} #{invoiceNumber}</DialogTitle>
+          <DialogDescription>Share this {itemType.toLowerCase()} via WhatsApp or email</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <Button 

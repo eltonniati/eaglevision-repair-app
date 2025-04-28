@@ -40,7 +40,7 @@ export const PrintPreview = ({
 
   const handlePrint = useReactToPrint({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
-    contentRef: jobCardRef,
+    content: () => jobCardRef.current,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -74,12 +74,18 @@ export const PrintPreview = ({
         }
       }
     `,
+    onBeforeGetContent: () => {
+      console.log("Preparing content for printing...");
+      return Promise.resolve();
+    },
     onBeforePrint: () => {
       document.body.classList.add('printing');
+      console.log("Print started...");
       return Promise.resolve();
     },
     onAfterPrint: () => {
       document.body.classList.remove('printing');
+      console.log("Print completed successfully");
       toast.success("Job card printed successfully");
     },
     onPrintError: (error) => {
@@ -91,7 +97,13 @@ export const PrintPreview = ({
 
   // Create a proper click handler function that calls handlePrint
   const onPrintButtonClick = () => {
-    handlePrint();
+    console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
+    if (jobCardRef.current) {
+      handlePrint();
+    } else {
+      console.error("Print reference not available");
+      toast.error("Print preparation failed. Please try again.");
+    }
   };
 
   return (

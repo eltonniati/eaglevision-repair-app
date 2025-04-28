@@ -3,6 +3,7 @@ import { Job } from "@/lib/types";
 import { PrintPreview } from "./PrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface JobPreviewModeProps {
   job: Job;
@@ -34,25 +35,41 @@ export const JobPreviewMode = ({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   
   const handleShare = () => {
-    const text = `Job Card #${job.job_card_number} for ${customerName}\nDevice: ${deviceName} ${deviceModel}\nProblem: ${problem}`;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: `Job Card #${job.job_card_number}`,
-        text: text
-      }).catch(err => console.error('Error sharing:', err));
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    try {
+      const text = `Job Card #${job.job_card_number} for ${customerName}\nDevice: ${deviceName} ${deviceModel}\nProblem: ${problem}\nContact: ${customerPhone}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: `Job Card #${job.job_card_number}`,
+          text: text
+        }).catch(err => {
+          console.error('Error sharing:', err);
+          // Fallback if share fails
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+        });
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+      }
+      toast.success("Job card shared successfully");
+    } catch (error) {
+      console.error("Share error:", error);
+      toast.error("Failed to share job card");
     }
     setIsShareDialogOpen(false);
   };
   
   const handleEmail = () => {
-    const subject = `Job Card #${job.job_card_number} for ${customerName}`;
-    const body = `Job Card #${job.job_card_number}\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail}\n\nDevice: ${deviceName} ${deviceModel}\nCondition: ${deviceCondition}\n\nProblem: ${problem}\n\nHandling Fees: ${handlingFees}`;
-    
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    try {
+      const subject = `Job Card #${job.job_card_number} for ${customerName}`;
+      const body = `Job Card #${job.job_card_number}\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail}\n\nDevice: ${deviceName} ${deviceModel}\nCondition: ${deviceCondition}\n\nProblem: ${problem}\n\nHandling Fees: ${handlingFees}\n\nCompany: ${companyName}`;
+      
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      toast.success("Email client opened");
+    } catch (error) {
+      console.error("Email error:", error);
+      toast.error("Failed to open email client");
+    }
     setIsShareDialogOpen(false);
   };
 

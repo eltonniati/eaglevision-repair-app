@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Job } from "@/lib/types";
 import { mapDatabaseJobToJob } from "@/lib/job-utils";
@@ -10,9 +10,10 @@ export function useJobDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getJob = async (id: string) => {
+  const getJob = useCallback(async (id: string) => {
     if (!id) {
       setError("Job ID is required");
+      toast.error("Job ID is required");
       return null;
     }
     
@@ -58,7 +59,7 @@ export function useJobDetails() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     job,
