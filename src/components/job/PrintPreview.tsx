@@ -1,4 +1,3 @@
-
 import { useRef, useCallback } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Job } from "@/lib/types";
@@ -44,7 +43,6 @@ export const PrintPreview = ({
     documentTitle: `JobCard_${job?.job_card_number || "unknown"}`,
     onBeforeGetContent: async () => {
       console.log("Preparing content for printing...");
-      return Promise.resolve();
     },
     onBeforePrint: () => {
       document.body.classList.add('printing');
@@ -64,18 +62,21 @@ export const PrintPreview = ({
     content: () => jobCardRef.current,
   });
 
-  // Simplified implementation that directly returns a Promise
-  const onPrintButtonClick = useCallback(() => {
+  const onPrintButtonClick = useCallback(async () => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     
     if (!jobCardRef.current) {
       console.error("Print reference not available");
       toast.error("Print preparation failed. Please try again.");
-      return Promise.resolve(); // Return a resolved promise even for errors
+      return;
     }
     
-    handlePrint();
-    return Promise.resolve(); // Return a resolved promise after triggering print
+    try {
+      await handlePrint();
+    } catch (error) {
+      console.error("Print error:", error);
+      toast.error("Failed to print job card");
+    }
   }, [handlePrint]);
 
   return (
