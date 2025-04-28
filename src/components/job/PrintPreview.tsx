@@ -64,7 +64,7 @@ export const PrintPreview = ({
     content: () => jobCardRef.current,
   });
 
-  const onPrintButtonClick = useCallback(() => {
+  const onPrintButtonClick = useCallback((): Promise<void> => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     
     if (!jobCardRef.current) {
@@ -73,8 +73,10 @@ export const PrintPreview = ({
       return Promise.reject(new Error("Print reference not available"));
     }
     
-    handlePrint();
-    return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      handlePrint();
+      resolve();
+    });
   }, [handlePrint]);
 
   return (
@@ -99,7 +101,7 @@ export const PrintPreview = ({
       </div>
       
       <div id="printable-content" className="border rounded-lg shadow-sm bg-white p-0">
-        <div ref={jobCardRef}>
+        <div ref={jobCardRef} id="print-content">
           <PrintableJobCard 
             job={job}
             customerName={customerName}
