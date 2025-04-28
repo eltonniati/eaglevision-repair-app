@@ -1,3 +1,4 @@
+
 import { useRef, useCallback } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Job } from "@/lib/types";
@@ -63,7 +64,7 @@ export const PrintPreview = ({
     content: () => jobCardRef.current,
   });
 
-  const onPrintButtonClick = useCallback(() => {
+  const onPrintButtonClick = useCallback((): Promise<void> => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     if (!jobCardRef.current) {
       console.error("Print reference not available");
@@ -72,8 +73,11 @@ export const PrintPreview = ({
     }
     
     try {
-      handlePrint();
-      return Promise.resolve();
+      // Return a Promise that resolves when handlePrint is called
+      return new Promise<void>((resolve) => {
+        handlePrint();
+        resolve();
+      });
     } catch (error) {
       console.error("Print error:", error);
       toast.error("Failed to print job card");
