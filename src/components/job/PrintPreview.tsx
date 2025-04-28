@@ -64,13 +64,15 @@ export const PrintPreview = ({
     content: () => jobCardRef.current,
   });
 
+  // Changed to return a Promise to match the expected type
   const onPrintButtonClick = useCallback(async () => {
     console.log("Print button clicked, jobCardRef exists:", !!jobCardRef.current);
     if (jobCardRef.current) {
-      await handlePrint();
+      return handlePrint();
     } else {
       console.error("Print reference not available");
       toast.error("Print preparation failed. Please try again.");
+      return Promise.resolve();
     }
   }, [handlePrint]);
 

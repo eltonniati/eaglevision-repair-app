@@ -9,6 +9,7 @@ interface ShareDialogProps {
   onShare: () => void;
   onEmail: () => void;
   invoiceNumber: string;
+  invoiceName?: string; // Added this property to fix the error
 }
 
 export const ShareDialog = ({ 
@@ -16,17 +17,19 @@ export const ShareDialog = ({
   onOpenChange, 
   onShare,
   onEmail,
-  invoiceNumber
+  invoiceNumber,
+  invoiceName
 }: ShareDialogProps) => {
   // Determine if we're sharing an invoice or job card
   const isJobCard = invoiceNumber && invoiceNumber.includes("-");
   const itemType = isJobCard ? "Job Card" : "Invoice";
+  const displayName = invoiceName || `#${invoiceNumber}`;
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="no-print">
         <DialogHeader>
-          <DialogTitle>Share {itemType} #{invoiceNumber}</DialogTitle>
+          <DialogTitle>Share {itemType} {displayName}</DialogTitle>
           <DialogDescription>Share this {itemType.toLowerCase()} via WhatsApp or email</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
