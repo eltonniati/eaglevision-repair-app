@@ -34,46 +34,46 @@ export const PrintableJobCard = ({
   handlingFees,
   companyName
 }: PrintableJobCardProps) => (
-  <div className="p-6 print:block print:visible print:w-full" style={{ backgroundColor: 'white' }}>
+  <div className="p-6 print:block print:visible print:w-full print:text-black" style={{ backgroundColor: 'white', color: 'black' }}>
     <div className="border-2 border-gray-200 p-6 print:border print:border-gray-300">
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h1 className="text-3xl font-bold print:text-black">JOB CARD</h1>
-          <p className="text-lg font-medium print:text-black">#{job?.job_card_number}</p>
+          <h1 className="text-3xl font-bold print:text-black" style={{ color: 'black' }}>JOB CARD</h1>
+          <p className="text-lg font-medium print:text-black" style={{ color: 'black' }}>#{job?.job_card_number}</p>
         </div>
-        <div className="text-right print:text-black">
+        <div className="text-right print:text-black" style={{ color: 'black' }}>
           <p><strong>Created Date:</strong> {format(new Date(job?.created_at || new Date()), "MMMM d, yyyy")}</p>
           <p><strong>Status:</strong> {job?.details.status}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-8 print:text-black">
+      <div className="grid grid-cols-2 gap-6 mb-8 print:text-black" style={{ color: 'black' }}>
         <div>
-          <h2 className="text-lg font-semibold border-b mb-2 print:text-black">Company</h2>
+          <h2 className="text-lg font-semibold border-b mb-2 print:text-black" style={{ color: 'black' }}>Company</h2>
           <p>{companyName}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold border-b mb-2 print:text-black">Customer</h2>
+          <h2 className="text-lg font-semibold border-b mb-2 print:text-black" style={{ color: 'black' }}>Customer</h2>
           <p>{customerName}</p>
           <p>{customerPhone}</p>
           <p>{customerEmail}</p>
         </div>
       </div>
 
-      <div className="mb-8 print:text-black">
-        <h2 className="text-lg font-semibold border-b mb-2 print:text-black">Device</h2>
+      <div className="mb-8 print:text-black" style={{ color: 'black' }}>
+        <h2 className="text-lg font-semibold border-b mb-2 print:text-black" style={{ color: 'black' }}>Device</h2>
         <p><strong>Name:</strong> {deviceName}</p>
         <p><strong>Model:</strong> {deviceModel}</p>
         <p><strong>Condition:</strong> {deviceCondition}</p>
       </div>
 
-      <div className="mb-8 print:text-black">
-        <h2 className="text-lg font-semibold border-b mb-2 print:text-black">Details</h2>
+      <div className="mb-8 print:text-black" style={{ color: 'black' }}>
+        <h2 className="text-lg font-semibold border-b mb-2 print:text-black" style={{ color: 'black' }}>Details</h2>
         <p><strong>Problem:</strong> {problem}</p>
         <p><strong>Handling Fees:</strong> {formatCurrency(handlingFees)}</p>
       </div>
 
-      <div className="mt-6 text-sm text-center border-t pt-2 print:text-black">
+      <div className="mt-6 text-sm text-center border-t pt-2 print:text-black" style={{ color: 'black' }}>
         <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
       </div>
     </div>

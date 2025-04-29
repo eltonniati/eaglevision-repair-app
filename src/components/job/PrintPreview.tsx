@@ -1,3 +1,4 @@
+
 import { useRef, useState } from "react";
 import { Job } from "@/lib/types";
 import { PrintableJobCard } from "./PrintableJobCard";
@@ -46,9 +47,23 @@ export const JobPreviewMode = ({
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     documentTitle: `JobCard_${job.job_card_number || "unknown"}`,
-    onBeforeGetContent: () => toast.info("Preparing document for printing..."),
-    onAfterPrint: () => toast.success("Printed successfully"),
-    onPrintError: () => toast.error("Failed to print"),
+    onBeforeGetContent: () => {
+      toast.info("Preparing document for printing...");
+      // Set up a class on the document body for print styling
+      document.body.classList.add('is-printing');
+    },
+    onAfterPrint: () => {
+      toast.success("Printed successfully");
+      document.body.classList.remove('is-printing');
+    },
+    onPrintError: (error) => {
+      console.error("Print error:", error);
+      toast.error("Failed to print");
+      document.body.classList.remove('is-printing');
+    },
+    // Mobile printing specific options
+    removeAfterPrint: true,
+    copyStyles: true,
   });
 
   // PDF generation
@@ -141,6 +156,17 @@ export const JobPreviewMode = ({
     }
   };
 
+  const onPrintButtonClick = () => {
+    if (typeof handlePrint === 'function') {
+      // Create a promise that resolves after the print function is called
+      return new Promise<void>((resolve) => {
+        handlePrint();
+        setTimeout(() => resolve(), 100);
+      });
+    }
+    return Promise.resolve();
+  };
+
   return (
     <div className="mb-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2 no-print">
@@ -162,7 +188,7 @@ export const JobPreviewMode = ({
             {isMobile ? "Share" : "Share Job Card"}
           </Button>
           <Button 
-            onClick={handlePrint}
+            onClick={onPrintButtonClick}
             disabled={isGeneratingPdf}
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -171,8 +197,8 @@ export const JobPreviewMode = ({
         </div>
       </div>
       
-      <div className="border rounded-lg shadow-sm bg-white p-0">
-        <div ref={printRef}>
+      <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
+        <div ref={printRef} className="print-area">
           <PrintableJobCard 
             job={job}
             customerName={customerName}
