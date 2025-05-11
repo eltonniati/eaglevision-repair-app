@@ -1,8 +1,8 @@
 
-import { Job } from "@/lib/types";
-import { PrintPreview } from "./PrintPreview";
-import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { useState } from "react";
+import { Job } from "@/lib/types";
+import { JobPrintPreview } from "./JobPrintPreview";
+import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -80,7 +80,7 @@ export const JobPreviewMode = ({
 
   return (
     <>
-      <PrintPreview
+      <JobPrintPreview
         job={job}
         customerName={customerName}
         customerPhone={customerPhone}
