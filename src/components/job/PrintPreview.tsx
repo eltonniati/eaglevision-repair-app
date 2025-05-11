@@ -7,9 +7,9 @@ import { Printer, Share, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useReactToPrint } from "react-to-print";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
+import { generatePdf, downloadPdf } from "./utils/pdf-utils";
+import { shareJobCard, emailJobCard } from "./utils/share-utils";
 
 interface JobPreviewModeProps {
   job: Job;
@@ -45,9 +45,8 @@ export const JobPreviewMode = ({
 
   // Print functionality
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
     documentTitle: `JobCard_${job.job_card_number || "unknown"}`,
-    onBeforeGetContent: () => {
+    onBeforePrint: () => {
       toast.info("Preparing document for printing...");
       // Set up a class on the document body for print styling
       document.body.classList.add('is-printing');
@@ -64,96 +63,31 @@ export const JobPreviewMode = ({
     // Mobile printing specific options
     removeAfterPrint: true,
     copyStyles: true,
+    contentRef: printRef,
   });
-
-  // PDF generation
-  const generatePdf = async () => {
-    if (!printRef.current) return null;
-    
-    setIsGeneratingPdf(true);
-    try {
-      const canvas = await html2canvas(printRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      return pdf;
-    } catch (error) {
-      console.error("PDF generation error:", error);
-      toast.error("Failed to generate PDF");
-      return null;
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
 
   // Share functionality
   const handleShare = async () => {
-    const pdf = await generatePdf();
-    if (!pdf) return;
-
-    try {
-      const pdfBlob = pdf.output('blob');
-      const pdfFile = new File([pdfBlob], `JobCard_${job.job_card_number}.pdf`, {
-        type: 'application/pdf',
-      });
-
-      if (navigator.share && navigator.canShare?.({ files: [pdfFile] })) {
-        await navigator.share({
-          files: [pdfFile],
-          title: `Job Card ${job.job_card_number}`,
-          text: `Job card details for ${customerName}`,
-        });
-      } else {
-        // Fallback for browsers that don't support sharing files
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
-        toast.info("PDF opened in new tab");
-      }
-    } catch (error) {
-      console.error("Sharing error:", error);
-      toast.error("Failed to share job card");
-    }
+    setIsGeneratingPdf(true);
+    await shareJobCard(printRef, job.job_card_number || "", customerName);
+    setIsGeneratingPdf(false);
+    setIsShareDialogOpen(false);
   };
 
-  // Email functionality
+  // Email handler
   const handleEmail = async () => {
-    const pdf = await generatePdf();
-    if (!pdf) return;
-
-    try {
-      const pdfBlob = pdf.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      
-      const subject = `Job Card #${job.job_card_number} - ${customerName}`;
-      const body = `Please find attached the job card details.\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nDevice: ${deviceName} ${deviceModel}`;
-      
-      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&attachment=${pdfUrl}`;
-    } catch (error) {
-      console.error("Email error:", error);
-      toast.error("Failed to prepare email");
-    }
+    setIsGeneratingPdf(true);
+    await emailJobCard(printRef, job.job_card_number || "", customerName, customerPhone);
+    setIsGeneratingPdf(false);
+    setIsShareDialogOpen(false);
   };
 
-  // PDF download
+  // PDF download handler
   const handleDownloadPdf = async () => {
-    const pdf = await generatePdf();
-    if (pdf) {
-      pdf.save(`JobCard_${job.job_card_number}.pdf`);
-      toast.success("PDF downloaded successfully");
-    }
+    setIsGeneratingPdf(true);
+    await downloadPdf(printRef, job.job_card_number || "");
+    setIsGeneratingPdf(false);
+    setIsShareDialogOpen(false);
   };
 
   const onPrintButtonClick = () => {

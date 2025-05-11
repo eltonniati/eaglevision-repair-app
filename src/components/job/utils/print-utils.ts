@@ -6,7 +6,7 @@ import { useReactToPrint } from "react-to-print";
 export const usePrintJob = (printRef: React.RefObject<HTMLDivElement>, jobCardNumber: string) => {
   const handlePrint = useReactToPrint({
     documentTitle: `JobCard_${jobCardNumber || "unknown"}`,
-    onBeforeGetContent: () => {
+    onBeforePrint: () => {
       toast.info("Preparing document for printing...");
       // Set up a class on the document body for print styling
       document.body.classList.add('is-printing');
@@ -24,6 +24,7 @@ export const usePrintJob = (printRef: React.RefObject<HTMLDivElement>, jobCardNu
     // Mobile printing specific options
     removeAfterPrint: true,
     copyStyles: true,
+    contentRef: printRef,
   });
 
   const onPrintButtonClick = () => {
