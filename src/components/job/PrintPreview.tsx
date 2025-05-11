@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Printer, Share, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useReactToPrint } from "react-to-print";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { generatePdf, downloadPdf } from "./utils/pdf-utils";
 import { shareJobCard, emailJobCard } from "./utils/share-utils";
+import { usePrintJob } from "./utils/print-utils";
 
 interface JobPreviewModeProps {
   job: Job;
@@ -43,28 +43,8 @@ export const JobPreviewMode = ({
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isMobile = useIsMobile();
 
-  // Print functionality
-  const handlePrint = useReactToPrint({
-    documentTitle: `JobCard_${job.job_card_number || "unknown"}`,
-    onBeforePrint: () => {
-      toast.info("Preparing document for printing...");
-      // Set up a class on the document body for print styling
-      document.body.classList.add('is-printing');
-    },
-    onAfterPrint: () => {
-      toast.success("Printed successfully");
-      document.body.classList.remove('is-printing');
-    },
-    onPrintError: (error) => {
-      console.error("Print error:", error);
-      toast.error("Failed to print");
-      document.body.classList.remove('is-printing');
-    },
-    // Mobile printing specific options
-    removeAfterPrint: true,
-    copyStyles: true,
-    contentRef: printRef,
-  });
+  // Use our print utility hook
+  const { onPrintButtonClick } = usePrintJob(printRef, job.job_card_number || "unknown");
 
   // Share functionality
   const handleShare = async () => {
@@ -88,17 +68,6 @@ export const JobPreviewMode = ({
     await downloadPdf(printRef, job.job_card_number || "");
     setIsGeneratingPdf(false);
     setIsShareDialogOpen(false);
-  };
-
-  const onPrintButtonClick = () => {
-    if (typeof handlePrint === 'function') {
-      // Create a promise that resolves after the print function is called
-      return new Promise<void>((resolve) => {
-        handlePrint();
-        setTimeout(() => resolve(), 100);
-      });
-    }
-    return Promise.resolve();
   };
 
   return (

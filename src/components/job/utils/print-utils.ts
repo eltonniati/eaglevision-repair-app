@@ -22,7 +22,7 @@ export const usePrintJob = (printRef: React.RefObject<HTMLDivElement>, jobCardNu
       document.body.classList.remove('is-printing');
     },
     // Mobile printing specific options
-    removeAfterPrint: true,
+    // Note: Removed invalid `removeAfterPrint` property
     copyStyles: true,
     contentRef: printRef,
   });

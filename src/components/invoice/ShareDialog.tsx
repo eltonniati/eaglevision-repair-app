@@ -7,12 +7,12 @@ import { Loader2 } from "lucide-react";
 interface ShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onShare: () => void;
-  onEmail: () => void;
-  onDownloadPdf?: () => void; // Added this prop
+  onShare: () => Promise<void>;
+  onEmail: () => Promise<void>;
+  onDownloadPdf?: () => Promise<void>;  // Using the correct Promise<void> type
   invoiceNumber: string;
   invoiceName?: string;
-  isGeneratingPdf?: boolean; // Added this prop
+  isGeneratingPdf?: boolean;
 }
 
 export const ShareDialog = ({ 
