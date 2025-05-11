@@ -12,8 +12,8 @@ interface JobDialogsProps {
   setIsShareDialogOpen: (open: boolean) => void;
   onDelete: () => void;
   onPrint: () => void;
-  onShare: () => void;
-  onEmail: () => void;
+  onShare: () => Promise<void>;
+  onEmail: () => Promise<void>;
   onPreview: () => void;
   jobCardNumber?: string;
   jobCardName?: string;

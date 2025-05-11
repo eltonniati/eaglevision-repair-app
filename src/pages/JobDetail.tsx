@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -86,33 +85,43 @@ const JobDetail = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const handleShare = () => {
-    if (!job) return;
+  const handleShare = async (): Promise<void> => {
+    if (!job) return Promise.resolve();
     
     const text = `Job Card #${job.job_card_number} for ${editedCustomerName}\nDevice: ${editedDeviceName} ${editedDeviceModel}\nProblem: ${editedProblem}\nContact: ${editedCustomerPhone}`;
     
-    if (navigator.share) {
-      navigator.share({
-        title: `Job Card #${job.job_card_number}`,
-        text: text
-      }).catch(err => {
-        console.error('Error sharing:', err);
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Job Card #${job.job_card_number}`,
+          text: text
+        });
+      } else {
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-      });
-    } else {
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
+    
     setIsShareDialogOpen(false);
+    return Promise.resolve();
   };
   
-  const handleEmail = () => {
-    if (!job) return;
+  const handleEmail = async (): Promise<void> => {
+    if (!job) return Promise.resolve();
     
-    const subject = `Job Card #${job.job_card_number} for ${editedCustomerName}`;
-    const body = `Job Card #${job.job_card_number}\n\nCustomer: ${editedCustomerName}\nPhone: ${editedCustomerPhone}\nEmail: ${editedCustomerEmail}\n\nDevice: ${editedDeviceName} ${editedDeviceModel}\nCondition: ${editedDeviceCondition}\n\nProblem: ${editedProblem}\n\nHandling Fees: ${editedHandlingFees}\n\nCompany: ${editedCompanyName}`;
+    try {
+      const subject = `Job Card #${job.job_card_number} for ${editedCustomerName}`;
+      const body = `Job Card #${job.job_card_number}\n\nCustomer: ${editedCustomerName}\nPhone: ${editedCustomerPhone}\nEmail: ${editedCustomerEmail}\n\nDevice: ${editedDeviceName} ${editedDeviceModel}\nCondition: ${editedDeviceCondition}\n\nProblem: ${editedProblem}\n\nHandling Fees: ${editedHandlingFees}\n\nCompany: ${editedCompanyName}`;
+      
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    } catch (error) {
+      console.error("Email error:", error);
+    }
     
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setIsShareDialogOpen(false);
+    return Promise.resolve();
   };
 
   const handlePrint = async () => {

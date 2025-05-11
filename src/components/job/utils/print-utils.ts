@@ -21,10 +21,8 @@ export const usePrintJob = (printRef: React.RefObject<HTMLDivElement>, jobCardNu
       toast.error("Failed to print");
       document.body.classList.remove('is-printing');
     },
-    // Mobile printing specific options
-    // Note: Removed invalid `removeAfterPrint` property
-    copyStyles: true,
-    contentRef: printRef,
+    // Note: Removed invalid properties
+    content: () => printRef.current,
   });
 
   const onPrintButtonClick = () => {

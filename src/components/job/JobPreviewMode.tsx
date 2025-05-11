@@ -36,12 +36,12 @@ export const JobPreviewMode = ({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   
-  const handleShare = () => {
+  const handleShare = async (): Promise<void> => {
     try {
       const text = `Job Card #${job.job_card_number} for ${customerName}\nDevice: ${deviceName} ${deviceModel}\nProblem: ${problem}\nContact: ${customerPhone}`;
       
       if (navigator.share) {
-        navigator.share({
+        await navigator.share({
           title: `Job Card #${job.job_card_number}`,
           text: text
         }).then(() => {
@@ -64,7 +64,7 @@ export const JobPreviewMode = ({
     setIsShareDialogOpen(false);
   };
   
-  const handleEmail = () => {
+  const handleEmail = async (): Promise<void> => {
     try {
       const subject = `Job Card #${job.job_card_number} for ${customerName}`;
       const body = `Job Card #${job.job_card_number}\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail}\n\nDevice: ${deviceName} ${deviceModel}\nCondition: ${deviceCondition}\n\nProblem: ${problem}\n\nHandling Fees: ${handlingFees}\n\nCompany: ${companyName}`;
@@ -76,6 +76,7 @@ export const JobPreviewMode = ({
       toast.error("Failed to open email client");
     }
     setIsShareDialogOpen(false);
+    return Promise.resolve();
   };
 
   return (

@@ -31,31 +31,43 @@ const JobCards = () => {
     setIsPreviewMode(true);
   };
 
-  const handleShare = () => {
-    if (!selectedJob) return;
+  const handleShare = async (): Promise<void> => {
+    if (!selectedJob) return Promise.resolve();
     
-    const text = `Job Card #${selectedJob.job_card_number} for ${selectedJob.customer.name}\nDevice: ${selectedJob.device.name} ${selectedJob.device.model}\nProblem: ${selectedJob.details.problem}`;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: `Job Card #${selectedJob.job_card_number}`,
-        text: text
-      }).catch(err => console.error('Error sharing:', err));
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    try {
+      const text = `Job Card #${selectedJob.job_card_number} for ${selectedJob.customer.name}\nDevice: ${selectedJob.device.name} ${selectedJob.device.model}\nProblem: ${selectedJob.details.problem}`;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: `Job Card #${selectedJob.job_card_number}`,
+          text: text
+        });
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
     }
+    
     setIsShareDialogOpen(false);
+    return Promise.resolve();
   };
   
-  const handleEmail = () => {
-    if (!selectedJob) return;
+  const handleEmail = async (): Promise<void> => {
+    if (!selectedJob) return Promise.resolve();
     
-    const subject = `Job Card #${selectedJob.job_card_number} for ${selectedJob.customer.name}`;
-    const body = `Job Card #${selectedJob.job_card_number}\n\nCustomer: ${selectedJob.customer.name}\nPhone: ${selectedJob.customer.phone}\nEmail: ${selectedJob.customer.email || ""}\n\nDevice: ${selectedJob.device.name} ${selectedJob.device.model}\nCondition: ${selectedJob.device.condition}\n\nProblem: ${selectedJob.details.problem}\n\nHandling Fees: ${selectedJob.details.handling_fees}`;
+    try {
+      const subject = `Job Card #${selectedJob.job_card_number} for ${selectedJob.customer.name}`;
+      const body = `Job Card #${selectedJob.job_card_number}\n\nCustomer: ${selectedJob.customer.name}\nPhone: ${selectedJob.customer.phone}\nEmail: ${selectedJob.customer.email || ""}\n\nDevice: ${selectedJob.device.name} ${selectedJob.device.model}\nCondition: ${selectedJob.device.condition}\n\nProblem: ${selectedJob.details.problem}\n\nHandling Fees: ${selectedJob.details.handling_fees}`;
+      
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    } catch (error) {
+      console.error("Email error:", error);
+    }
     
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setIsShareDialogOpen(false);
+    return Promise.resolve();
   };
 
   if (error) {
