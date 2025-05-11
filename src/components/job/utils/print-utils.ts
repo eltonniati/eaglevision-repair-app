@@ -21,8 +21,8 @@ export const usePrintJob = (printRef: React.RefObject<HTMLDivElement>, jobCardNu
       toast.error("Failed to print");
       document.body.classList.remove('is-printing');
     },
-    // Fixed: changed 'content' to 'contentRef' to match the type definition
-    contentRef: () => printRef.current,
+    // Fixed: pass the ref object directly rather than a function returning the current value
+    contentRef: printRef,
   });
 
   const onPrintButtonClick = () => {
