@@ -116,8 +116,8 @@ const InvoiceDetail = () => {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-4 mx-auto" style={{ maxWidth: '100%' }}>
-      <div className="flex flex-col space-y-4">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 mx-auto w-full">
+      <div className="flex flex-col space-y-4 w-full">
         <div className="flex justify-between items-center mb-4">
           <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
             <ChevronLeft className="mr-1 h-4 w-4" />
@@ -145,15 +145,15 @@ const InvoiceDetail = () => {
           </Button>
         </div>
         
-        <div className="flex justify-center w-full overflow-x-auto">
+        <div className="w-full flex justify-center">
           <div 
             ref={printableInvoiceRef} 
             id="print-content"
             className="print-content bg-white shadow-sm"
             style={{
-              width: '210mm',
-              minHeight: '297mm',
-              padding: '20mm',
+              width: '100%',
+              maxWidth: '210mm',
+              padding: '20px',
               margin: '0 auto',
               boxSizing: 'border-box'
             }}
