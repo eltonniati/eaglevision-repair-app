@@ -92,6 +92,7 @@ export const JobPreviewMode = ({
         problem={problem}
         handlingFees={handlingFees}
         companyName={companyName}
+        status={job.details.status}
         onBack={onBack}
         onShare={() => setIsShareDialogOpen(true)}
       />
