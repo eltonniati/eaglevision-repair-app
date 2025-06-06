@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import * as html2pdf from 'html2pdf.js';
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
