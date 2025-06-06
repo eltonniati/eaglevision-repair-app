@@ -89,3 +89,4 @@ export const PrintableInvoice = ({ invoice }: { invoice: DatabaseInvoice }) => {
     </div>
   );
 };
+export default InvoiceDetail;
