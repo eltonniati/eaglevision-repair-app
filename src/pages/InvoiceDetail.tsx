@@ -1,91 +1,168 @@
+
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, Share } from "lucide-react";
+import { useInvoiceDetails } from "@/hooks/use-invoice-details";
+import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
+import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
+import { PrintDialog } from "@/components/invoice/PrintDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DatabaseInvoice } from "@/lib/types";
+import { shareInvoice, emailInvoice } from "@/components/invoice/utils/invoice-share-utils";
+import { downloadInvoicePdf } from "@/components/invoice/utils/invoice-pdf-utils";
 
-export const PrintableInvoice = ({ invoice }: { invoice: DatabaseInvoice }) => {
+const InvoiceDetail = () => {
+  const { invoiceId } = useParams<{ invoiceId: string }>();
+  const navigate = useNavigate();
+  const { invoice, loading, getInvoice } = useInvoiceDetails();
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const printableInvoiceRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (invoiceId) {
+      getInvoice(invoiceId);
+    }
+  }, [invoiceId]);
+
+  const handlePrintOrPDF = async () => {
+    if (!printableInvoiceRef.current || !invoice) {
+      toast.error('Unable to print invoice. Content not found.');
+      return;
+    }
+
+    setIsPrinting(true);
+    try {
+      await downloadInvoicePdf(printableInvoiceRef, invoice.invoice_number);
+    } catch (error) {
+      console.error('Print/PDF error:', error);
+      toast.error('Failed to generate PDF');
+    } finally {
+      setIsPrinting(false);
+      setShowPrintDialog(false);
+    }
+  };
+
+  const handleBackToList = () => {
+    navigate("/job-cards");
+  };
+
+  const handleShare = async () => {
+    if (!invoice) return;
+    
+    try {
+      const customerName = invoice.jobs?.customer_name || 'Customer';
+      await shareInvoice(printableInvoiceRef, invoice.invoice_number, customerName);
+    } catch (error) {
+      console.error("Error sharing:", error);
+      toast.error("Failed to share invoice");
+    }
+    setShowPrintDialog(false);
+  };
+
+  const handleEmail = async () => {
+    if (!invoice) return;
+    
+    try {
+      const customerName = invoice.jobs?.customer_name || 'Customer';
+      const customerEmail = invoice.jobs?.customer_email;
+      await emailInvoice(printableInvoiceRef, invoice.invoice_number, customerName, customerEmail);
+    } catch (error) {
+      console.error("Email error:", error);
+      toast.error("Failed to prepare email");
+    }
+    setShowPrintDialog(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-muted-foreground">Loading invoice...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!invoice) {
+    return <InvoiceNotFound onBack={handleBackToList} />;
+  }
+
+  // Ensure invoice has required id field for DatabaseInvoice compatibility
+  const databaseInvoice: DatabaseInvoice = {
+    ...invoice,
+    id: invoice.id || '', // Provide default empty string if id is undefined
+    job_id: invoice.job_id,
+    bill_description: invoice.bill_description,
+    bill_amount: invoice.bill_amount,
+    total: invoice.total,
+    created_at: invoice.created_at || new Date().toISOString(),
+    invoice_number: invoice.invoice_number,
+    invoice_data: {
+      status: invoice.status,
+      issue_date: invoice.issue_date,
+      due_date: invoice.due_date,
+      line_items: invoice.line_items,
+      taxes: invoice.taxes,
+      subtotal: invoice.subtotal,
+      tax_total: invoice.tax_total,
+      notes: invoice.notes,
+      terms: invoice.terms
+    }
+  };
+
   return (
-    <div className="w-full h-full flex flex-col" style={{ minHeight: '297mm' }}>
-      {/* Header Section */}
-      <header className="mb-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold">INVOICE</h1>
-            <p className="text-sm text-muted-foreground">#{invoice.invoice_number}</p>
-          </div>
-          <div className="text-right">
-            {/* Your company info */}
-          </div>
+    <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
+      <div className="flex flex-col space-y-4">
+        <div className="flex justify-between items-center mb-4">
+          <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            Back to Job Cards
+          </Button>
+          
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={() => setShowPrintDialog(true)}
+            className="no-print"
+            disabled={isPrinting}
+          >
+            {isMobile ? (
+              <>
+                <Share className="mr-1 h-4 w-4" />
+                Share PDF
+              </>
+            ) : (
+              <>
+                <Share className="mr-1 h-4 w-4" />
+                Print/Share PDF
+              </>
+            )}
+          </Button>
         </div>
-      </header>
-
-      {/* Invoice Details */}
-      <div className="flex-1 grid grid-cols-2 gap-8 mb-8">
-        <div>
-          <h2 className="font-semibold mb-2">Bill To:</h2>
-          <p>{invoice.jobs?.customer_name}</p>
-          {/* Add more customer details */}
-        </div>
-        <div className="text-right">
-          <div className="mb-2">
-            <span className="font-semibold">Date Issued:</span> {invoice.invoice_data.issue_date}
-          </div>
-          <div>
-            <span className="font-semibold">Due Date:</span> {invoice.invoice_data.due_date}
-          </div>
-        </div>
-      </div>
-
-      {/* Line Items Table */}
-      <div className="mb-8">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2">Description</th>
-              <th className="text-right py-2">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoice.invoice_data.line_items?.map((item, index) => (
-              <tr key={index} className="border-b">
-                <td className="py-2">{item.description}</td>
-                <td className="text-right py-2">{item.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Totals Section */}
-      <div className="ml-auto w-64 mb-8">
-        <div className="flex justify-between py-2">
-          <span>Subtotal:</span>
-          <span>{invoice.invoice_data.subtotal}</span>
-        </div>
-        {invoice.invoice_data.taxes?.map((tax, index) => (
-          <div key={index} className="flex justify-between py-2">
-            <span>{tax.name} ({tax.rate}%):</span>
-            <span>{tax.amount}</span>
-          </div>
-        ))}
-        <div className="flex justify-between font-bold text-lg pt-2 border-t">
-          <span>Total:</span>
-          <span>{invoice.total}</span>
+        
+        <div 
+          ref={printableInvoiceRef} 
+          id="print-content"
+          className="print-content rounded-lg shadow-sm bg-white"
+        >
+          <PrintableInvoice invoice={databaseInvoice} />
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="mt-auto pt-8 border-t">
-        {invoice.invoice_data.notes && (
-          <div className="mb-4">
-            <h3 className="font-semibold mb-1">Notes</h3>
-            <p className="text-sm">{invoice.invoice_data.notes}</p>
-          </div>
-        )}
-        {invoice.invoice_data.terms && (
-          <div>
-            <h3 className="font-semibold mb-1">Terms</h3>
-            <p className="text-sm">{invoice.invoice_data.terms}</p>
-          </div>
-        )}
-      </footer>
+      <PrintDialog 
+        open={showPrintDialog} 
+        onOpenChange={setShowPrintDialog}
+        onPrint={handlePrintOrPDF}
+        onShare={handleShare}
+        onEmail={handleEmail}
+        invoiceNumber={invoice.invoice_number}
+      />
     </div>
   );
 };
+
+export default InvoiceDetail;

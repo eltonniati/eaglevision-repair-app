@@ -1,72 +1,42 @@
-/* Print-specific styles */
-@page {
-  size: A4;
-  margin: 15mm;
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  
-  #print-content, #print-content * {
-    visibility: visible;
-  }
-  
-  #print-content {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-    background: white;
-  }
-  
-  .no-print {
-    display: none !important;
-  }
-  
-  /* Ensure tables don't break across pages */
-  table {
-    page-break-inside: auto;
-  }
-  
-  tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
-  }
-  
-  /* Invoice specific styles */
-  .invoice-container {
-    width: 210mm;
-    min-height: 297mm;
-    margin: 0 auto;
-    padding: 20mm;
-    box-sizing: border-box;
-  }
-  
-  /* Force full width for print */
-  .print-full-width {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-}
-
-/* Screen styles */
-.print-content {
-  width: 210mm;
-  min-height: 297mm;
+#root {
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 20px;
-  background: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 2rem;
+  text-align: center;
 }
 
-@media screen and (max-width: 210mm) {
-  .print-content {
-    width: 100%;
-    padding: 15px;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
   }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
 }
