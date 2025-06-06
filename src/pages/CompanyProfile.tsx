@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompany } from "@/hooks/use-company";
@@ -75,17 +74,7 @@ export default function CompanyProfile() {
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `company_logo_${Date.now()}.${fileExt}`;
-      const filePath = `company_logos/${fileName}`;
-      
-      // Create company_logos bucket if it doesn't exist
-      const { data: bucketExists } = await supabase.storage.getBucket('company_logos');
-      if (!bucketExists) {
-        await supabase.storage.createBucket('company_logos', {
-          public: true,
-          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
-          fileSizeLimit: 2097152, // 2MB
-        });
-      }
+      const filePath = `${fileName}`;
       
       const { error: uploadError } = await supabase.storage
         .from('company_logos')

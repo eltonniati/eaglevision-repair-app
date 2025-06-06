@@ -17,6 +17,7 @@ export function useCompanies() {
     }
 
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from("companies")
         .select("*")

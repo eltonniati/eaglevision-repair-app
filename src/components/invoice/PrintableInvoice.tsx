@@ -1,98 +1,177 @@
 
-import { Invoice } from "@/lib/types";
 import { format } from "date-fns";
-import { formatCurrency } from "@/lib/currency-utils";
+import { DatabaseInvoice } from "@/lib/types";
+import { useCompany } from "@/hooks/use-company";
 
 interface PrintableInvoiceProps {
-  invoice: Invoice;
+  invoice: DatabaseInvoice;
 }
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-ZA", {
+    style: 'currency',
+    currency: 'ZAR'
+  }).format(amount);
+};
+
 export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
+  const { company } = useCompany();
+  
+  const invoiceData = invoice.invoice_data || {
+    status: "Draft",
+    issue_date: new Date().toISOString(),
+    due_date: new Date().toISOString(),
+    line_items: [],
+    taxes: [],
+    subtotal: 0,
+    tax_total: 0,
+    notes: "",
+    terms: ""
+  };
+
   return (
-    <div className="p-4 bg-white print:p-0 print:m-0">
-      <div className="border border-gray-200 p-4 max-w-[210mm] mx-auto">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-2xl font-bold">INVOICE</h1>
-            <p className="text-base font-medium">{invoice?.invoice_number}</p>
+    <div className="p-8 print:block print:visible print:w-full print:text-black bg-white text-black max-w-4xl mx-auto">
+      <div className="border-2 border-gray-200 p-8 print:border print:border-gray-300">
+        {/* Header with Company Info and Logo */}
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex items-center gap-4">
+            {company?.logo_url && (
+              <img 
+                src={company.logo_url} 
+                alt="Company Logo" 
+                className="h-16 w-16 object-contain"
+                onError={(e) => {
+                  // Hide image if it fails to load
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
+            <div>
+              <h1 className="text-3xl font-bold text-black">INVOICE</h1>
+              <p className="text-lg font-medium text-black">#{invoice.invoice_number}</p>
+            </div>
           </div>
-          <div className="text-right text-sm">
-            <p><strong>Issue Date:</strong> {format(new Date(invoice?.issue_date || new Date()), "MMMM d, yyyy")}</p>
-            <p><strong>Due Date:</strong> {format(new Date(invoice?.due_date || new Date()), "MMMM d, yyyy")}</p>
-            <p className="mt-1">
-              <span className="px-2 py-0.5 rounded-full bg-gray-200 text-gray-800 font-medium text-xs">
-                {invoice?.status}
-              </span>
-            </p>
+          <div className="text-right text-black">
+            <p><strong>Issue Date:</strong> {format(new Date(invoiceData.issue_date), "MMMM d, yyyy")}</p>
+            <p><strong>Due Date:</strong> {format(new Date(invoiceData.due_date), "MMMM d, yyyy")}</p>
+            <p><strong>Status:</strong> {invoiceData.status}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+        {/* Company and Customer Info */}
+        <div className="grid grid-cols-2 gap-8 mb-8 text-black">
           <div>
-            <h2 className="text-base font-semibold border-b mb-1">Bill To</h2>
-            <p>{invoice?.bill_description}</p>
+            <h2 className="text-lg font-semibold border-b mb-2 text-black">From</h2>
+            {company ? (
+              <>
+                <p className="font-semibold">{company.name}</p>
+                <p>{company.address}</p>
+                <p>{company.phone}</p>
+                <p>{company.email}</p>
+              </>
+            ) : (
+              <p>Company information not available</p>
+            )}
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold border-b mb-2 text-black">Bill To</h2>
+            {invoice.jobs && (
+              <>
+                <p className="font-semibold">{invoice.jobs.customer_name}</p>
+                <p>{invoice.jobs.customer_phone}</p>
+                {invoice.jobs.customer_email && <p>{invoice.jobs.customer_email}</p>}
+              </>
+            )}
           </div>
         </div>
 
-        <div className="mb-4 overflow-x-auto">
-          <h2 className="text-base font-semibold border-b mb-1">Items</h2>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left">
-                <th className="py-1">Description</th>
-                <th className="py-1 text-right">Qty</th>
-                <th className="py-1 text-right">Unit Price</th>
-                <th className="py-1 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoice?.line_items.map((item, idx) => (
-                <tr key={idx} className="border-b">
-                  <td className="py-1">{item.description}</td>
-                  <td className="py-1 text-right">{item.quantity}</td>
-                  <td className="py-1 text-right">{formatCurrency(item.unit_price)}</td>
-                  <td className="py-1 text-right">{formatCurrency(item.amount)}</td>
+        {/* Invoice Details */}
+        <div className="mb-8 text-black">
+          <h2 className="text-lg font-semibold border-b mb-2 text-black">Invoice Details</h2>
+          <p><strong>Description:</strong> {invoice.bill_description}</p>
+          {invoice.jobs && (
+            <>
+              <p><strong>Device:</strong> {invoice.jobs.device_name} {invoice.jobs.device_model}</p>
+              <p><strong>Problem:</strong> {invoice.jobs.problem}</p>
+            </>
+          )}
+        </div>
+
+        {/* Line Items */}
+        {invoiceData.line_items && invoiceData.line_items.length > 0 && (
+          <div className="mb-8 text-black">
+            <h2 className="text-lg font-semibold border-b mb-2 text-black">Line Items</h2>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2 text-left">Description</th>
+                  <th className="border border-gray-300 p-2 text-center">Qty</th>
+                  <th className="border border-gray-300 p-2 text-right">Unit Price</th>
+                  <th className="border border-gray-300 p-2 text-right">Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {invoiceData.line_items.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-300 p-2">{item.description}</td>
+                    <td className="border border-gray-300 p-2 text-center">{item.quantity}</td>
+                    <td className="border border-gray-300 p-2 text-right">{formatCurrency(item.unit_price)}</td>
+                    <td className="border border-gray-300 p-2 text-right">{formatCurrency(item.amount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        <div className="flex justify-end mb-4">
-          <div className="w-48 text-sm">
-            <div className="flex justify-between border-b py-1">
-              <span>Subtotal</span>
-              <span>{formatCurrency(invoice?.subtotal || 0)}</span>
-            </div>
-            {invoice?.taxes.map((tax, index) => (
-              <div key={index} className="flex justify-between border-b py-1">
-                <span>{tax.name} ({tax.rate}%)</span>
-                <span>{formatCurrency(tax.amount)}</span>
+        {/* Totals */}
+        <div className="mb-8 text-black">
+          <div className="flex justify-end">
+            <div className="w-64">
+              <div className="flex justify-between border-b py-2">
+                <span>Subtotal:</span>
+                <span>{formatCurrency(invoiceData.subtotal || 0)}</span>
               </div>
-            ))}
-            <div className="flex justify-between font-bold py-1">
-              <span>Total</span>
-              <span>{formatCurrency(invoice?.total || 0)}</span>
+              {invoiceData.taxes && invoiceData.taxes.length > 0 && (
+                <>
+                  {invoiceData.taxes.map((tax, index) => (
+                    <div key={index} className="flex justify-between border-b py-2">
+                      <span>{tax.name} ({tax.rate}%):</span>
+                      <span>{formatCurrency(tax.amount)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              <div className="flex justify-between font-bold text-lg py-2 border-t-2">
+                <span>Total:</span>
+                <span>{formatCurrency(invoice.total)}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {invoice?.notes && (
-          <div className="mb-3 text-sm">
-            <h2 className="text-base font-semibold border-b mb-1">Notes</h2>
-            <p>{invoice.notes}</p>
+        {/* Notes and Terms */}
+        {(invoiceData.notes || invoiceData.terms) && (
+          <div className="mb-8 text-black">
+            {invoiceData.notes && (
+              <div className="mb-4">
+                <h3 className="font-semibold mb-2">Notes:</h3>
+                <p className="whitespace-pre-line">{invoiceData.notes}</p>
+              </div>
+            )}
+            {invoiceData.terms && (
+              <div>
+                <h3 className="font-semibold mb-2">Terms & Conditions:</h3>
+                <p className="whitespace-pre-line">{invoiceData.terms}</p>
+              </div>
+            )}
           </div>
         )}
 
-        {invoice?.terms && (
-          <div className="mb-3 text-sm">
-            <h2 className="text-base font-semibold border-b mb-1">Terms & Conditions</h2>
-            <p>{invoice.terms}</p>
-          </div>
-        )}
-
-        <div className="mt-3 text-xs text-center border-t pt-1">
-          <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
+        {/* Footer */}
+        <div className="text-center text-sm text-gray-500 mt-8 pt-4 border-t text-black">
+          <p>Thank you for your business!</p>
+          <p className="mt-1">Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
         </div>
       </div>
     </div>

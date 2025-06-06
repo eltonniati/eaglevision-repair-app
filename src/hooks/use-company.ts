@@ -18,6 +18,7 @@ export function useCompany() {
 
     const fetchCompany = async () => {
       try {
+        setLoading(true);
         const { data, error } = await supabase
           .from("companies")
           .select("*")
