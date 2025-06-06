@@ -9,8 +9,9 @@ import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { handleInvoicePrint } from "@/components/job/utils/print-utils";
 import { DatabaseInvoice } from "@/lib/types";
+import { shareInvoice, emailInvoice } from "@/components/invoice/utils/invoice-share-utils";
+import { downloadInvoicePdf } from "@/components/invoice/utils/invoice-pdf-utils";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -27,17 +28,22 @@ const InvoiceDetail = () => {
     }
   }, [invoiceId]);
 
-  const handlePrintOrPDF = () => {
+  const handlePrintOrPDF = async () => {
     if (!printableInvoiceRef.current || !invoice) {
       toast.error('Unable to print invoice. Content not found.');
       return;
     }
 
     setIsPrinting(true);
-    const content = printableInvoiceRef.current.innerHTML;
-    handleInvoicePrint(content, invoice.invoice_number);
-    setIsPrinting(false);
-    setShowPrintDialog(false);
+    try {
+      await downloadInvoicePdf(printableInvoiceRef, invoice.invoice_number);
+    } catch (error) {
+      console.error('Print/PDF error:', error);
+      toast.error('Failed to generate PDF');
+    } finally {
+      setIsPrinting(false);
+      setShowPrintDialog(false);
+    }
   };
 
   const handleBackToList = () => {
@@ -48,18 +54,8 @@ const InvoiceDetail = () => {
     if (!invoice) return;
     
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: `Invoice #${invoice.invoice_number}`,
-          text: `Invoice details for #${invoice.invoice_number}`,
-        });
-        toast.success("Invoice shared successfully");
-      } else {
-        // Fallback for WhatsApp
-        const text = `Invoice #${invoice.invoice_number} - Total: ${invoice.total}`;
-        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`;
-        window.location.href = whatsappUrl;
-      }
+      const customerName = invoice.jobs?.customer_name || 'Customer';
+      await shareInvoice(printableInvoiceRef, invoice.invoice_number, customerName);
     } catch (error) {
       console.error("Error sharing:", error);
       toast.error("Failed to share invoice");
@@ -67,12 +63,17 @@ const InvoiceDetail = () => {
     setShowPrintDialog(false);
   };
 
-  const handleEmail = () => {
+  const handleEmail = async () => {
     if (!invoice) return;
     
-    const subject = encodeURIComponent(`Invoice #${invoice.invoice_number}`);
-    const body = encodeURIComponent(`Please find attached Invoice #${invoice.invoice_number}`);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    try {
+      const customerName = invoice.jobs?.customer_name || 'Customer';
+      const customerEmail = invoice.jobs?.customer_email;
+      await emailInvoice(printableInvoiceRef, invoice.invoice_number, customerName, customerEmail);
+    } catch (error) {
+      console.error("Email error:", error);
+      toast.error("Failed to prepare email");
+    }
     setShowPrintDialog(false);
   };
 
@@ -127,16 +128,17 @@ const InvoiceDetail = () => {
             size="sm" 
             onClick={() => setShowPrintDialog(true)}
             className="no-print"
+            disabled={isPrinting}
           >
             {isMobile ? (
               <>
                 <Share className="mr-1 h-4 w-4" />
-                Share
+                Share PDF
               </>
             ) : (
               <>
                 <Share className="mr-1 h-4 w-4" />
-                Print/Share
+                Print/Share PDF
               </>
             )}
           </Button>
