@@ -53,7 +53,6 @@ const InvoiceDetail = () => {
     if (!invoice) return;
     
     try {
-      // Cast invoice to any to access jobs property from database result
       const invoiceWithJobs = invoice as any;
       const customerName = invoiceWithJobs.jobs?.customer_name || 'Customer';
       await shareInvoice(printableInvoiceRef, invoice.invoice_number || 'INV', customerName);
@@ -68,7 +67,6 @@ const InvoiceDetail = () => {
     if (!invoice) return;
     
     try {
-      // Cast invoice to any to access jobs property from database result
       const invoiceWithJobs = invoice as any;
       const customerName = invoiceWithJobs.jobs?.customer_name || 'Customer';
       const customerEmail = invoiceWithJobs.jobs?.customer_email;
@@ -94,10 +92,9 @@ const InvoiceDetail = () => {
     return <InvoiceNotFound onBack={handleBackToList} />;
   }
 
-  // Ensure invoice has required id field for DatabaseInvoice compatibility
   const databaseInvoice: DatabaseInvoice = {
     ...invoice,
-    id: invoice.id || '', // Provide default empty string if id is undefined
+    id: invoice.id || '',
     job_id: invoice.job_id,
     bill_description: invoice.bill_description,
     bill_amount: invoice.bill_amount,
@@ -115,7 +112,6 @@ const InvoiceDetail = () => {
       notes: invoice.notes,
       terms: invoice.terms
     },
-    // Cast to access jobs property if it exists from database join
     jobs: (invoice as any).jobs
   };
 
@@ -149,18 +145,19 @@ const InvoiceDetail = () => {
           </Button>
         </div>
         
-        <div 
-          ref={printableInvoiceRef} 
-          id="print-content"
-          className="print-content rounded-lg shadow-sm bg-white"
-          style={{
-            width: '210mm', // A4 width
-            minHeight: '297mm', // A4 height
-            margin: '0 auto',
-            padding: '20mm' // Standard print margin
-          }}
-        >
-          <PrintableInvoice invoice={databaseInvoice} />
+        <div className="flex justify-center">
+          <div 
+            ref={printableInvoiceRef} 
+            id="print-content"
+            className="print-content rounded-lg shadow-sm bg-white"
+            style={{
+              width: '210mm',
+              minHeight: '297mm',
+              padding: '20mm'
+            }}
+          >
+            <PrintableInvoice invoice={databaseInvoice} />
+          </div>
         </div>
       </div>
 
