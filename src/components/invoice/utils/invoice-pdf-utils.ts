@@ -8,14 +8,39 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
   if (!printRef.current) return null;
   
   try {
-    const canvas = await html2canvas(printRef.current, {
+    // Clone the element to avoid affecting the original
+    const clonedElement = printRef.current.cloneNode(true) as HTMLElement;
+    
+    // Apply A4-specific styles for PDF generation
+    clonedElement.style.width = '210mm';
+    clonedElement.style.minHeight = '297mm';
+    clonedElement.style.padding = '15mm';
+    clonedElement.style.margin = '0';
+    clonedElement.style.backgroundColor = 'white';
+    clonedElement.style.color = 'black';
+    clonedElement.style.fontSize = '12px';
+    clonedElement.style.lineHeight = '1.4';
+    clonedElement.style.fontFamily = 'Arial, sans-serif';
+    
+    // Temporarily add to DOM for canvas generation
+    clonedElement.style.position = 'absolute';
+    clonedElement.style.left = '-9999px';
+    clonedElement.style.top = '0';
+    document.body.appendChild(clonedElement);
+
+    const canvas = await html2canvas(clonedElement, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
       allowTaint: true,
       foreignObjectRendering: true,
+      width: 794, // A4 width in pixels at 96 DPI (210mm)
+      height: 1123, // A4 height in pixels at 96 DPI (297mm)
     });
+
+    // Remove cloned element
+    document.body.removeChild(clonedElement);
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -24,18 +49,13 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     });
 
     const imgData = canvas.toDataURL('image/png');
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-    // If content is longer than one page, scale it to fit
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    if (pdfHeight > pageHeight) {
-      const scale = pageHeight / pdfHeight;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth * scale, pageHeight);
-    } else {
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    }
+    
+    // A4 dimensions in mm
+    const pdfWidth = 210;
+    const pdfHeight = 297;
+    
+    // Add image to fill entire A4 page
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
     return pdf;
   } catch (error) {

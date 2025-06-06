@@ -21,19 +21,28 @@ export const shareInvoice = async (
       await navigator.share({
         files: [pdfFile],
         title: `Invoice ${invoiceNumber}`,
-        text: `Invoice details for ${customerName}`,
+        text: `Invoice for ${customerName}`,
       });
-      toast.success("Invoice shared successfully");
+      toast.success("Invoice PDF shared successfully");
     } else {
-      // Fallback for WhatsApp
+      // Fallback: Create download link and WhatsApp share
       const pdfUrl = URL.createObjectURL(blob);
-      const text = `Invoice #${invoiceNumber} for ${customerName}`;
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `Invoice_${invoiceNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Also prepare WhatsApp message
+      const text = `Invoice #${invoiceNumber} for ${customerName} - PDF downloaded`;
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
       
-      // Also open PDF in new tab
-      window.open(pdfUrl, '_blank');
-      toast.info("Invoice PDF opened in new tab. Please share manually.");
+      toast.success("Invoice PDF downloaded. WhatsApp opened for sharing.");
+      
+      // Clean up URL
+      setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
     }
   } catch (error) {
     console.error("Sharing error:", error);
@@ -53,17 +62,26 @@ export const emailInvoice = async (
 
   try {
     const { blob } = pdfResult;
-    const pdfUrl = URL.createObjectURL(blob);
     
+    // Create download link for the PDF
+    const pdfUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `Invoice_${invoiceNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Open email client
     const subject = `Invoice #${invoiceNumber} - ${customerName}`;
-    const body = `Please find attached the invoice details.\n\nInvoice: #${invoiceNumber}\nCustomer: ${customerName}`;
+    const body = `Please find the invoice PDF attached.\n\nInvoice: #${invoiceNumber}\nCustomer: ${customerName}\n\nThe PDF has been downloaded to your device. Please attach it to this email.`;
     const mailtoUrl = `mailto:${customerEmail || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     window.location.href = mailtoUrl;
+    toast.success("Invoice PDF downloaded. Email client opened.");
     
-    // Also open PDF in new tab for manual attachment
-    window.open(pdfUrl, '_blank');
-    toast.info("Email client opened. PDF opened in new tab for manual attachment.");
+    // Clean up URL
+    setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
   } catch (error) {
     console.error("Email error:", error);
     toast.error("Failed to prepare email");
