@@ -9,7 +9,7 @@ import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DatabaseInvoice } from "@/lib/types";
-import * as html2pdf from 'html2pdf.js';
+import html2pdf from "html2pdf.js";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
