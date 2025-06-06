@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import * as html2pdf from 'html2pdf.js';
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DatabaseInvoice } from "@/lib/types";
-import html2pdf from "html2pdf.js";
+import * as html2pdf from 'html2pdf.js';
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
