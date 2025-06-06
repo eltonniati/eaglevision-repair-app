@@ -460,3 +460,13 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
     throw error;
   }
 };
+
+// Export handlePrint as an alias for handleJobCardPrint for backward compatibility
+export const handlePrint = (printRef: React.RefObject<HTMLDivElement>, jobNumber?: string) => {
+  if (!printRef.current) {
+    throw new Error('Print reference is not available');
+  }
+  
+  const content = printRef.current.innerHTML;
+  return handleJobCardPrint(content, jobNumber);
+};

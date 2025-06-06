@@ -10,6 +10,7 @@ import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { handleInvoicePrint } from "@/components/job/utils/print-utils";
+import { DatabaseInvoice } from "@/lib/types";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -89,6 +90,29 @@ const InvoiceDetail = () => {
     return <InvoiceNotFound onBack={handleBackToList} />;
   }
 
+  // Ensure invoice has required id field for DatabaseInvoice compatibility
+  const databaseInvoice: DatabaseInvoice = {
+    ...invoice,
+    id: invoice.id || '', // Provide default empty string if id is undefined
+    job_id: invoice.job_id,
+    bill_description: invoice.bill_description,
+    bill_amount: invoice.bill_amount,
+    total: invoice.total,
+    created_at: invoice.created_at || new Date().toISOString(),
+    invoice_number: invoice.invoice_number,
+    invoice_data: {
+      status: invoice.status,
+      issue_date: invoice.issue_date,
+      due_date: invoice.due_date,
+      line_items: invoice.line_items,
+      taxes: invoice.taxes,
+      subtotal: invoice.subtotal,
+      tax_total: invoice.tax_total,
+      notes: invoice.notes,
+      terms: invoice.terms
+    }
+  };
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
       <div className="flex flex-col space-y-4">
@@ -123,7 +147,7 @@ const InvoiceDetail = () => {
           id="print-content"
           className="print-content rounded-lg shadow-sm bg-white"
         >
-          <PrintableInvoice invoice={invoice} />
+          <PrintableInvoice invoice={databaseInvoice} />
         </div>
       </div>
 
