@@ -9,7 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { generatePdf, downloadPdf } from "./utils/pdf-utils";
 import { shareJobCard, emailJobCard } from "./utils/share-utils";
-import { usePrintJob } from "./utils/print-utils";
+import { handlePrint } from "./utils/print-utils";
 
 interface JobPreviewModeProps {
   job: Job;
@@ -43,8 +43,11 @@ export const JobPreviewMode = ({
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isMobile = useIsMobile();
 
-  // Use our print utility hook
-  const { onPrintButtonClick } = usePrintJob(printRef, job.job_card_number || "unknown");
+  // Print functionality
+  const onPrintButtonClick = () => {
+    handlePrint(printRef, job.job_card_number || "unknown");
+    return Promise.resolve();
+  };
 
   // Share functionality
   const handleShare = async () => {

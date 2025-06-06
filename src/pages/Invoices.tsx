@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Printer } from "lucide-react";
@@ -10,6 +9,7 @@ import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { handleInvoicePrint } from "@/components/job/utils/print-utils";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -26,48 +26,19 @@ const InvoiceDetail = () => {
     }
   }, [invoiceId]);
 
-  const handlePrintOrPDF = useReactToPrint({
-    documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
-    // Fix: Use contentRef as a RefObject instead of a function
-    contentRef: printableInvoiceRef,
-    onBeforePrint: () => {
-      setIsPrinting(true);
-      return new Promise<void>((resolve) => {
-        setTimeout(resolve, 100);
-      });
-    },
-    onAfterPrint: () => {
-      setIsPrinting(false);
-      setShowPrintDialog(false);
-      toast.success("Invoice printed/saved successfully");
-    },
-    onPrintError: (error) => {
-      console.error("Print error:", error);
-      toast.error("Failed to print invoice");
-      setIsPrinting(false);
-      setShowPrintDialog(false);
-    },
-    pageStyle: `
-      @page {
-        size: A4;
-        margin: 10mm;
-      }
-      @media print {
-        body * {
-          visibility: hidden;
-        }
-        #print-content, #print-content * {
-          visibility: visible;
-        }
-        #print-content {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-        }
-      }
-    `,
-  });
+  const handlePrintOrPDF = () => {
+    if (!printableInvoiceRef.current || !invoice) {
+      toast.error('Unable to print invoice. Content not found.');
+      return;
+    }
+
+    setIsPrinting(true);
+    const content = printableInvoiceRef.current.innerHTML;
+    handleInvoicePrint(content, invoice.invoice_number);
+    setIsPrinting(false);
+    setShowPrintDialog(false);
+    toast.success("Invoice printed/saved successfully");
+  };
 
   const handleBackToList = () => {
     navigate("/job-cards");
@@ -88,7 +59,7 @@ const InvoiceDetail = () => {
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
       <div className="flex flex-col space-y-4">
         <div className="flex justify-between items-center mb-4">
           <Button variant="outline" size="sm" onClick={handleBackToList}>
@@ -119,7 +90,6 @@ const InvoiceDetail = () => {
         open={showPrintDialog} 
         onOpenChange={setShowPrintDialog}
         onPrint={handlePrintOrPDF}
-        // Remove isMobile if it's not needed in PrintDialog
       />
     </div>
   );

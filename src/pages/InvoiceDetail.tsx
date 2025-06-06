@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Share } from "lucide-react";
@@ -10,6 +9,7 @@ import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { handleInvoicePrint } from "@/components/job/utils/print-utils";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -26,33 +26,18 @@ const InvoiceDetail = () => {
     }
   }, [invoiceId]);
 
-  const handlePrintOrPDF = useReactToPrint({
-    documentTitle: `Invoice_${invoice?.invoice_number || "unknown"}`,
-    contentRef: printableInvoiceRef,
-    onBeforePrint: () => {
-      setIsPrinting(true);
-      return new Promise<void>((resolve) => {
-        setTimeout(resolve, 100);
-      });
-    },
-    onAfterPrint: () => {
-      setIsPrinting(false);
-      setShowPrintDialog(false);
-      toast.success("Invoice printed/saved successfully");
-    },
-    onPrintError: (error) => {
-      console.error("Print error:", error);
-      toast.error("Failed to print invoice");
-      setIsPrinting(false);
-      setShowPrintDialog(false);
-    },
-    pageStyle: `
-      @page {
-        size: A4;
-        margin: 10mm;
-      }
-    `,
-  });
+  const handlePrintOrPDF = () => {
+    if (!printableInvoiceRef.current || !invoice) {
+      toast.error('Unable to print invoice. Content not found.');
+      return;
+    }
+
+    setIsPrinting(true);
+    const content = printableInvoiceRef.current.innerHTML;
+    handleInvoicePrint(content, invoice.invoice_number);
+    setIsPrinting(false);
+    setShowPrintDialog(false);
+  };
 
   const handleBackToList = () => {
     navigate("/job-cards");
