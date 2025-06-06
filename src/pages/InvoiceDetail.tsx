@@ -36,7 +36,7 @@ const InvoiceDetail = () => {
 
     setIsPrinting(true);
     try {
-      await downloadInvoicePdf(printableInvoiceRef, invoice.invoice_number);
+      await downloadInvoicePdf(printableInvoiceRef, invoice.invoice_number || 'INV');
     } catch (error) {
       console.error('Print/PDF error:', error);
       toast.error('Failed to generate PDF');
@@ -54,8 +54,10 @@ const InvoiceDetail = () => {
     if (!invoice) return;
     
     try {
-      const customerName = invoice.jobs?.customer_name || 'Customer';
-      await shareInvoice(printableInvoiceRef, invoice.invoice_number, customerName);
+      // Cast invoice to any to access jobs property from database result
+      const invoiceWithJobs = invoice as any;
+      const customerName = invoiceWithJobs.jobs?.customer_name || 'Customer';
+      await shareInvoice(printableInvoiceRef, invoice.invoice_number || 'INV', customerName);
     } catch (error) {
       console.error("Error sharing:", error);
       toast.error("Failed to share invoice");
@@ -67,9 +69,11 @@ const InvoiceDetail = () => {
     if (!invoice) return;
     
     try {
-      const customerName = invoice.jobs?.customer_name || 'Customer';
-      const customerEmail = invoice.jobs?.customer_email;
-      await emailInvoice(printableInvoiceRef, invoice.invoice_number, customerName, customerEmail);
+      // Cast invoice to any to access jobs property from database result
+      const invoiceWithJobs = invoice as any;
+      const customerName = invoiceWithJobs.jobs?.customer_name || 'Customer';
+      const customerEmail = invoiceWithJobs.jobs?.customer_email;
+      await emailInvoice(printableInvoiceRef, invoice.invoice_number || 'INV', customerName, customerEmail);
     } catch (error) {
       console.error("Email error:", error);
       toast.error("Failed to prepare email");
@@ -111,7 +115,9 @@ const InvoiceDetail = () => {
       tax_total: invoice.tax_total,
       notes: invoice.notes,
       terms: invoice.terms
-    }
+    },
+    // Cast to access jobs property if it exists from database join
+    jobs: (invoice as any).jobs
   };
 
   return (
@@ -159,7 +165,7 @@ const InvoiceDetail = () => {
         onPrint={handlePrintOrPDF}
         onShare={handleShare}
         onEmail={handleEmail}
-        invoiceNumber={invoice.invoice_number}
+        invoiceNumber={invoice.invoice_number || 'INV'}
       />
     </div>
   );
