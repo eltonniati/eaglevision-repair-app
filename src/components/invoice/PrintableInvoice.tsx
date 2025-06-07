@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
@@ -33,12 +32,13 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
     <div 
       className="w-full bg-white text-black print-container" 
       style={{ 
-        width: '595px',
-        minHeight: '842px',
-        padding: '20px',
-        margin: '0 auto',
-        fontSize: '11px',
-        lineHeight: '1.3',
+        width: '210mm',
+        minHeight: '297mm',
+        maxWidth: '210mm',
+        padding: '10mm',
+        margin: '0',
+        fontSize: '12px',
+        lineHeight: '1.4',
         fontFamily: 'Arial, sans-serif',
         boxSizing: 'border-box',
         position: 'relative',
@@ -49,8 +49,8 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
     >
       <div style={{ 
         border: '1px solid #333',
-        padding: '20px',
-        height: 'calc(100% - 40px)',
+        padding: '15px',
+        height: 'calc(100% - 30px)',
         boxSizing: 'border-box',
         background: 'white'
       }}>
@@ -59,7 +59,7 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'flex-start', 
-          marginBottom: '20px',
+          marginBottom: '15px',
           width: '100%'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -68,8 +68,8 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                 src={company.logo_url} 
                 alt="Company Logo" 
                 style={{ 
-                  height: '40px', 
-                  width: '40px', 
+                  height: '35px', 
+                  width: '35px', 
                   objectFit: 'contain' 
                 }}
                 onError={(e) => {
@@ -79,7 +79,7 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
             )}
             <div>
               <h1 style={{ 
-                fontSize: '22px', 
+                fontSize: '20px', 
                 fontWeight: 'bold', 
                 margin: '0 0 5px 0',
                 color: '#000'
@@ -93,13 +93,13 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: '0 0 5px 0', fontSize: '11px', color: '#000' }}>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: '#000' }}>
               <strong>Issue Date:</strong> {format(new Date(invoiceData.issue_date), "MMM d, yyyy")}
             </p>
-            <p style={{ margin: '0 0 5px 0', fontSize: '11px', color: '#000' }}>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: '#000' }}>
               <strong>Due Date:</strong> {format(new Date(invoiceData.due_date), "MMM d, yyyy")}
             </p>
-            <p style={{ margin: '0', fontSize: '11px', color: '#000' }}>
+            <p style={{ margin: '0', fontSize: '12px', color: '#000' }}>
               <strong>Status:</strong> {invoiceData.status}
             </p>
           </div>
@@ -110,67 +110,67 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr', 
           gap: '20px',
-          marginBottom: '20px',
+          marginBottom: '15px',
           width: '100%'
         }}>
           <div>
             <h2 style={{ 
-              fontSize: '12px', 
+              fontSize: '13px', 
               fontWeight: 'bold', 
               borderBottom: '1px solid #000',
               paddingBottom: '5px',
-              marginBottom: '10px',
+              marginBottom: '8px',
               color: '#000'
             }}>From</h2>
             {company ? (
               <div>
-                <p style={{ margin: '0 0 3px 0', fontWeight: 'bold', fontSize: '11px', color: '#000' }}>{company.name}</p>
-                <p style={{ margin: '0 0 3px 0', fontSize: '10px', color: '#000' }}>{company.address}</p>
-                <p style={{ margin: '0 0 3px 0', fontSize: '10px', color: '#000' }}>{company.phone}</p>
-                <p style={{ margin: '0', fontSize: '10px', color: '#000' }}>{company.email}</p>
+                <p style={{ margin: '0 0 3px 0', fontWeight: 'bold', fontSize: '12px', color: '#000' }}>{company.name}</p>
+                <p style={{ margin: '0 0 3px 0', fontSize: '11px', color: '#000' }}>{company.address}</p>
+                <p style={{ margin: '0 0 3px 0', fontSize: '11px', color: '#000' }}>{company.phone}</p>
+                <p style={{ margin: '0', fontSize: '11px', color: '#000' }}>{company.email}</p>
               </div>
             ) : (
-              <p style={{ margin: '0', fontSize: '10px', color: '#000' }}>Company information not available</p>
+              <p style={{ margin: '0', fontSize: '11px', color: '#000' }}>Company information not available</p>
             )}
           </div>
           <div>
             <h2 style={{ 
-              fontSize: '12px', 
+              fontSize: '13px', 
               fontWeight: 'bold', 
               borderBottom: '1px solid #000',
               paddingBottom: '5px',
-              marginBottom: '10px',
+              marginBottom: '8px',
               color: '#000'
             }}>Bill To</h2>
             {invoice.jobs && (
               <div>
-                <p style={{ margin: '0 0 3px 0', fontWeight: 'bold', fontSize: '11px', color: '#000' }}>{invoice.jobs.customer_name}</p>
-                <p style={{ margin: '0 0 3px 0', fontSize: '10px', color: '#000' }}>{invoice.jobs.customer_phone}</p>
-                {invoice.jobs.customer_email && <p style={{ margin: '0', fontSize: '10px', color: '#000' }}>{invoice.jobs.customer_email}</p>}
+                <p style={{ margin: '0 0 3px 0', fontWeight: 'bold', fontSize: '12px', color: '#000' }}>{invoice.jobs.customer_name}</p>
+                <p style={{ margin: '0 0 3px 0', fontSize: '11px', color: '#000' }}>{invoice.jobs.customer_phone}</p>
+                {invoice.jobs.customer_email && <p style={{ margin: '0', fontSize: '11px', color: '#000' }}>{invoice.jobs.customer_email}</p>}
               </div>
             )}
           </div>
         </div>
 
         {/* Invoice Details */}
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: '15px' }}>
           <h2 style={{ 
-            fontSize: '12px', 
+            fontSize: '13px', 
             fontWeight: 'bold', 
             borderBottom: '1px solid #000',
             paddingBottom: '5px',
-            marginBottom: '10px',
+            marginBottom: '8px',
             color: '#000'
           }}>Invoice Details</h2>
-          <p style={{ margin: '0 0 5px 0', fontSize: '10px', color: '#000' }}>
+          <p style={{ margin: '0 0 5px 0', fontSize: '11px', color: '#000' }}>
             <strong>Description:</strong> {invoice.bill_description}
           </p>
           {invoice.jobs && (
             <div>
-              <p style={{ margin: '0 0 5px 0', fontSize: '10px', color: '#000' }}>
+              <p style={{ margin: '0 0 5px 0', fontSize: '11px', color: '#000' }}>
                 <strong>Device:</strong> {invoice.jobs.device_name} {invoice.jobs.device_model}
               </p>
-              <p style={{ margin: '0', fontSize: '10px', color: '#000' }}>
+              <p style={{ margin: '0', fontSize: '11px', color: '#000' }}>
                 <strong>Problem:</strong> {invoice.jobs.problem}
               </p>
             </div>
@@ -179,13 +179,13 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
 
         {/* Line Items */}
         {invoiceData.line_items && invoiceData.line_items.length > 0 && (
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '15px' }}>
             <h2 style={{ 
-              fontSize: '12px', 
+              fontSize: '13px', 
               fontWeight: 'bold', 
               borderBottom: '1px solid #000',
               paddingBottom: '5px',
-              marginBottom: '10px',
+              marginBottom: '8px',
               color: '#000'
             }}>Line Items</h2>
             <table style={{ 
@@ -267,7 +267,7 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         )}
 
         {/* Totals */}
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: '15px' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <div style={{ width: '200px' }}>
               <div style={{ 
@@ -353,10 +353,11 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         {/* Footer */}
         <div style={{ 
           textAlign: 'center',
-          fontSize: '9px',
+          fontSize: '10px',
           color: '#666',
           borderTop: '1px solid #ccc',
-          paddingTop: '10px'
+          paddingTop: '8px',
+          marginTop: '15px'
         }}>
           <p style={{ margin: '0 0 3px 0' }}>Thank you for your business!</p>
           <p style={{ margin: '0' }}>Generated on: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
