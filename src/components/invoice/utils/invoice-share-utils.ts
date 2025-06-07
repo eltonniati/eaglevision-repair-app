@@ -25,15 +25,27 @@ export const shareInvoice = async (
       });
       toast.success("Invoice shared successfully");
     } else {
-      // Fallback for WhatsApp
+      // Enhanced fallback for WhatsApp and other platforms
       const pdfUrl = URL.createObjectURL(blob);
       const text = `Invoice #${invoiceNumber} for ${customerName}`;
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-      window.open(whatsappUrl, '_blank');
       
-      // Also open PDF in new tab
-      window.open(pdfUrl, '_blank');
-      toast.info("Invoice PDF opened in new tab. Please share manually.");
+      // For mobile devices, open WhatsApp first
+      if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n\nPDF will open in new tab for sharing')}`;
+        window.open(whatsappUrl, '_blank');
+        
+        // Small delay before opening PDF
+        setTimeout(() => {
+          window.open(pdfUrl, '_blank');
+        }, 1000);
+      } else {
+        // For desktop, open both simultaneously
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank');
+        window.open(pdfUrl, '_blank');
+      }
+      
+      toast.info("WhatsApp opened. PDF will open separately for sharing.");
     }
   } catch (error) {
     console.error("Sharing error:", error);
@@ -61,8 +73,11 @@ export const emailInvoice = async (
     
     window.location.href = mailtoUrl;
     
-    // Also open PDF in new tab for manual attachment
-    window.open(pdfUrl, '_blank');
+    // Open PDF in new tab for manual attachment
+    setTimeout(() => {
+      window.open(pdfUrl, '_blank');
+    }, 500);
+    
     toast.info("Email client opened. PDF opened in new tab for manual attachment.");
   } catch (error) {
     console.error("Email error:", error);

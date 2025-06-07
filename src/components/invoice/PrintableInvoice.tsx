@@ -30,19 +30,35 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
   };
 
   return (
-    <div className="w-full bg-white text-black" style={{ 
-      width: '210mm',
-      minHeight: '297mm',
-      padding: '20mm',
-      margin: '0 auto',
-      fontSize: '12px',
-      lineHeight: '1.4',
-      fontFamily: 'Arial, sans-serif'
-    }}>
-      <div className="border-2 border-gray-300" style={{ padding: '15mm' }}>
+    <div 
+      className="w-full bg-white text-black print-container" 
+      style={{ 
+        width: '210mm',
+        minHeight: '297mm',
+        padding: '20mm',
+        margin: '0 auto',
+        fontSize: '12px',
+        lineHeight: '1.4',
+        fontFamily: 'Arial, sans-serif',
+        boxSizing: 'border-box',
+        position: 'relative',
+        overflow: 'visible'
+      }}
+    >
+      <div className="border-2 border-gray-300" style={{ 
+        padding: '15mm',
+        height: '100%',
+        boxSizing: 'border-box'
+      }}>
         {/* Header with Company Info and Logo */}
-        <div className="flex justify-between items-start mb-6" style={{ marginBottom: '15mm' }}>
-          <div className="flex items-center gap-4">
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start', 
+          marginBottom: '15mm',
+          width: '100%'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {company?.logo_url && (
               <img 
                 src={company.logo_url} 
@@ -84,11 +100,12 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         </div>
 
         {/* Company and Customer Info */}
-        <div className="grid grid-cols-2 gap-6" style={{ 
+        <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr', 
           gap: '20px',
-          marginBottom: '15mm'
+          marginBottom: '15mm',
+          width: '100%'
         }}>
           <div>
             <h2 style={{ 
