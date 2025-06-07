@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -145,17 +146,16 @@ const InvoiceDetail = () => {
           </Button>
         </div>
         
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center overflow-x-auto">
           <div 
             ref={printableInvoiceRef} 
             id="print-content"
             className="print-content bg-white shadow-sm"
             style={{
-              width: '100%',
-              maxWidth: '210mm',
-              padding: '20px',
-              margin: '0 auto',
-              boxSizing: 'border-box'
+              maxWidth: isMobile ? '100vw' : '210mm',
+              transform: isMobile ? 'scale(0.4)' : 'scale(1)',
+              transformOrigin: 'top center',
+              margin: isMobile ? '-40% auto' : '0 auto'
             }}
           >
             <PrintableInvoice invoice={databaseInvoice} />

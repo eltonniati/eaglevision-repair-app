@@ -30,92 +30,196 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
   };
 
   return (
-    <div className="p-6 print:p-4 print:block print:visible print:w-full print:text-black bg-white text-black max-w-4xl mx-auto print:max-w-none print:mx-0">
-      <div className="border-2 border-gray-200 p-6 print:border print:border-gray-300 print:p-4 print:text-xs">
+    <div className="w-full bg-white text-black" style={{ 
+      width: '210mm',
+      minHeight: '297mm',
+      padding: '20mm',
+      margin: '0 auto',
+      fontSize: '12px',
+      lineHeight: '1.4',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <div className="border-2 border-gray-300" style={{ padding: '15mm' }}>
         {/* Header with Company Info and Logo */}
-        <div className="flex justify-between items-start mb-6 print:mb-4">
-          <div className="flex items-center gap-4 print:gap-2">
+        <div className="flex justify-between items-start mb-6" style={{ marginBottom: '15mm' }}>
+          <div className="flex items-center gap-4">
             {company?.logo_url && (
               <img 
                 src={company.logo_url} 
                 alt="Company Logo" 
-                className="h-16 w-16 print:h-12 print:w-12 object-contain"
+                style={{ 
+                  height: '40px', 
+                  width: '40px', 
+                  objectFit: 'contain' 
+                }}
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
             )}
             <div>
-              <h1 className="text-3xl print:text-xl font-bold text-black">INVOICE</h1>
-              <p className="text-lg print:text-sm font-medium text-black">#{invoice.invoice_number}</p>
+              <h1 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                margin: '0 0 5px 0' 
+              }}>INVOICE</h1>
+              <p style={{ 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                margin: '0' 
+              }}>#{invoice.invoice_number}</p>
             </div>
           </div>
-          <div className="text-right text-black print:text-xs">
-            <p><strong>Issue Date:</strong> {format(new Date(invoiceData.issue_date), "MMM d, yyyy")}</p>
-            <p><strong>Due Date:</strong> {format(new Date(invoiceData.due_date), "MMM d, yyyy")}</p>
-            <p><strong>Status:</strong> {invoiceData.status}</p>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ margin: '0 0 5px 0' }}>
+              <strong>Issue Date:</strong> {format(new Date(invoiceData.issue_date), "MMM d, yyyy")}
+            </p>
+            <p style={{ margin: '0 0 5px 0' }}>
+              <strong>Due Date:</strong> {format(new Date(invoiceData.due_date), "MMM d, yyyy")}
+            </p>
+            <p style={{ margin: '0' }}>
+              <strong>Status:</strong> {invoiceData.status}
+            </p>
           </div>
         </div>
 
         {/* Company and Customer Info */}
-        <div className="grid grid-cols-2 gap-6 print:gap-4 mb-6 print:mb-4 text-black print:text-xs">
+        <div className="grid grid-cols-2 gap-6" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr', 
+          gap: '20px',
+          marginBottom: '15mm'
+        }}>
           <div>
-            <h2 className="text-lg print:text-sm font-semibold border-b mb-2 print:mb-1 text-black">From</h2>
+            <h2 style={{ 
+              fontSize: '14px', 
+              fontWeight: 'bold', 
+              borderBottom: '1px solid #000',
+              paddingBottom: '5px',
+              marginBottom: '10px'
+            }}>From</h2>
             {company ? (
-              <>
-                <p className="font-semibold">{company.name}</p>
-                <p>{company.address}</p>
-                <p>{company.phone}</p>
-                <p>{company.email}</p>
-              </>
+              <div>
+                <p style={{ margin: '0 0 3px 0', fontWeight: 'bold' }}>{company.name}</p>
+                <p style={{ margin: '0 0 3px 0' }}>{company.address}</p>
+                <p style={{ margin: '0 0 3px 0' }}>{company.phone}</p>
+                <p style={{ margin: '0' }}>{company.email}</p>
+              </div>
             ) : (
-              <p>Company information not available</p>
+              <p style={{ margin: '0' }}>Company information not available</p>
             )}
           </div>
           <div>
-            <h2 className="text-lg print:text-sm font-semibold border-b mb-2 print:mb-1 text-black">Bill To</h2>
+            <h2 style={{ 
+              fontSize: '14px', 
+              fontWeight: 'bold', 
+              borderBottom: '1px solid #000',
+              paddingBottom: '5px',
+              marginBottom: '10px'
+            }}>Bill To</h2>
             {invoice.jobs && (
-              <>
-                <p className="font-semibold">{invoice.jobs.customer_name}</p>
-                <p>{invoice.jobs.customer_phone}</p>
-                {invoice.jobs.customer_email && <p>{invoice.jobs.customer_email}</p>}
-              </>
+              <div>
+                <p style={{ margin: '0 0 3px 0', fontWeight: 'bold' }}>{invoice.jobs.customer_name}</p>
+                <p style={{ margin: '0 0 3px 0' }}>{invoice.jobs.customer_phone}</p>
+                {invoice.jobs.customer_email && <p style={{ margin: '0' }}>{invoice.jobs.customer_email}</p>}
+              </div>
             )}
           </div>
         </div>
 
         {/* Invoice Details */}
-        <div className="mb-6 print:mb-4 text-black print:text-xs">
-          <h2 className="text-lg print:text-sm font-semibold border-b mb-2 print:mb-1 text-black">Invoice Details</h2>
-          <p><strong>Description:</strong> {invoice.bill_description}</p>
+        <div style={{ marginBottom: '15mm' }}>
+          <h2 style={{ 
+            fontSize: '14px', 
+            fontWeight: 'bold', 
+            borderBottom: '1px solid #000',
+            paddingBottom: '5px',
+            marginBottom: '10px'
+          }}>Invoice Details</h2>
+          <p style={{ margin: '0 0 5px 0' }}>
+            <strong>Description:</strong> {invoice.bill_description}
+          </p>
           {invoice.jobs && (
-            <>
-              <p><strong>Device:</strong> {invoice.jobs.device_name} {invoice.jobs.device_model}</p>
-              <p><strong>Problem:</strong> {invoice.jobs.problem}</p>
-            </>
+            <div>
+              <p style={{ margin: '0 0 5px 0' }}>
+                <strong>Device:</strong> {invoice.jobs.device_name} {invoice.jobs.device_model}
+              </p>
+              <p style={{ margin: '0' }}>
+                <strong>Problem:</strong> {invoice.jobs.problem}
+              </p>
+            </div>
           )}
         </div>
 
         {/* Line Items */}
         {invoiceData.line_items && invoiceData.line_items.length > 0 && (
-          <div className="mb-6 print:mb-4 text-black print:text-xs">
-            <h2 className="text-lg print:text-sm font-semibold border-b mb-2 print:mb-1 text-black">Line Items</h2>
-            <table className="w-full border-collapse border border-gray-300 print:text-xs">
+          <div style={{ marginBottom: '15mm' }}>
+            <h2 style={{ 
+              fontSize: '14px', 
+              fontWeight: 'bold', 
+              borderBottom: '1px solid #000',
+              paddingBottom: '5px',
+              marginBottom: '10px'
+            }}>Line Items</h2>
+            <table style={{ 
+              width: '100%', 
+              borderCollapse: 'collapse',
+              border: '1px solid #000'
+            }}>
               <thead>
-                <tr className="bg-gray-100 print:bg-gray-200">
-                  <th className="border border-gray-300 p-2 print:p-1 text-left">Description</th>
-                  <th className="border border-gray-300 p-2 print:p-1 text-center">Qty</th>
-                  <th className="border border-gray-300 p-2 print:p-1 text-right">Unit Price</th>
-                  <th className="border border-gray-300 p-2 print:p-1 text-right">Amount</th>
+                <tr style={{ backgroundColor: '#f0f0f0' }}>
+                  <th style={{ 
+                    border: '1px solid #000', 
+                    padding: '8px', 
+                    textAlign: 'left',
+                    fontSize: '12px'
+                  }}>Description</th>
+                  <th style={{ 
+                    border: '1px solid #000', 
+                    padding: '8px', 
+                    textAlign: 'center',
+                    fontSize: '12px'
+                  }}>Qty</th>
+                  <th style={{ 
+                    border: '1px solid #000', 
+                    padding: '8px', 
+                    textAlign: 'right',
+                    fontSize: '12px'
+                  }}>Unit Price</th>
+                  <th style={{ 
+                    border: '1px solid #000', 
+                    padding: '8px', 
+                    textAlign: 'right',
+                    fontSize: '12px'
+                  }}>Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {invoiceData.line_items.map((item, index) => (
                   <tr key={index}>
-                    <td className="border border-gray-300 p-2 print:p-1">{item.description}</td>
-                    <td className="border border-gray-300 p-2 print:p-1 text-center">{item.quantity}</td>
-                    <td className="border border-gray-300 p-2 print:p-1 text-right">{formatCurrency(item.unit_price)}</td>
-                    <td className="border border-gray-300 p-2 print:p-1 text-right">{formatCurrency(item.amount)}</td>
+                    <td style={{ 
+                      border: '1px solid #000', 
+                      padding: '8px',
+                      fontSize: '11px'
+                    }}>{item.description}</td>
+                    <td style={{ 
+                      border: '1px solid #000', 
+                      padding: '8px', 
+                      textAlign: 'center',
+                      fontSize: '11px'
+                    }}>{item.quantity}</td>
+                    <td style={{ 
+                      border: '1px solid #000', 
+                      padding: '8px', 
+                      textAlign: 'right',
+                      fontSize: '11px'
+                    }}>{formatCurrency(item.unit_price)}</td>
+                    <td style={{ 
+                      border: '1px solid #000', 
+                      padding: '8px', 
+                      textAlign: 'right',
+                      fontSize: '11px'
+                    }}>{formatCurrency(item.amount)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -124,24 +228,43 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         )}
 
         {/* Totals */}
-        <div className="mb-6 print:mb-4 text-black print:text-xs">
-          <div className="flex justify-end">
-            <div className="w-64 print:w-48">
-              <div className="flex justify-between border-b py-2 print:py-1">
+        <div style={{ marginBottom: '15mm' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ width: '200px' }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                borderBottom: '1px solid #000',
+                paddingBottom: '5px',
+                marginBottom: '5px'
+              }}>
                 <span>Subtotal:</span>
                 <span>{formatCurrency(invoiceData.subtotal || 0)}</span>
               </div>
               {invoiceData.taxes && invoiceData.taxes.length > 0 && (
                 <>
                   {invoiceData.taxes.map((tax, index) => (
-                    <div key={index} className="flex justify-between border-b py-2 print:py-1">
+                    <div key={index} style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      borderBottom: '1px solid #000',
+                      paddingBottom: '5px',
+                      marginBottom: '5px'
+                    }}>
                       <span>{tax.name} ({tax.rate}%):</span>
                       <span>{formatCurrency(tax.amount)}</span>
                     </div>
                   ))}
                 </>
               )}
-              <div className="flex justify-between font-bold text-lg print:text-sm py-2 print:py-1 border-t-2">
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                borderTop: '2px solid #000',
+                paddingTop: '8px'
+              }}>
                 <span>Total:</span>
                 <span>{formatCurrency(invoice.total)}</span>
               </div>
@@ -151,26 +274,48 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
 
         {/* Notes and Terms */}
         {(invoiceData.notes || invoiceData.terms) && (
-          <div className="mb-6 print:mb-4 text-black print:text-xs">
+          <div style={{ marginBottom: '15mm' }}>
             {invoiceData.notes && (
-              <div className="mb-4 print:mb-2">
-                <h3 className="font-semibold mb-2 print:mb-1">Notes:</h3>
-                <p className="whitespace-pre-line">{invoiceData.notes}</p>
+              <div style={{ marginBottom: '10mm' }}>
+                <h3 style={{ 
+                  fontWeight: 'bold', 
+                  fontSize: '12px',
+                  marginBottom: '5px'
+                }}>Notes:</h3>
+                <p style={{ 
+                  whiteSpace: 'pre-line',
+                  margin: '0',
+                  fontSize: '11px'
+                }}>{invoiceData.notes}</p>
               </div>
             )}
             {invoiceData.terms && (
               <div>
-                <h3 className="font-semibold mb-2 print:mb-1">Terms & Conditions:</h3>
-                <p className="whitespace-pre-line">{invoiceData.terms}</p>
+                <h3 style={{ 
+                  fontWeight: 'bold', 
+                  fontSize: '12px',
+                  marginBottom: '5px'
+                }}>Terms & Conditions:</h3>
+                <p style={{ 
+                  whiteSpace: 'pre-line',
+                  margin: '0',
+                  fontSize: '11px'
+                }}>{invoiceData.terms}</p>
               </div>
             )}
           </div>
         )}
 
         {/* Footer */}
-        <div className="text-center text-sm print:text-xs text-gray-500 mt-6 print:mt-4 pt-4 print:pt-2 border-t text-black">
-          <p>Thank you for your business!</p>
-          <p className="mt-1">Generated on: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
+        <div style={{ 
+          textAlign: 'center',
+          fontSize: '10px',
+          color: '#666',
+          borderTop: '1px solid #ccc',
+          paddingTop: '10px'
+        }}>
+          <p style={{ margin: '0 0 5px 0' }}>Thank you for your business!</p>
+          <p style={{ margin: '0' }}>Generated on: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
         </div>
       </div>
     </div>

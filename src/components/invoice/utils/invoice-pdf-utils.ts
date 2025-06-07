@@ -8,6 +8,20 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
   if (!printRef.current) return null;
   
   try {
+    // Force the element to render at full size for PDF
+    const originalStyle = printRef.current.style.cssText;
+    printRef.current.style.cssText = `
+      width: 210mm !important;
+      min-height: 297mm !important;
+      padding: 20mm !important;
+      margin: 0 !important;
+      transform: none !important;
+      position: relative !important;
+      background: white !important;
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+    `;
+
     const canvas = await html2canvas(printRef.current, {
       scale: 2,
       useCORS: true,
@@ -15,7 +29,14 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       backgroundColor: '#ffffff',
       allowTaint: true,
       foreignObjectRendering: true,
+      width: 794, // A4 width in pixels at 96 DPI
+      height: 1123, // A4 height in pixels at 96 DPI
+      windowWidth: 794,
+      windowHeight: 1123,
     });
+
+    // Restore original styles
+    printRef.current.style.cssText = originalStyle;
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -23,19 +44,11 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       format: 'a4'
     });
 
-    const imgData = canvas.toDataURL('image/png');
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const imgData = canvas.toDataURL('image/png', 1.0);
+    const pdfWidth = 210; // A4 width in mm
+    const pdfHeight = 297; // A4 height in mm
 
-    // If content is longer than one page, scale it to fit
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    if (pdfHeight > pageHeight) {
-      const scale = pageHeight / pdfHeight;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth * scale, pageHeight);
-    } else {
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    }
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
     return pdf;
   } catch (error) {
