@@ -8,37 +8,43 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
   if (!printRef.current) return null;
   
   try {
-    // Force the element to render at A4 size for PDF
-    const originalStyle = printRef.current.style.cssText;
-    const originalTransform = printRef.current.style.transform;
+    // Create a clone of the element to avoid modifying the original
+    const originalElement = printRef.current;
+    const clonedElement = originalElement.cloneNode(true) as HTMLDivElement;
     
-    // Set proper A4 dimensions and styling
-    printRef.current.style.cssText = `
-      width: 210mm !important;
-      min-height: 297mm !important;
-      padding: 20mm !important;
-      margin: 0 auto !important;
+    // Apply proper styling for PDF generation
+    clonedElement.style.cssText = `
+      width: 794px !important;
+      min-height: 1123px !important;
+      padding: 40px !important;
+      margin: 0 !important;
       transform: none !important;
-      position: relative !important;
+      position: absolute !important;
+      top: -9999px !important;
+      left: 0 !important;
       background: white !important;
       font-size: 12px !important;
       line-height: 1.4 !important;
       box-sizing: border-box !important;
       overflow: visible !important;
+      font-family: Arial, sans-serif !important;
     `;
 
-    // Wait for styles to apply
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Append to body temporarily
+    document.body.appendChild(clonedElement);
 
-    const canvas = await html2canvas(printRef.current, {
+    // Wait for styles to apply
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    const canvas = await html2canvas(clonedElement, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
       allowTaint: true,
       foreignObjectRendering: true,
-      width: 794, // A4 width in pixels at 96 DPI
-      height: 1123, // A4 height in pixels at 96 DPI
+      width: 794,
+      height: 1123,
       windowWidth: 794,
       windowHeight: 1123,
       x: 0,
@@ -47,25 +53,20 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       scrollY: 0,
     });
 
-    // Restore original styles
-    printRef.current.style.cssText = originalStyle;
-    if (originalTransform) {
-      printRef.current.style.transform = originalTransform;
-    }
+    // Remove the cloned element
+    document.body.removeChild(clonedElement);
 
     const pdf = new jsPDF({
       orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
+      unit: 'px',
+      format: [794, 1123],
       compress: true
     });
 
     const imgData = canvas.toDataURL('image/png', 0.95);
-    const pdfWidth = 210; // A4 width in mm
-    const pdfHeight = 297; // A4 height in mm
-
-    // Add image centered and at full size
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
+    
+    // Add image with exact dimensions to fill the PDF
+    pdf.addImage(imgData, 'PNG', 0, 0, 794, 1123, '', 'FAST');
 
     return pdf;
   } catch (error) {
