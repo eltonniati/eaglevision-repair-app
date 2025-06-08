@@ -2,9 +2,11 @@
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
+import { Language, getTranslations } from "@/lib/invoice-translations";
 
 interface PrintableInvoiceProps {
   invoice: DatabaseInvoice;
+  language?: Language;
 }
 
 const formatCurrency = (amount: number) => {
@@ -14,8 +16,9 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
+export const PrintableInvoice = ({ invoice, language = 'en' }: PrintableInvoiceProps) => {
   const { company } = useCompany();
+  const t = getTranslations(language);
   
   const invoiceData = invoice.invoice_data || {
     status: "Draft",
@@ -36,14 +39,13 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
     <div 
       className="w-full bg-white text-black print-container" 
       style={{ 
-        width: isMobile ? '375px' : '210mm',
-        height: isMobile ? '667px' : '297mm',
-        minHeight: isMobile ? '667px' : '297mm',
-        maxWidth: isMobile ? '375px' : '210mm',
-        maxHeight: isMobile ? '667px' : '297mm',
+        width: isMobile ? '100vw' : '210mm',
+        height: isMobile ? '100vh' : '297mm',
+        minHeight: isMobile ? '100vh' : '297mm',
+        maxWidth: isMobile ? '100vw' : '210mm',
         padding: '0',
-        margin: '0',
-        fontSize: isMobile ? '10px' : '12px',
+        margin: '0 auto',
+        fontSize: isMobile ? '3.5vw' : '12px',
         lineHeight: '1.3',
         fontFamily: 'Arial, sans-serif',
         boxSizing: 'border-box',
@@ -57,8 +59,8 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
       }}
     >
       <div style={{ 
-        border: isMobile ? '2px solid #333' : '1px solid #333',
-        padding: isMobile ? '12px' : '16px',
+        border: isMobile ? '0.5vw solid #333' : '1px solid #333',
+        padding: isMobile ? '3vw' : '16px',
         height: '100%',
         width: '100%',
         boxSizing: 'border-box',
@@ -72,18 +74,18 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'flex-start', 
-          marginBottom: isMobile ? '12px' : '16px',
+          marginBottom: isMobile ? '3vw' : '16px',
           width: '100%',
-          minHeight: isMobile ? '40px' : '50px'
+          minHeight: isMobile ? '10vw' : '50px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '2vw' : '8px' }}>
             {company?.logo_url && (
               <img 
                 src={company.logo_url} 
                 alt="Company Logo" 
                 style={{ 
-                  height: isMobile ? '24px' : '35px', 
-                  width: isMobile ? '24px' : '35px', 
+                  height: isMobile ? '8vw' : '35px', 
+                  width: isMobile ? '8vw' : '35px', 
                   objectFit: 'contain' 
                 }}
                 onError={(e) => {
@@ -93,13 +95,13 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
             )}
             <div>
               <h1 style={{ 
-                fontSize: isMobile ? '16px' : '22px', 
+                fontSize: isMobile ? '6vw' : '22px', 
                 fontWeight: 'bold', 
                 margin: '0 0 2px 0',
                 color: '#000'
-              }}>INVOICE</h1>
+              }}>{t.invoice}</h1>
               <p style={{ 
-                fontSize: isMobile ? '12px' : '16px', 
+                fontSize: isMobile ? '4vw' : '16px', 
                 fontWeight: '600', 
                 margin: '0',
                 color: '#000'
@@ -107,14 +109,14 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '9px' : '12px', color: '#000' }}>
-              <strong>Issue Date:</strong> {format(new Date(invoiceData.issue_date), "MMM d, yyyy")}
+            <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '3vw' : '12px', color: '#000' }}>
+              <strong>{t.issueDate}:</strong> {format(new Date(invoiceData.issue_date), "MMM d, yyyy")}
             </p>
-            <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '9px' : '12px', color: '#000' }}>
-              <strong>Due Date:</strong> {format(new Date(invoiceData.due_date), "MMM d, yyyy")}
+            <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '3vw' : '12px', color: '#000' }}>
+              <strong>{t.dueDate}:</strong> {format(new Date(invoiceData.due_date), "MMM d, yyyy")}
             </p>
-            <p style={{ margin: '0', fontSize: isMobile ? '9px' : '12px', color: '#000' }}>
-              <strong>Status:</strong> {invoiceData.status}
+            <p style={{ margin: '0', fontSize: isMobile ? '3vw' : '12px', color: '#000' }}>
+              <strong>{t.status}:</strong> {invoiceData.status}
             </p>
           </div>
         </div>
@@ -123,70 +125,70 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr', 
-          gap: isMobile ? '12px' : '20px',
-          marginBottom: isMobile ? '12px' : '16px',
+          gap: isMobile ? '3vw' : '20px',
+          marginBottom: isMobile ? '3vw' : '16px',
           width: '100%',
-          minHeight: isMobile ? '80px' : '100px'
+          minHeight: isMobile ? '20vw' : '100px'
         }}>
           <div>
             <h2 style={{ 
-              fontSize: isMobile ? '11px' : '14px', 
+              fontSize: isMobile ? '3.5vw' : '14px', 
               fontWeight: 'bold', 
               borderBottom: '1px solid #000',
               paddingBottom: '2px',
-              marginBottom: isMobile ? '6px' : '8px',
+              marginBottom: isMobile ? '2vw' : '8px',
               color: '#000'
-            }}>From</h2>
+            }}>{t.from}</h2>
             {company ? (
               <div>
-                <p style={{ margin: '0 0 2px 0', fontWeight: 'bold', fontSize: isMobile ? '9px' : '12px', color: '#000' }}>{company.name}</p>
-                <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{company.address}</p>
-                <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{company.phone}</p>
-                <p style={{ margin: '0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{company.email}</p>
+                <p style={{ margin: '0 0 2px 0', fontWeight: 'bold', fontSize: isMobile ? '3vw' : '12px', color: '#000' }}>{company.name}</p>
+                <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{company.address}</p>
+                <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{company.phone}</p>
+                <p style={{ margin: '0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{company.email}</p>
               </div>
             ) : (
-              <p style={{ margin: '0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>Company information not available</p>
+              <p style={{ margin: '0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{t.companyInfoNotAvailable}</p>
             )}
           </div>
           <div>
             <h2 style={{ 
-              fontSize: isMobile ? '11px' : '14px', 
+              fontSize: isMobile ? '3.5vw' : '14px', 
               fontWeight: 'bold', 
               borderBottom: '1px solid #000',
               paddingBottom: '2px',
-              marginBottom: isMobile ? '6px' : '8px',
+              marginBottom: isMobile ? '2vw' : '8px',
               color: '#000'
-            }}>Bill To</h2>
+            }}>{t.billTo}</h2>
             {invoice.jobs && (
               <div>
-                <p style={{ margin: '0 0 2px 0', fontWeight: 'bold', fontSize: isMobile ? '9px' : '12px', color: '#000' }}>{invoice.jobs.customer_name}</p>
-                <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{invoice.jobs.customer_phone}</p>
-                {invoice.jobs.customer_email && <p style={{ margin: '0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{invoice.jobs.customer_email}</p>}
+                <p style={{ margin: '0 0 2px 0', fontWeight: 'bold', fontSize: isMobile ? '3vw' : '12px', color: '#000' }}>{invoice.jobs.customer_name}</p>
+                <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{invoice.jobs.customer_phone}</p>
+                {invoice.jobs.customer_email && <p style={{ margin: '0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{invoice.jobs.customer_email}</p>}
               </div>
             )}
           </div>
         </div>
 
         {/* Invoice Details */}
-        <div style={{ marginBottom: isMobile ? '12px' : '16px', minHeight: isMobile ? '60px' : '80px' }}>
+        <div style={{ marginBottom: isMobile ? '3vw' : '16px', minHeight: isMobile ? '15vw' : '80px' }}>
           <h2 style={{ 
-            fontSize: isMobile ? '11px' : '14px', 
+            fontSize: isMobile ? '3.5vw' : '14px', 
             fontWeight: 'bold', 
             borderBottom: '1px solid #000',
             paddingBottom: '2px',
-            marginBottom: isMobile ? '6px' : '8px',
+            marginBottom: isMobile ? '2vw' : '8px',
             color: '#000'
-          }}>Invoice Details</h2>
-          <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>
-            <strong>Description:</strong> {invoice.bill_description}
+          }}>{t.invoiceDetails}</h2>
+          <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>
+            <strong>{t.description}:</strong> {invoice.bill_description}
           </p>
           {invoice.jobs && (
             <div>
-              <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>
-                <strong>Device:</strong> {invoice.jobs.device_name} {invoice.jobs.device_model}
+              <p style={{ margin: '0 0 2px 0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>
+                <strong>{t.device}:</strong> {invoice.jobs.device_name} {invoice.jobs.device_model}
               </p>
-              <p style={{ margin: '0', fontSize: isMobile ? '8px' : '11px', color: '#000' }}>
-                <strong>Problem:</strong> {invoice.jobs.problem}
+              <p style={{ margin: '0', fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>
+                <strong>{t.problem}:</strong> {invoice.jobs.problem}
               </p>
             </div>
           )}
@@ -194,15 +196,15 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
 
         {/* Line Items */}
         {invoiceData.line_items && invoiceData.line_items.length > 0 && (
-          <div style={{ marginBottom: isMobile ? '12px' : '16px', flex: '1', minHeight: isMobile ? '120px' : '150px' }}>
+          <div style={{ marginBottom: isMobile ? '3vw' : '16px', flex: '1', minHeight: isMobile ? '30vw' : '150px' }}>
             <h2 style={{ 
-              fontSize: isMobile ? '11px' : '14px', 
+              fontSize: isMobile ? '3.5vw' : '14px', 
               fontWeight: 'bold', 
               borderBottom: '1px solid #000',
               paddingBottom: '2px',
-              marginBottom: isMobile ? '6px' : '8px',
+              marginBottom: isMobile ? '2vw' : '8px',
               color: '#000'
-            }}>Line Items</h2>
+            }}>{t.lineItems}</h2>
             <table style={{ 
               width: '100%', 
               borderCollapse: 'collapse',
@@ -212,36 +214,36 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                 <tr style={{ backgroundColor: '#f5f5f5' }}>
                   <th style={{ 
                     border: '1px solid #000', 
-                    padding: isMobile ? '4px' : '8px', 
+                    padding: isMobile ? '1vw' : '8px', 
                     textAlign: 'left',
-                    fontSize: isMobile ? '8px' : '10px',
+                    fontSize: isMobile ? '2.5vw' : '10px',
                     fontWeight: 'bold',
                     color: '#000'
-                  }}>Description</th>
+                  }}>{t.description}</th>
                   <th style={{ 
                     border: '1px solid #000', 
-                    padding: isMobile ? '4px' : '8px', 
+                    padding: isMobile ? '1vw' : '8px', 
                     textAlign: 'center',
-                    fontSize: isMobile ? '8px' : '10px',
+                    fontSize: isMobile ? '2.5vw' : '10px',
                     fontWeight: 'bold',
                     color: '#000'
-                  }}>Qty</th>
+                  }}>{t.qty}</th>
                   <th style={{ 
                     border: '1px solid #000', 
-                    padding: isMobile ? '4px' : '8px', 
+                    padding: isMobile ? '1vw' : '8px', 
                     textAlign: 'right',
-                    fontSize: isMobile ? '8px' : '10px',
+                    fontSize: isMobile ? '2.5vw' : '10px',
                     fontWeight: 'bold',
                     color: '#000'
-                  }}>Unit Price</th>
+                  }}>{t.unitPrice}</th>
                   <th style={{ 
                     border: '1px solid #000', 
-                    padding: isMobile ? '4px' : '8px', 
+                    padding: isMobile ? '1vw' : '8px', 
                     textAlign: 'right',
-                    fontSize: isMobile ? '8px' : '10px',
+                    fontSize: isMobile ? '2.5vw' : '10px',
                     fontWeight: 'bold',
                     color: '#000'
-                  }}>Amount</th>
+                  }}>{t.amount}</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,29 +251,29 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                   <tr key={index}>
                     <td style={{ 
                       border: '1px solid #000', 
-                      padding: isMobile ? '3px' : '6px',
-                      fontSize: isMobile ? '7px' : '9px',
+                      padding: isMobile ? '0.8vw' : '6px',
+                      fontSize: isMobile ? '2.2vw' : '9px',
                       color: '#000'
                     }}>{item.description}</td>
                     <td style={{ 
                       border: '1px solid #000', 
-                      padding: isMobile ? '3px' : '6px', 
+                      padding: isMobile ? '0.8vw' : '6px', 
                       textAlign: 'center',
-                      fontSize: isMobile ? '7px' : '9px',
+                      fontSize: isMobile ? '2.2vw' : '9px',
                       color: '#000'
                     }}>{item.quantity}</td>
                     <td style={{ 
                       border: '1px solid #000', 
-                      padding: isMobile ? '3px' : '6px', 
+                      padding: isMobile ? '0.8vw' : '6px', 
                       textAlign: 'right',
-                      fontSize: isMobile ? '7px' : '9px',
+                      fontSize: isMobile ? '2.2vw' : '9px',
                       color: '#000'
                     }}>{formatCurrency(item.unit_price)}</td>
                     <td style={{ 
                       border: '1px solid #000', 
-                      padding: isMobile ? '3px' : '6px', 
+                      padding: isMobile ? '0.8vw' : '6px', 
                       textAlign: 'right',
-                      fontSize: isMobile ? '7px' : '9px',
+                      fontSize: isMobile ? '2.2vw' : '9px',
                       color: '#000'
                     }}>{formatCurrency(item.amount)}</td>
                   </tr>
@@ -282,9 +284,9 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         )}
 
         {/* Totals */}
-        <div style={{ marginBottom: isMobile ? '12px' : '16px', minHeight: isMobile ? '60px' : '80px' }}>
+        <div style={{ marginBottom: isMobile ? '3vw' : '16px', minHeight: isMobile ? '15vw' : '80px' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ width: isMobile ? '140px' : '200px' }}>
+            <div style={{ width: isMobile ? '35vw' : '200px' }}>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between',
@@ -292,8 +294,8 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                 paddingBottom: '2px',
                 marginBottom: '2px'
               }}>
-                <span style={{ fontSize: isMobile ? '8px' : '11px', color: '#000' }}>Subtotal:</span>
-                <span style={{ fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{formatCurrency(invoiceData.subtotal || 0)}</span>
+                <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{t.subtotal}:</span>
+                <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{formatCurrency(invoiceData.subtotal || 0)}</span>
               </div>
               {invoiceData.taxes && invoiceData.taxes.length > 0 && (
                 <>
@@ -305,8 +307,8 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                       paddingBottom: '2px',
                       marginBottom: '2px'
                     }}>
-                      <span style={{ fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{tax.name} ({tax.rate}%):</span>
-                      <span style={{ fontSize: isMobile ? '8px' : '11px', color: '#000' }}>{formatCurrency(tax.amount)}</span>
+                      <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{tax.name} ({tax.rate}%):</span>
+                      <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{formatCurrency(tax.amount)}</span>
                     </div>
                   ))}
                 </>
@@ -315,12 +317,12 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                 display: 'flex', 
                 justifyContent: 'space-between',
                 fontWeight: 'bold',
-                fontSize: isMobile ? '10px' : '13px',
+                fontSize: isMobile ? '3.2vw' : '13px',
                 borderTop: '2px solid #000',
-                paddingTop: isMobile ? '4px' : '8px',
+                paddingTop: isMobile ? '1vw' : '8px',
                 color: '#000'
               }}>
-                <span>Total:</span>
+                <span>{t.total}:</span>
                 <span>{formatCurrency(invoice.total)}</span>
               </div>
             </div>
@@ -329,19 +331,19 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
 
         {/* Notes and Terms */}
         {(invoiceData.notes || invoiceData.terms) && (
-          <div style={{ marginBottom: isMobile ? '12px' : '16px', minHeight: isMobile ? '40px' : '60px' }}>
+          <div style={{ marginBottom: isMobile ? '3vw' : '16px', minHeight: isMobile ? '10vw' : '60px' }}>
             {invoiceData.notes && (
-              <div style={{ marginBottom: isMobile ? '6px' : '10px' }}>
+              <div style={{ marginBottom: isMobile ? '2vw' : '10px' }}>
                 <h3 style={{ 
                   fontWeight: 'bold', 
-                  fontSize: isMobile ? '8px' : '11px',
+                  fontSize: isMobile ? '2.5vw' : '11px',
                   marginBottom: '2px',
                   color: '#000'
-                }}>Notes:</h3>
+                }}>{t.notes}:</h3>
                 <p style={{ 
                   whiteSpace: 'pre-line',
                   margin: '0',
-                  fontSize: isMobile ? '7px' : '9px',
+                  fontSize: isMobile ? '2.2vw' : '9px',
                   color: '#000'
                 }}>{invoiceData.notes}</p>
               </div>
@@ -350,14 +352,14 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
               <div>
                 <h3 style={{ 
                   fontWeight: 'bold', 
-                  fontSize: isMobile ? '8px' : '11px',
+                  fontSize: isMobile ? '2.5vw' : '11px',
                   marginBottom: '2px',
                   color: '#000'
-                }}>Terms & Conditions:</h3>
+                }}>{t.termsConditions}:</h3>
                 <p style={{ 
                   whiteSpace: 'pre-line',
                   margin: '0',
-                  fontSize: isMobile ? '7px' : '9px',
+                  fontSize: isMobile ? '2.2vw' : '9px',
                   color: '#000'
                 }}>{invoiceData.terms}</p>
               </div>
@@ -368,15 +370,15 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         {/* Footer */}
         <div style={{ 
           textAlign: 'center',
-          fontSize: isMobile ? '7px' : '10px',
+          fontSize: isMobile ? '2.2vw' : '10px',
           color: '#666',
           borderTop: '1px solid #ccc',
-          paddingTop: isMobile ? '4px' : '8px',
+          paddingTop: isMobile ? '1vw' : '8px',
           marginTop: 'auto',
-          minHeight: isMobile ? '20px' : '30px'
+          minHeight: isMobile ? '5vw' : '30px'
         }}>
-          <p style={{ margin: '0 0 1px 0' }}>Thank you for your business!</p>
-          <p style={{ margin: '0' }}>Generated on: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
+          <p style={{ margin: '0 0 1px 0' }}>{t.thankYou}</p>
+          <p style={{ margin: '0' }}>{t.generatedOn}: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
         </div>
       </div>
     </div>

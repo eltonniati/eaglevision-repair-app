@@ -8,8 +8,10 @@ import { useInvoiceDetails } from "@/hooks/use-invoice-details";
 import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
+import { LanguageSelector } from "@/components/invoice/LanguageSelector";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DatabaseInvoice } from "@/lib/types";
+import { Language } from "@/lib/invoice-translations";
 import { shareInvoice, emailInvoice } from "@/components/invoice/utils/invoice-share-utils";
 import { downloadInvoicePdf } from "@/components/invoice/utils/invoice-pdf-utils";
 
@@ -19,6 +21,7 @@ const InvoiceDetail = () => {
   const { invoice, loading, getInvoice } = useInvoiceDetails();
   const [isPrinting, setIsPrinting] = useState(false);
   const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const printableInvoiceRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
@@ -119,31 +122,38 @@ const InvoiceDetail = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-4 mx-auto w-full">
       <div className="flex flex-col space-y-4 w-full">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
             <ChevronLeft className="mr-1 h-4 w-4" />
             Back to Job Cards
           </Button>
           
-          <Button 
-            variant="default" 
-            size="sm" 
-            onClick={() => setShowPrintDialog(true)}
-            className="no-print"
-            disabled={isPrinting}
-          >
-            {isMobile ? (
-              <>
-                <Share className="mr-1 h-4 w-4" />
-                Share PDF
-              </>
-            ) : (
-              <>
-                <Share className="mr-1 h-4 w-4" />
-                Print/Share PDF
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <LanguageSelector 
+              value={selectedLanguage} 
+              onValueChange={setSelectedLanguage}
+            />
+            
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={() => setShowPrintDialog(true)}
+              className="no-print"
+              disabled={isPrinting}
+            >
+              {isMobile ? (
+                <>
+                  <Share className="mr-1 h-4 w-4" />
+                  Share PDF
+                </>
+              ) : (
+                <>
+                  <Share className="mr-1 h-4 w-4" />
+                  Print/Share PDF
+                </>
+              )}
+            </Button>
+          </div>
         </div>
         
         <div className="w-full flex justify-center overflow-x-auto">
@@ -158,7 +168,7 @@ const InvoiceDetail = () => {
               margin: isMobile ? '-40% auto' : '0 auto'
             }}
           >
-            <PrintableInvoice invoice={databaseInvoice} />
+            <PrintableInvoice invoice={databaseInvoice} language={selectedLanguage} />
           </div>
         </div>
       </div>
