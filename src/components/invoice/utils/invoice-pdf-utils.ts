@@ -12,12 +12,14 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     const originalElement = printRef.current;
     const clonedElement = originalElement.cloneNode(true) as HTMLDivElement;
     
-    // Apply proper styling for PDF generation - mobile optimized
+    // Apply proper styling for PDF generation - full page coverage
     clonedElement.style.cssText = `
       width: 210mm !important;
+      height: 297mm !important;
       min-height: 297mm !important;
       max-width: 210mm !important;
-      padding: 10mm !important;
+      max-height: 297mm !important;
+      padding: 8mm !important;
       margin: 0 !important;
       transform: scale(1) !important;
       position: fixed !important;
@@ -27,7 +29,7 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       font-size: 12px !important;
       line-height: 1.4 !important;
       box-sizing: border-box !important;
-      overflow: visible !important;
+      overflow: hidden !important;
       font-family: Arial, sans-serif !important;
       color: black !important;
       z-index: 9999 !important;
@@ -51,9 +53,9 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     // Wait for styles to apply and fonts to load
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Generate canvas with A4 dimensions (210x297mm at 96 DPI)
+    // Generate canvas with exact A4 dimensions (210x297mm at 96 DPI)
     const canvas = await html2canvas(clonedElement, {
-      scale: 1,
+      scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
@@ -82,7 +84,7 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
 
     const imgData = canvas.toDataURL('image/png', 1.0);
     
-    // Add image to fit A4 page (210x297mm)
+    // Add image to fill entire A4 page (210x297mm) with no margins
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST');
 
     return pdf;
