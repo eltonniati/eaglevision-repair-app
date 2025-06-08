@@ -1,4 +1,3 @@
-
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
@@ -22,21 +21,23 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       min-height: ${isMobile ? '667px' : '1123px'} !important;
       max-width: ${isMobile ? '375px' : '794px'} !important;
       max-height: ${isMobile ? '667px' : '1123px'} !important;
-      padding: ${isMobile ? '10px' : '20px'} !important;
+      padding: 0 !important;
       margin: 0 !important;
       transform: scale(1) !important;
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       background: white !important;
-      font-size: ${isMobile ? '10px' : '12px'} !important;
-      line-height: 1.3 !important;
+      font-size: ${isMobile ? '8px' : '12px'} !important;
+      line-height: 1.2 !important;
       box-sizing: border-box !important;
       overflow: hidden !important;
       font-family: Arial, sans-serif !important;
       color: black !important;
       z-index: 9999 !important;
-      display: block !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
       visibility: visible !important;
     `;
 
@@ -49,18 +50,12 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       el.style.visibility = 'visible';
       el.style.display = el.style.display === 'none' ? 'block' : el.style.display;
       
-      // Mobile-specific adjustments
-      if (isMobile) {
-        if (el.tagName === 'H1') {
-          el.style.fontSize = '14px';
-        } else if (el.tagName === 'H2') {
-          el.style.fontSize = '12px';
-        } else if (el.tagName === 'P' || el.tagName === 'SPAN') {
-          el.style.fontSize = '9px';
-        } else if (el.tagName === 'TD' || el.tagName === 'TH') {
-          el.style.fontSize = '8px';
-          el.style.padding = '3px';
-        }
+      // Remove any left margins that might cause offset
+      if (el.style.marginLeft) {
+        el.style.marginLeft = '0';
+      }
+      if (el.style.paddingLeft && el !== clonedElement) {
+        el.style.paddingLeft = el.style.paddingLeft;
       }
     });
 
@@ -68,14 +63,14 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     document.body.appendChild(clonedElement);
 
     // Wait for styles to apply and fonts to load
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Generate canvas with device-appropriate dimensions
     const canvasWidth = isMobile ? 375 : 794;
     const canvasHeight = isMobile ? 667 : 1123;
     
     const canvas = await html2canvas(clonedElement, {
-      scale: isMobile ? 3 : 2,
+      scale: isMobile ? 4 : 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
@@ -96,15 +91,15 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
 
     // Create PDF with appropriate dimensions
     const pdf = new jsPDF({
-      orientation: isMobile ? 'portrait' : 'portrait',
+      orientation: 'portrait',
       unit: 'mm',
-      format: isMobile ? [100, 177] : 'a4', // Mobile-friendly size vs A4
+      format: isMobile ? [100, 177] : 'a4',
       compress: true
     });
 
     const imgData = canvas.toDataURL('image/png', 1.0);
     
-    // Add image to fill the page dimensions
+    // Add image to fill the page dimensions completely
     if (isMobile) {
       pdf.addImage(imgData, 'PNG', 0, 0, 100, 177, '', 'FAST');
     } else {
