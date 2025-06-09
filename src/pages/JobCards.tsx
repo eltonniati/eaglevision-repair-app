@@ -13,16 +13,29 @@ import { ShareDialog } from "@/components/invoice/ShareDialog";
 
 const JobCards = () => {
   const { jobs, loading, error, fetchJobs } = useJobs();
-  const { companies } = useCompanies();
+  const { companies, loading: companiesLoading } = useCompanies();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    fetchJobs();
+    const loadData = async () => {
+      try {
+        await fetchJobs();
+      } catch (err) {
+        console.error("Error loading job cards:", err);
+        toast.error("Failed to load job cards");
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+    
+    loadData();
   }, [fetchJobs]);
 
   const getCompanyName = (companyId?: string) => {
+    if (!companyId || companiesLoading) return "";
     return companies.find(c => c.id === companyId)?.name || "";
   };
 
@@ -70,13 +83,42 @@ const JobCards = () => {
     return Promise.resolve();
   };
 
+  // Show loading state during initial load
+  if (isInitialLoading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">Job Cards</h1>
+          <Link to="/job-cards/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Job Card
+            </Button>
+          </Link>
+        </div>
+        <div className="flex justify-center items-center h-64">
+          <p className="text-muted-foreground">Loading job cards...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">Job Cards</h1>
+          <Link to="/job-cards/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Job Card
+            </Button>
+          </Link>
+        </div>
         <div className="text-center p-6">
-          <h2 className="text-2xl font-semibold text-destructive">Error</h2>
+          <h2 className="text-2xl font-semibold text-destructive">Error Loading Job Cards</h2>
           <p className="text-muted-foreground mt-2">{error}</p>
-          <Button onClick={fetchJobs} className="mt-4">Retry</Button>
+          <Button onClick={() => window.location.reload()} className="mt-4">Reload Page</Button>
         </div>
       </div>
     );

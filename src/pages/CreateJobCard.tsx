@@ -50,6 +50,8 @@ export default function CreateJobCard() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    console.log("Form submitted, validating fields...");
+    
     if (!customerName || !customerPhone || !deviceName || !deviceModel || !deviceCondition || !problem) {
       toast.error("Please fill in all required fields");
       return;
@@ -58,6 +60,18 @@ export default function CreateJobCard() {
     setIsSubmitting(true);
 
     try {
+      console.log("Creating job card with data:", {
+        customerName,
+        customerPhone,
+        customerEmail,
+        deviceName,
+        deviceModel,
+        deviceCondition,
+        problem,
+        handlingFees,
+        companyId
+      });
+
       const newJobData: Omit<Job, 'id' | 'job_card_number' | 'created_at' | 'updated_at'> = {
         customer: {
           name: customerName,
@@ -94,6 +108,7 @@ export default function CreateJobCard() {
   };
 
   const handleBackClick = () => {
+    console.log("Navigating back to job cards");
     navigate("/job-cards");
   };
 
@@ -229,9 +244,9 @@ export default function CreateJobCard() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="company">Company (Optional)</Label>
-                <Select value={companyId} onValueChange={setCompanyId}>
+                <Select value={companyId} onValueChange={setCompanyId} disabled={loadingCompanies}>
                   <SelectTrigger id="company">
-                    <SelectValue placeholder="Select a company" />
+                    <SelectValue placeholder={loadingCompanies ? "Loading companies..." : "Select a company"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No company</SelectItem>
