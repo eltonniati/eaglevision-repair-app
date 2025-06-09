@@ -1,12 +1,10 @@
-
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
-import { Language, getTranslations } from "@/lib/invoice-translations";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PrintableInvoiceProps {
   invoice: DatabaseInvoice;
-  language?: Language;
 }
 
 const formatCurrency = (amount: number) => {
@@ -16,9 +14,9 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const PrintableInvoice = ({ invoice, language = 'en' }: PrintableInvoiceProps) => {
+export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
   const { company } = useCompany();
-  const t = getTranslations(language);
+  const { t } = useLanguage();
   
   const invoiceData = invoice.invoice_data || {
     status: "Draft",
