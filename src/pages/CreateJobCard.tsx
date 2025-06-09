@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
@@ -93,12 +93,17 @@ export default function CreateJobCard() {
     }
   };
 
+  const handleBackClick = () => {
+    navigate("/job-cards");
+  };
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
       <Button
         variant="ghost"
-        onClick={() => navigate("/job-cards")}
+        onClick={handleBackClick}
         className="mb-6"
+        type="button"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Job Cards
