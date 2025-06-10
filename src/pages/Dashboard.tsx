@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,14 +7,20 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRightIcon, PlusCircle, ClipboardList, Settings, ShoppingBag, Clock, CheckCircle } from "lucide-react";
+import { ArrowRightIcon, PlusCircle, ClipboardList, Settings, ShoppingBag, Clock, CheckCircle, Languages } from "lucide-react";
 import SignOutButton from "@/components/auth/SignOutButton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Dashboard() {
   const { session } = useAuth();
   const { jobs, loading: jobsLoading } = useJobs();
   const { company, loading: companyLoading } = useCompany();
-  const { t } = useLanguage();
+  const { t, language, changeLanguage } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
   const navigate = useNavigate();
 
@@ -87,6 +92,24 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Languages className="h-4 w-4" />
+                <span className="sr-only">Change language</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => changeLanguage("en")} className={language === "en" ? "bg-gray-100" : ""}>
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage("es")} className={language === "es" ? "bg-gray-100" : ""}>
+                Español
+              </DropdownMenuItem>
+              {/* Add more languages as needed */}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {!company && (
             <Button 
               onClick={() => navigate("/company-profile")}
