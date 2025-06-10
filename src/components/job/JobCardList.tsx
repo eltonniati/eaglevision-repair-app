@@ -4,7 +4,6 @@ import { Job } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { JobCardItem } from "./JobCardItem";
 
 interface JobCardListProps {
@@ -14,17 +13,10 @@ interface JobCardListProps {
 }
 
 export const JobCardList = ({ jobs, loading, onPreview }: JobCardListProps) => {
-  const { t } = useLanguage();
-  
-  console.log("JobCardList rendered with:", { jobsCount: jobs.length, loading });
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">{t.loadingJobCards}</p>
-        </div>
+        <p className="text-muted-foreground">Loading job cards...</p>
       </div>
     );
   }
@@ -33,11 +25,11 @@ export const JobCardList = ({ jobs, loading, onPreview }: JobCardListProps) => {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center h-64">
-          <p className="text-muted-foreground mb-4">{t.noJobCardsFound}</p>
+          <p className="text-muted-foreground mb-4">No job cards found</p>
           <Link to="/job-cards/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              {t.createFirstJobCard}
+              Create First Job Card
             </Button>
           </Link>
         </CardContent>
