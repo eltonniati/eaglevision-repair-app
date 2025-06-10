@@ -34,13 +34,17 @@ export const mapDatabaseInvoiceToInvoice = (dbInvoice: any): Invoice => {
 export const calculateInvoiceTotals = (lineItems: InvoiceLineItem[], taxes: InvoiceTax[], vatEnabled: boolean = false, vatRate: number = 15) => {
   const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
   
-  let updatedTaxes = taxes.map(tax => ({
+  // Remove any existing VAT taxes first
+  let updatedTaxes = taxes.filter(tax => !tax.name.toLowerCase().includes('vat'));
+  
+  // Recalculate non-VAT taxes
+  updatedTaxes = updatedTaxes.map(tax => ({
     ...tax,
     amount: subtotal * (tax.rate / 100)
   }));
 
-  // Add VAT if enabled and not already in taxes
-  if (vatEnabled && !taxes.some(tax => tax.name.toLowerCase().includes('vat'))) {
+  // Add VAT only if enabled
+  if (vatEnabled) {
     updatedTaxes.push({
       name: `VAT (${vatRate}%)`,
       rate: vatRate,
