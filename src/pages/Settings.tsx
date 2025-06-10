@@ -10,7 +10,7 @@ const Settings = () => {
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
       <Header 
         title={t.settings}
-        description="Manage your application preferences"
+        description={t.managePreferences}
       />
       
       <div className="space-y-6">

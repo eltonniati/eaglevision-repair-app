@@ -1,10 +1,10 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Job } from "@/lib/types";
 import { Plus } from "lucide-react";
 import { JobCardList } from "@/components/job/JobCardList";
@@ -14,6 +14,7 @@ import { ShareDialog } from "@/components/invoice/ShareDialog";
 const JobCards = () => {
   const { jobs, loading, error } = useJobs();
   const { companies, loading: companiesLoading } = useCompanies();
+  const { t } = useLanguage();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -78,18 +79,18 @@ const JobCards = () => {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Job Cards</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t.jobCards}</h1>
           <Link to="/job-cards/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Create Job Card
+              {t.createJobCard}
             </Button>
           </Link>
         </div>
         <div className="text-center p-6">
-          <h2 className="text-2xl font-semibold text-destructive">Error Loading Job Cards</h2>
+          <h2 className="text-2xl font-semibold text-destructive">{t.errorLoadingJobCards}</h2>
           <p className="text-muted-foreground mt-2">{error}</p>
-          <Button onClick={() => window.location.reload()} className="mt-4">Reload Page</Button>
+          <Button onClick={() => window.location.reload()} className="mt-4">{t.reloadPage}</Button>
         </div>
       </div>
     );
@@ -116,11 +117,11 @@ const JobCards = () => {
       ) : (
         <>
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold tracking-tight">Job Cards</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t.jobCards}</h1>
             <Link to="/job-cards/new">
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Job Card
+                {t.createJobCard}
               </Button>
             </Link>
           </div>
