@@ -8,6 +8,9 @@ export interface Company {
   phone: string;
   email: string;
   logo_url?: string;
+  vat_enabled?: boolean;
+  vat_rate?: number;
+  vat_number?: string;
 }
 
 export interface Customer {
@@ -26,6 +29,7 @@ export interface JobDetails {
   problem: string;
   status: JobStatus;
   handling_fees: number;
+  vat_included?: boolean;
 }
 
 export interface Job {
@@ -71,6 +75,7 @@ export interface Invoice {
   notes?: string;
   terms?: string;
   created_at?: string;
+  vat_enabled?: boolean;
 }
 
 export interface DatabaseInvoice {
@@ -91,6 +96,7 @@ export interface DatabaseInvoice {
     tax_total: number;
     notes?: string;
     terms?: string;
+    vat_enabled?: boolean;
   };
   jobs?: any;
 }

@@ -2,11 +2,10 @@
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
-import { Language, getTranslations } from "@/lib/invoice-translations";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PrintableInvoiceProps {
   invoice: DatabaseInvoice;
-  language?: Language;
 }
 
 const formatCurrency = (amount: number) => {
@@ -16,9 +15,9 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const PrintableInvoice = ({ invoice, language = 'en' }: PrintableInvoiceProps) => {
+export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
   const { company } = useCompany();
-  const t = getTranslations(language);
+  const { t } = useLanguage();
   
   const invoiceData = invoice.invoice_data || {
     status: "Draft",
@@ -29,8 +28,14 @@ export const PrintableInvoice = ({ invoice, language = 'en' }: PrintableInvoiceP
     subtotal: 0,
     tax_total: 0,
     notes: "",
-    terms: ""
+    terms: "",
+    vat_enabled: false
   };
+
+  // Filter out VAT taxes if VAT is not enabled
+  const displayTaxes = invoiceData.vat_enabled 
+    ? invoiceData.taxes || []
+    : (invoiceData.taxes || []).filter(tax => !tax.name.toLowerCase().includes('vat'));
 
   // Detect mobile for responsive styling
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -297,9 +302,9 @@ export const PrintableInvoice = ({ invoice, language = 'en' }: PrintableInvoiceP
                 <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{t.subtotal}:</span>
                 <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{formatCurrency(invoiceData.subtotal || 0)}</span>
               </div>
-              {invoiceData.taxes && invoiceData.taxes.length > 0 && (
+              {displayTaxes && displayTaxes.length > 0 && (
                 <>
-                  {invoiceData.taxes.map((tax, index) => (
+                  {displayTaxes.map((tax, index) => (
                     <div key={index} style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between',

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Job } from "@/lib/types";
@@ -11,15 +11,18 @@ export function useFetchJobs() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
+    if (!user) {
+      setJobs([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       
-      if (!user) {
-        setJobs([]);
-        return;
-      }
+      console.log("Fetching jobs for user:", user.id);
 
       const { data, error } = await supabase
         .from("jobs")
@@ -28,17 +31,22 @@ export function useFetchJobs() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setJobs(data?.map(mapDatabaseJobToJob) || []);
+      
+      const mappedJobs = data?.map(mapDatabaseJobToJob) || [];
+      console.log("Jobs fetched successfully:", mappedJobs.length);
+      setJobs(mappedJobs);
     } catch (err) {
       console.error("Fetch Error:", err);
       setError(err instanceof Error ? err.message : "Failed to load jobs");
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchJobs();
+
+    if (!user?.id) return;
 
     const channel = supabase
       .channel('jobs-realtime')
@@ -46,14 +54,17 @@ export function useFetchJobs() {
         event: '*',
         schema: 'public',
         table: 'jobs',
-        filter: `user_id=eq.${user?.id}`
-      }, fetchJobs)
+        filter: `user_id=eq.${user.id}`
+      }, () => {
+        console.log("Real-time update received, refetching jobs");
+        fetchJobs();
+      })
       .subscribe();
 
     return () => {
       channel.unsubscribe();
     };
-  }, [user?.id]);
+  }, [fetchJobs]);
 
   return {
     jobs,
