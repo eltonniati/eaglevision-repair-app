@@ -39,17 +39,26 @@ export default function Dashboard() {
 
   const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
 
+  // Status translations mapping
+  const statusTranslations = {
+    "In Progress": t.inProgress,
+    "Completed": t.completed,
+    "Finished": t.completed,
+    "Waiting for Parts": t.waitingForParts
+  };
+
   useEffect(() => {
     if (!jobsLoading && jobs) {
       const statusCounts: { [key: string]: number } = {
         [t.inProgress]: 0,
         [t.completed]: 0,
-        "Waiting for Parts": 0,
+        [t.waitingForParts]: 0,
       };
 
       jobs.forEach((job) => {
-        if (statusCounts[job.details.status] !== undefined) {
-          statusCounts[job.details.status]++;
+        const translatedStatus = statusTranslations[job.details.status] || job.details.status;
+        if (statusCounts[translatedStatus] !== undefined) {
+          statusCounts[translatedStatus]++;
         }
       });
 
@@ -67,6 +76,7 @@ export default function Dashboard() {
       case t.completed:
         return "bg-green-100 text-green-800";
       case "Waiting for Parts":
+      case t.waitingForParts:
         return "bg-amber-100 text-amber-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -83,6 +93,7 @@ export default function Dashboard() {
       case t.completed:
         return <CheckCircle className="h-4 w-4" />;
       case "Waiting for Parts":
+      case t.waitingForParts:
         return <ShoppingBag className="h-4 w-4" />;
       default:
         return null;
@@ -208,6 +219,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{jobs.length}</div>
+              <p className="text-sm text-gray-500 mt-1">{t.totalJobCards}</p>
             </CardContent>
           </Card>
           
@@ -223,6 +235,11 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">{count}</div>
+                <p className="text-sm text-gray-500 mt-1">
+                  {status === t.inProgress && t.jobsInProgress}
+                  {status === t.completed && t.jobsCompleted}
+                  {status === t.waitingForParts && t.jobsWaitingParts}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -234,18 +251,18 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>{t.jobCards}</CardTitle>
+                <CardTitle>{t.recentJobCards}</CardTitle>
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => navigate("/job-cards")}
                   className="text-gray-500 hover:text-gray-900"
                 >
-                  {t.preview}
+                  {t.viewAll}
                 </Button>
               </div>
               <CardDescription>
-                {t.jobCards}
+                {t.recentJobsDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -257,28 +274,31 @@ export default function Dashboard() {
                 </div>
               ) : recentJobs.length > 0 ? (
                 <div className="space-y-4">
-                  {recentJobs.map((job) => (
-                    <div 
-                      key={job.id} 
-                      className="flex items-center justify-between p-4 border rounded-md hover:bg-gray-50 cursor-pointer"
-                      onClick={() => navigate(`/job-cards/${job.id}`)}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <span className="font-medium text-gray-900">
-                            {job.job_card_number}
-                          </span>
-                          <Badge className={`${getStatusColor(job.details.status)}`}>
-                            {job.details.status}
-                          </Badge>
+                  {recentJobs.map((job) => {
+                    const translatedStatus = statusTranslations[job.details.status] || job.details.status;
+                    return (
+                      <div 
+                        key={job.id} 
+                        className="flex items-center justify-between p-4 border rounded-md hover:bg-gray-50 cursor-pointer"
+                        onClick={() => navigate(`/job-cards/${job.id}`)}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <span className="font-medium text-gray-900">
+                              {job.job_card_number}
+                            </span>
+                            <Badge className={`${getStatusColor(job.details.status)}`}>
+                              {translatedStatus}
+                            </Badge>
+                          </div>
+                          <div className="mt-1 text-sm text-gray-500">
+                            {t.customer}: {job.customer.name} • {t.device}: {job.device.name} {job.device.model}
+                          </div>
                         </div>
-                        <div className="mt-1 text-sm text-gray-500">
-                          {job.customer.name} • {job.device.name} {job.device.model}
-                        </div>
+                        <ArrowRightIcon className="h-4 w-4 text-gray-400" />
                       </div>
-                      <ArrowRightIcon className="h-4 w-4 text-gray-400" />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -305,7 +325,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>{t.companyProfile}</CardTitle>
               <CardDescription>
-                {t.managePreferences}
+                {t.companyProfileDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -325,7 +345,7 @@ export default function Dashboard() {
                     <p className="text-gray-900">{company.address}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">{t.companyPhone}</h3>
+                    <h3 className="text-sm font-medium text-gray-500">{t.contactInformation}</h3>
                     <p className="text-gray-900">{company.phone}</p>
                     <p className="text-gray-900">{company.email}</p>
                   </div>
@@ -354,7 +374,7 @@ export default function Dashboard() {
                   variant="outline"
                   className="w-full"
                 >
-                  {t.edit}
+                  {t.editProfile}
                 </Button>
               </CardFooter>
             )}
