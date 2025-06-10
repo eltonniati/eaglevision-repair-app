@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NavItem {
   label: string;
@@ -25,32 +24,26 @@ export function Navbar() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { signOut, session } = useAuth();
-  const { t } = useLanguage();
 
   const navItems: NavItem[] = [
     {
-      label: t.dashboard,
+      label: "Dashboard",
       href: "/dashboard",
       icon: <Home className="h-4 w-4" />
     },
     {
-      label: t.jobCards,
+      label: "Job Cards",
       href: "/job-cards",
       icon: <ClipboardList className="h-4 w-4" />
     },
     {
-      label: t.invoices,
+      label: "Invoices",
       href: "/invoices",
       icon: <FileText className="h-4 w-4" />
     },
     {
-      label: t.companyProfile,
+      label: "Company Profile",
       href: "/company-profile",
-      icon: <Settings className="h-4 w-4" />
-    },
-    {
-      label: t.settings,
-      href: "/settings",
       icon: <Settings className="h-4 w-4" />
     }
   ];
@@ -98,7 +91,7 @@ export function Navbar() {
                   onClick={() => signOut()}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  {t.logout}
+                  Logout
                 </Button>
               </>
             )}
@@ -150,7 +143,7 @@ export function Navbar() {
                   }}
                 >
                   <LogOut className="h-5 w-5 mr-3" />
-                  {t.logout}
+                  Logout
                 </button>
               </>
             )}

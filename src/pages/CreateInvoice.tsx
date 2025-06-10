@@ -37,7 +37,6 @@ import { useInvoiceDetails } from "@/hooks/use-invoice-details";
 import { useCompanies } from "@/hooks/use-companies";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Job, Company, InvoiceLineItem, InvoiceTax } from "@/lib/types";
-import { Switch } from "@/components/ui/switch";
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-ZA", {
@@ -170,12 +169,6 @@ const InvoiceForm = () => {
     }
   };
   
-  const handleToggleVat = () => {
-    if (!invoice) return;
-    const newVatEnabled = !invoice.vat_enabled;
-    updateInvoice(invoice.id!, { vat_enabled: newVatEnabled });
-  };
-  
   if (loading || !invoice) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -257,15 +250,6 @@ const InvoiceForm = () => {
                     onChange={(e) => updateInvoice(invoice.id!, { due_date: e.target.value })}
                   />
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="vat-enabled"
-                  checked={invoice.vat_enabled || false}
-                  onCheckedChange={handleToggleVat}
-                />
-                <Label htmlFor="vat-enabled">Include VAT ({company?.vat_rate || 15}%)</Label>
               </div>
               
               <div className="space-y-2">

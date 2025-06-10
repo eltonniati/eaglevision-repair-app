@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
@@ -28,14 +27,8 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
     subtotal: 0,
     tax_total: 0,
     notes: "",
-    terms: "",
-    vat_enabled: false
+    terms: ""
   };
-
-  // Filter out VAT taxes if VAT is not enabled
-  const displayTaxes = invoiceData.vat_enabled 
-    ? invoiceData.taxes || []
-    : (invoiceData.taxes || []).filter(tax => !tax.name.toLowerCase().includes('vat'));
 
   // Detect mobile for responsive styling
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -302,9 +295,9 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
                 <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{t.subtotal}:</span>
                 <span style={{ fontSize: isMobile ? '2.5vw' : '11px', color: '#000' }}>{formatCurrency(invoiceData.subtotal || 0)}</span>
               </div>
-              {displayTaxes && displayTaxes.length > 0 && (
+              {invoiceData.taxes && invoiceData.taxes.length > 0 && (
                 <>
-                  {displayTaxes.map((tax, index) => (
+                  {invoiceData.taxes.map((tax, index) => (
                     <div key={index} style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between',

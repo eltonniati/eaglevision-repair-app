@@ -16,11 +16,7 @@ export function useInvoiceItems() {
     };
 
     const updatedLineItems = [...invoice.line_items, newItem];
-    const { subtotal, tax_total, total, taxes } = calculateInvoiceTotals(
-      updatedLineItems, 
-      invoice.taxes,
-      invoice.vat_enabled
-    );
+    const { subtotal, tax_total, total, taxes } = calculateInvoiceTotals(updatedLineItems, invoice.taxes);
 
     return {
       ...invoice,
@@ -42,6 +38,7 @@ export function useInvoiceItems() {
           ...item,
           ...updates
         };
+        // Recalculate amount if quantity or unit_price changed
         if (updates.quantity !== undefined || updates.unit_price !== undefined) {
           updatedItem.amount = (updates.quantity ?? item.quantity) * (updates.unit_price ?? item.unit_price);
         }
@@ -50,11 +47,7 @@ export function useInvoiceItems() {
       return item;
     });
 
-    const { subtotal, tax_total, total, taxes } = calculateInvoiceTotals(
-      updatedLineItems, 
-      invoice.taxes,
-      invoice.vat_enabled
-    );
+    const { subtotal, tax_total, total, taxes } = calculateInvoiceTotals(updatedLineItems, invoice.taxes);
 
     return {
       ...invoice,
@@ -71,11 +64,7 @@ export function useInvoiceItems() {
     if (!invoice) return invoice;
 
     const updatedLineItems = invoice.line_items.filter(item => item.id !== id);
-    const { subtotal, tax_total, total, taxes } = calculateInvoiceTotals(
-      updatedLineItems, 
-      invoice.taxes,
-      invoice.vat_enabled
-    );
+    const { subtotal, tax_total, total, taxes } = calculateInvoiceTotals(updatedLineItems, invoice.taxes);
 
     return {
       ...invoice,
@@ -119,6 +108,7 @@ export function useInvoiceItems() {
           ...tax,
           ...updates
         };
+        // Recalculate amount if rate changed
         if (updates.rate !== undefined) {
           updatedTax.amount = invoice.subtotal * (updates.rate / 100);
         }

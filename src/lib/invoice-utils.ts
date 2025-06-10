@@ -23,34 +23,21 @@ export const mapDatabaseInvoiceToInvoice = (dbInvoice: any): Invoice => {
     total: dbInvoice.total || 0,
     notes: dbInvoice.invoice_data?.notes || "",
     terms: dbInvoice.invoice_data?.terms || "",
-    created_at: dbInvoice.created_at,
-    vat_enabled: dbInvoice.invoice_data?.vat_enabled || false
+    created_at: dbInvoice.created_at
   };
 };
 
 /**
- * Calculates invoice totals based on line items and taxes with VAT support
+ * Calculates invoice totals based on line items and taxes
  */
-export const calculateInvoiceTotals = (lineItems: InvoiceLineItem[], taxes: InvoiceTax[], vatEnabled: boolean = false, vatRate: number = 15) => {
+export const calculateInvoiceTotals = (lineItems: InvoiceLineItem[], taxes: InvoiceTax[]) => {
   const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
   
-  // Remove any existing VAT taxes first
-  let updatedTaxes = taxes.filter(tax => !tax.name.toLowerCase().includes('vat'));
-  
-  // Recalculate non-VAT taxes
-  updatedTaxes = updatedTaxes.map(tax => ({
+  // Update tax amounts based on the subtotal
+  const updatedTaxes = taxes.map(tax => ({
     ...tax,
     amount: subtotal * (tax.rate / 100)
   }));
-
-  // Add VAT only if enabled
-  if (vatEnabled) {
-    updatedTaxes.push({
-      name: `VAT (${vatRate}%)`,
-      rate: vatRate,
-      amount: subtotal * (vatRate / 100)
-    });
-  }
   
   const taxTotal = updatedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
   const total = subtotal + taxTotal;
@@ -92,6 +79,8 @@ export const createTaxItem = (name: string, rate: number, subtotal: number): Inv
  * Converts complex objects to JSON compatible format for Supabase
  */
 export const prepareInvoiceForDatabase = (invoice: Partial<Invoice>) => {
+  // First, create a properly structured JSON object
+  // that conforms to the Json type from Supabase
   const invoiceData = {
     status: invoice.status,
     issue_date: invoice.issue_date,
@@ -101,8 +90,7 @@ export const prepareInvoiceForDatabase = (invoice: Partial<Invoice>) => {
     subtotal: invoice.subtotal,
     tax_total: invoice.tax_total,
     notes: invoice.notes || "",
-    terms: invoice.terms || "",
-    vat_enabled: invoice.vat_enabled || false
+    terms: invoice.terms || ""
   };
 
   return {

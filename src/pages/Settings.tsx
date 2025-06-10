@@ -1,7 +1,6 @@
 
 import { Header } from "@/components/layout/Header";
 import { LanguageSettings } from "@/components/settings/LanguageSettings";
-import { VatSettings } from "@/components/settings/VatSettings";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Settings = () => {
@@ -16,7 +15,6 @@ const Settings = () => {
       
       <div className="space-y-6">
         <LanguageSettings />
-        <VatSettings />
       </div>
     </div>
   );
