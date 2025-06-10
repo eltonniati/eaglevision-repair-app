@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompany } from "@/hooks/use-company";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,14 +15,15 @@ export default function Dashboard() {
   const { session } = useAuth();
   const { jobs, loading: jobsLoading } = useJobs();
   const { company, loading: companyLoading } = useCompany();
+  const { t } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!jobsLoading && jobs) {
       const statusCounts: { [key: string]: number } = {
-        "In Progress": 0,
-        "Finished": 0,
+        [t.inProgress]: 0,
+        [t.completed]: 0,
         "Waiting for Parts": 0,
       };
 
@@ -33,13 +35,16 @@ export default function Dashboard() {
 
       setJobsByStatus(statusCounts);
     }
-  }, [jobs, jobsLoading]);
+  }, [jobs, jobsLoading, t]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "In Progress":
+      case t.inProgress:
         return "bg-blue-100 text-blue-800";
       case "Finished":
+      case "Completed":
+      case t.completed:
         return "bg-green-100 text-green-800";
       case "Waiting for Parts":
         return "bg-amber-100 text-amber-800";
@@ -51,8 +56,11 @@ export default function Dashboard() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "In Progress":
+      case t.inProgress:
         return <Clock className="h-4 w-4" />;
       case "Finished":
+      case "Completed":
+      case t.completed:
         return <CheckCircle className="h-4 w-4" />;
       case "Waiting for Parts":
         return <ShoppingBag className="h-4 w-4" />;
@@ -62,7 +70,6 @@ export default function Dashboard() {
   };
 
   const isLoading = jobsLoading || companyLoading;
-
   const recentJobs = jobs.slice(0, 5);
 
   if (!session) {
@@ -74,9 +81,9 @@ export default function Dashboard() {
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t.dashboard}</h1>
           <p className="text-gray-500 mt-1">
-            Welcome {company?.name ? `to ${company.name}` : "back"}
+            {company?.name ? `${t.welcomeTitle} ${company.name}` : t.welcomeSubtitle}
           </p>
         </div>
         <div className="flex gap-4">
@@ -87,7 +94,7 @@ export default function Dashboard() {
               className="flex items-center gap-2"
             >
               <Settings className="h-4 w-4" />
-              Setup Company
+              {t.updateProfile}
             </Button>
           )}
           <Button 
@@ -95,7 +102,7 @@ export default function Dashboard() {
             className="flex items-center gap-2"
           >
             <PlusCircle className="h-4 w-4" />
-            New Job
+            {t.createJobCard}
           </Button>
           <SignOutButton />
         </div>
@@ -112,7 +119,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-500">
-                Total Jobs
+                {t.jobCards}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -143,18 +150,18 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Recent Jobs</CardTitle>
+                <CardTitle>{t.jobCards}</CardTitle>
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => navigate("/job-cards")}
                   className="text-gray-500 hover:text-gray-900"
                 >
-                  View all
+                  {t.preview}
                 </Button>
               </div>
               <CardDescription>
-                Your 5 most recent job cards
+                {t.jobCards}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -192,16 +199,16 @@ export default function Dashboard() {
               ) : (
                 <div className="text-center py-8">
                   <ClipboardList className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <h3 className="text-lg font-medium text-gray-900">No jobs yet</h3>
+                  <h3 className="text-lg font-medium text-gray-900">{t.noJobCardsFound}</h3>
                   <p className="text-gray-500 mt-1">
-                    Create your first job card to get started
+                    {t.createFirstJobCard}
                   </p>
                   <Button 
                     onClick={() => navigate("/job-cards")}
                     className="mt-4"
                   >
                     <PlusCircle className="h-4 w-4 mr-2" />
-                    New Job
+                    {t.createJobCard}
                   </Button>
                 </div>
               )}
@@ -212,9 +219,9 @@ export default function Dashboard() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Company Info</CardTitle>
+              <CardTitle>{t.companyProfile}</CardTitle>
               <CardDescription>
-                Your business details
+                {t.managePreferences}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -226,15 +233,15 @@ export default function Dashboard() {
               ) : company ? (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">Company Name</h3>
+                    <h3 className="text-sm font-medium text-gray-500">{t.companyName}</h3>
                     <p className="text-gray-900">{company.name}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">Address</h3>
+                    <h3 className="text-sm font-medium text-gray-500">{t.companyAddress}</h3>
                     <p className="text-gray-900">{company.address}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">Contact</h3>
+                    <h3 className="text-sm font-medium text-gray-500">{t.companyPhone}</h3>
                     <p className="text-gray-900">{company.phone}</p>
                     <p className="text-gray-900">{company.email}</p>
                   </div>
@@ -242,16 +249,16 @@ export default function Dashboard() {
               ) : (
                 <div className="text-center py-6">
                   <Settings className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                  <h3 className="text-gray-900 font-medium">Setup your company</h3>
+                  <h3 className="text-gray-900 font-medium">{t.updateProfile}</h3>
                   <p className="text-gray-500 text-sm mt-1">
-                    Add your business details to get started
+                    {t.managePreferences}
                   </p>
                   <Button 
                     onClick={() => navigate("/company-profile")}
                     className="mt-4"
                     variant="outline"
                   >
-                    Setup now
+                    {t.updateProfile}
                   </Button>
                 </div>
               )}
@@ -263,7 +270,7 @@ export default function Dashboard() {
                   variant="outline"
                   className="w-full"
                 >
-                  Edit details
+                  {t.edit}
                 </Button>
               </CardFooter>
             )}

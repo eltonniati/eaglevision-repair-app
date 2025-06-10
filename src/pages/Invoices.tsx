@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Printer } from "lucide-react";
 import { useInvoiceDetails } from "@/hooks/use-invoice-details";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
@@ -16,6 +17,7 @@ const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const navigate = useNavigate();
   const { invoice, loading, getInvoice } = useInvoiceDetails();
+  const { t } = useLanguage();
   const [isPrinting, setIsPrinting] = useState(false);
   const [showPrintDialog, setShowPrintDialog] = useState(false);
   const printableInvoiceRef = useRef<HTMLDivElement>(null);
@@ -29,7 +31,7 @@ const InvoiceDetail = () => {
 
   const handlePrintOrPDF = () => {
     if (!printableInvoiceRef.current || !invoice) {
-      toast.error('Unable to print invoice. Content not found.');
+      toast.error(t.error);
       return;
     }
 
@@ -38,7 +40,7 @@ const InvoiceDetail = () => {
     handleInvoicePrint(content, invoice.invoice_number);
     setIsPrinting(false);
     setShowPrintDialog(false);
-    toast.success("Invoice printed/saved successfully");
+    toast.success(t.success);
   };
 
   const handleBackToList = () => {
@@ -49,7 +51,7 @@ const InvoiceDetail = () => {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="flex justify-center items-center h-64">
-          <p className="text-muted-foreground">Loading invoice...</p>
+          <p className="text-muted-foreground">{t.loading}</p>
         </div>
       </div>
     );
@@ -88,7 +90,7 @@ const InvoiceDetail = () => {
         <div className="flex justify-between items-center mb-4">
           <Button variant="outline" size="sm" onClick={handleBackToList}>
             <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Job Cards
+            {t.back}
           </Button>
           
           <Button 
@@ -97,7 +99,7 @@ const InvoiceDetail = () => {
             onClick={() => setShowPrintDialog(true)}
           >
             <Printer className="mr-1 h-4 w-4" />
-            {isMobile ? "Save as PDF" : "Print Invoice"}
+            {isMobile ? t.download : t.print}
           </Button>
         </div>
         
