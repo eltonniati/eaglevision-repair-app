@@ -13,6 +13,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -23,6 +25,19 @@ export default function Dashboard() {
   const { t, language, changeLanguage } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
   const navigate = useNavigate();
+
+  const languages = [
+    { code: "en", name: "English", flag: "🇬🇧" },
+    { code: "fr", name: "Français", flag: "🇫🇷" },
+    { code: "pt", name: "Português", flag: "🇵🇹" },
+    { code: "es", name: "Español", flag: "🇪🇸" },
+    { code: "ln", name: "Lingála", flag: "🇨🇩" },
+    { code: "kg", name: "Kikóngó", flag: "🇨🇩" },
+    { code: "sw", name: "Swahili", flag: "🇨🇩" },
+    { code: "ts", name: "Tshiluba", flag: "🇨🇩" },
+  ];
+
+  const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
 
   useEffect(() => {
     if (!jobsLoading && jobs) {
@@ -94,19 +109,65 @@ export default function Dashboard() {
         <div className="flex gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" className="flex items-center gap-2">
                 <Languages className="h-4 w-4" />
-                <span className="sr-only">Change language</span>
+                <span>{currentLanguage.flag} {currentLanguage.name}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLanguage("en")} className={language === "en" ? "bg-gray-100" : ""}>
-                English
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>{t.selectLanguage}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("en")}
+                className={language === "en" ? "bg-gray-100" : ""}
+              >
+                🇬🇧 English
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLanguage("es")} className={language === "es" ? "bg-gray-100" : ""}>
-                Español
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("fr")}
+                className={language === "fr" ? "bg-gray-100" : ""}
+              >
+                🇫🇷 Français
               </DropdownMenuItem>
-              {/* Add more languages as needed */}
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("pt")}
+                className={language === "pt" ? "bg-gray-100" : ""}
+              >
+                🇵🇹 Português
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("es")}
+                className={language === "es" ? "bg-gray-100" : ""}
+              >
+                🇪🇸 Español
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>{t.congoleseLanguages}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("ln")}
+                className={language === "ln" ? "bg-gray-100" : ""}
+              >
+                🇨🇩 Lingála
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("kg")}
+                className={language === "kg" ? "bg-gray-100" : ""}
+              >
+                🇨🇩 Kikóngó
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("sw")}
+                className={language === "sw" ? "bg-gray-100" : ""}
+              >
+                🇨🇩 Swahili
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage("ts")}
+                className={language === "ts" ? "bg-gray-100" : ""}
+              >
+                🇨🇩 Tshiluba
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
