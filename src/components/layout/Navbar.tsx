@@ -9,11 +9,14 @@ import {
   ClipboardList, 
   Menu, 
   X,
-  LogOut
+  LogOut,
+  Globe
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Language } from "@/lib/app-translations";
 
 interface NavItem {
   label: string;
@@ -25,7 +28,7 @@ export function Navbar() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { signOut, session } = useAuth();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   const navItems: NavItem[] = [
     {
@@ -57,6 +60,20 @@ export function Navbar() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const getLanguageLabel = (lang: Language) => {
+    switch (lang) {
+      case 'en': return 'EN';
+      case 'fr': return 'FR';
+      case 'pt': return 'PT';
+      case 'es': return 'ES';
+      case 'ln': return 'LN';
+      case 'kg': return 'KG';
+      case 'sw': return 'SW';
+      case 'ts': return 'TS';
+      default: return 'EN';
+    }
   };
 
   return (
@@ -91,6 +108,27 @@ export function Navbar() {
                     {item.label}
                   </Link>
                 ))}
+                
+                {/* Language Selector */}
+                <div className="flex items-center space-x-2">
+                  <Globe className="h-4 w-4 text-gray-500" />
+                  <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
+                    <SelectTrigger className="w-20 h-8 text-xs">
+                      <SelectValue placeholder="Lang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">{t.english}</SelectItem>
+                      <SelectItem value="fr">{t.french}</SelectItem>
+                      <SelectItem value="pt">{t.portuguese}</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="ln">Lingála</SelectItem>
+                      <SelectItem value="kg">Kikongo</SelectItem>
+                      <SelectItem value="sw">Kiswahili</SelectItem>
+                      <SelectItem value="ts">Tshiluba</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -142,6 +180,30 @@ export function Navbar() {
                     {item.label}
                   </Link>
                 ))}
+                
+                {/* Mobile Language Selector */}
+                <div className="px-3 py-2">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Globe className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700">{t.language}</span>
+                  </div>
+                  <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t.selectLanguage} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">{t.english}</SelectItem>
+                      <SelectItem value="fr">{t.french}</SelectItem>
+                      <SelectItem value="pt">{t.portuguese}</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="ln">Lingála</SelectItem>
+                      <SelectItem value="kg">Kikongo</SelectItem>
+                      <SelectItem value="sw">Kiswahili</SelectItem>
+                      <SelectItem value="ts">Tshiluba</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
                 <button
                   className="flex items-center w-full px-3 py-2 text-base font-medium rounded-md text-gray-600 hover:text-fixflow-600 hover:bg-gray-50"
                   onClick={() => {
