@@ -1,6 +1,6 @@
+
 import { format } from "date-fns";
 import { Job } from "@/lib/types";
-import { Signature } from "@/components/common/Signature";
 
 interface PrintableJobCardProps { 
   job: Job, 
@@ -76,8 +76,6 @@ export const PrintableJobCard = ({
       <div className="mt-6 text-sm text-center border-t pt-2 text-black">
         <p>Generated on: {format(new Date(), "MMMM d, yyyy HH:mm")}</p>
       </div>
-
-      <Signature variant="print" className="mt-4 text-black" />
     </div>
   </div>
 );

@@ -1,8 +1,8 @@
+
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Signature } from "@/components/common/Signature";
 
 interface PrintableInvoiceProps {
   invoice: DatabaseInvoice;
@@ -384,23 +384,6 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
         }}>
           <p style={{ margin: '0 0 1px 0' }}>{t.thankYou}</p>
           <p style={{ margin: '0' }}>{t.generatedOn}: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
-        </div>
-
-        {/* Signature */}
-        <div style={{
-          textAlign: 'center',
-          fontSize: isMobile ? '2vw' : '9px',
-          color: '#000',
-          borderTop: '1px solid #ccc',
-          paddingTop: isMobile ? '1vw' : '8px',
-          marginTop: isMobile ? '2vw' : '12px',
-          minHeight: isMobile ? '8vw' : '40px'
-        }}>
-          <p style={{ margin: '0 0 2px 0', fontWeight: 'bold' }}>Made by Elton Niati</p>
-          <p style={{ margin: '0 0 1px 0' }}>🌐 eaglevision.dev30.com</p>
-          <p style={{ margin: '0 0 1px 0' }}>📱 WhatsApp: 027659132527</p>
-          <p style={{ margin: '0 0 1px 0' }}>📘 Facebook: eaglevisiondev30</p>
-          <p style={{ margin: '0' }}>🐦 Twitter: eaglevisiondev30</p>
         </div>
       </div>
     </div>
