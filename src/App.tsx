@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,14 +8,10 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 import JobCards from "./pages/JobCards";
-import NewJobCard from "./pages/NewJobCard";
-import EditJobCard from "./pages/EditJobCard";
+import CreateJobCard from "./pages/CreateJobCard";
 import InvoiceDetail from "./pages/InvoiceDetail";
 import Invoices from "./pages/Invoices";
 import Settings from "./pages/Settings";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Header from "./components/Header";
 import { Signature } from "./components/common/Signature";
 
 const queryClient = new QueryClient();
@@ -55,19 +52,15 @@ function App() {
             <div className="min-h-screen bg-background font-sans antialiased">
               <div className="relative flex min-h-screen flex-col">
                 <RequireAuth>
-                  <Header />
                   <div className="flex-1">
                     <main className="flex-1">
                       <Routes>
                         <Route path="/" element={<Navigate to="/job-cards" />} />
                         <Route path="/job-cards" element={<JobCards />} />
-                        <Route path="/job-cards/new" element={<NewJobCard />} />
-                        <Route path="/job-cards/:jobId/edit" element={<EditJobCard />} />
+                        <Route path="/job-cards/new" element={<CreateJobCard />} />
                         <Route path="/invoices/:invoiceId" element={<InvoiceDetail />} />
                         <Route path="/job-cards/:jobId/invoices/new" element={<Invoices />} />
                         <Route path="/settings" element={<Settings />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
                       </Routes>
                     </main>
                   </div>
