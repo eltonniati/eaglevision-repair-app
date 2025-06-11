@@ -1,6 +1,7 @@
 
 import { Job } from "@/lib/types";
 import { PrintableJobCard } from "./PrintableJobCard";
+import { Signature } from "@/components/common/Signature";
 import { forwardRef } from "react";
 
 interface PrintPreviewContentProps {
@@ -43,6 +44,9 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
           handlingFees={handlingFees}
           companyName={companyName}
         />
+        <div className="no-print px-6 pb-6">
+          <Signature />
+        </div>
       </div>
     </div>
   );
