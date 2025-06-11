@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface JobDetailsProps {
   job: Job;
@@ -58,14 +59,16 @@ export const JobDetails = ({
   onPrintDialogOpen,
   onDeleteDialogOpen
 }: JobDetailsProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="grid gap-8 md:grid-cols-3">
       <Card className="md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Job Card #{job.job_card_number}</CardTitle>
+            <CardTitle>{t.jobCardNumber} #{job.job_card_number}</CardTitle>
             <CardDescription>
-              Created on {format(new Date(job.created_at!), "MMMM d, yyyy")}
+              {t.createdOn || "Created on"} {format(new Date(job.created_at!), "MMMM d, yyyy")}
             </CardDescription>
           </div>
           <div className="no-print">
@@ -76,20 +79,20 @@ export const JobDetails = ({
                   onClick={onSave}
                   disabled={isSaving}
                 >
-                  {isSaving ? "Saving..." : "Save"}
+                  {isSaving ? t.loading : t.save}
                 </Button>
                 <Button 
                   variant="ghost" 
                   onClick={onEditToggle}
                   disabled={isSaving}
                 >
-                  Cancel
+                  {t.cancel}
                 </Button>
               </div>
             ) : (
               <Button onClick={onEditToggle}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit
+                {t.edit}
               </Button>
             )}
           </div>
@@ -101,21 +104,21 @@ export const JobDetails = ({
 
       <Card className="md:col-span-1 no-print">
         <CardHeader>
-          <CardTitle>Job Card Actions</CardTitle>
-          <CardDescription>Manage this job card</CardDescription>
+          <CardTitle>{t.jobCardActions || "Job Card Actions"}</CardTitle>
+          <CardDescription>{t.manageJobCard || "Manage this job card"}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t.status}</Label>
             {isEditMode ? (
               <Select value={editedStatus} onValueChange={onStatusChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a status" />
+                  <SelectValue placeholder={t.selectStatus || "Select a status"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Finished">Finished</SelectItem>
-                  <SelectItem value="Waiting for Parts">Waiting for Parts</SelectItem>
+                  <SelectItem value="In Progress">{t.inProgress}</SelectItem>
+                  <SelectItem value="Finished">{t.completed}</SelectItem>
+                  <SelectItem value="Waiting for Parts">{t.waitingForParts}</SelectItem>
                 </SelectContent>
               </Select>
             ) : (
@@ -124,7 +127,7 @@ export const JobDetails = ({
           </div>
 
           <div>
-            <Label htmlFor="handling-fees">Handling Fees</Label>
+            <Label htmlFor="handling-fees">{t.handlingFees}</Label>
             {isEditMode ? (
               <Input
                 id="handling-fees"
@@ -145,11 +148,11 @@ export const JobDetails = ({
             disabled={isEditMode}
           >
             <Printer className="mr-2 h-4 w-4" />
-            Print Job Card
+            {t.printJob}
           </Button>
           <Link to={`/invoices/new/${job.id}`} className="w-full">
             <Button className="w-full">
-              Create Invoice
+              {t.createInvoice}
             </Button>
           </Link>
           <Button
@@ -159,7 +162,7 @@ export const JobDetails = ({
             disabled={isEditMode}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete Job Card
+            {t.deleteJob}
           </Button>
         </CardFooter>
       </Card>

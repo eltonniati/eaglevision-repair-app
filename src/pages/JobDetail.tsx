@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -12,12 +13,14 @@ import { JobError } from "@/components/job/JobError";
 import { JobDialogs } from "@/components/job/JobDialogs";
 import { JobCardNotFound } from "@/components/job/JobCardNotFound";
 import { useJobEditor } from "@/hooks/use-job-editor";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { job, loading, error, getJob, deleteJob } = useJobs();
   const { companies, fetchCompanies } = useCompanies();
+  const { t } = useLanguage();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -50,11 +53,11 @@ const JobDetail = () => {
         try {
           const jobData = await getJob(id);
           if (!jobData) {
-            toast.error("Job card not found");
+            toast.error(t.jobCardNotFound || "Job card not found");
           }
         } catch (error) {
           console.error("Error fetching job:", error);
-          toast.error("Failed to load job card");
+          toast.error(t.errorLoadingJobCards || "Failed to load job card");
         } finally {
           setLoadingComplete(true);
         }
@@ -62,7 +65,7 @@ const JobDetail = () => {
     };
     loadJob();
     fetchCompanies();
-  }, [id, getJob, fetchCompanies]);
+  }, [id, getJob, fetchCompanies, t]);
 
   useEffect(() => {
     if (job && companies.length > 0) {
@@ -77,10 +80,10 @@ const JobDetail = () => {
     const success = await deleteJob(job.id!);
     
     if (success) {
-      toast.success("Job card deleted successfully");
+      toast.success(t.jobCardDeleted);
       navigate("/job-cards");
     } else {
-      toast.error("Failed to delete job card");
+      toast.error(t.failedToDeleteJobCard || "Failed to delete job card");
     }
     setIsDeleteDialogOpen(false);
   };
@@ -88,12 +91,12 @@ const JobDetail = () => {
   const handleShare = async (): Promise<void> => {
     if (!job) return Promise.resolve();
     
-    const text = `Job Card #${job.job_card_number} for ${editedCustomerName}\nDevice: ${editedDeviceName} ${editedDeviceModel}\nProblem: ${editedProblem}\nContact: ${editedCustomerPhone}`;
+    const text = `${t.jobCardNumber} #${job.job_card_number} ${t.for || "for"} ${editedCustomerName}\n${t.device}: ${editedDeviceName} ${editedDeviceModel}\n${t.problem}: ${editedProblem}\n${t.contact || "Contact"}: ${editedCustomerPhone}`;
     
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `Job Card #${job.job_card_number}`,
+          title: `${t.jobCardNumber} #${job.job_card_number}`,
           text: text
         });
       } else {
@@ -112,8 +115,8 @@ const JobDetail = () => {
     if (!job) return Promise.resolve();
     
     try {
-      const subject = `Job Card #${job.job_card_number} for ${editedCustomerName}`;
-      const body = `Job Card #${job.job_card_number}\n\nCustomer: ${editedCustomerName}\nPhone: ${editedCustomerPhone}\nEmail: ${editedCustomerEmail}\n\nDevice: ${editedDeviceName} ${editedDeviceModel}\nCondition: ${editedDeviceCondition}\n\nProblem: ${editedProblem}\n\nHandling Fees: ${editedHandlingFees}\n\nCompany: ${editedCompanyName}`;
+      const subject = `${t.jobCardNumber} #${job.job_card_number} ${t.for || "for"} ${editedCustomerName}`;
+      const body = `${t.jobCardNumber} #${job.job_card_number}\n\n${t.customer}: ${editedCustomerName}\n${t.customerPhone}: ${editedCustomerPhone}\n${t.customerEmail}: ${editedCustomerEmail}\n\n${t.device}: ${editedDeviceName} ${editedDeviceModel}\n${t.deviceCondition}: ${editedDeviceCondition}\n\n${t.problem}: ${editedProblem}\n\n${t.handlingFees}: ${editedHandlingFees}\n\n${t.companyName}: ${editedCompanyName}`;
       
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     } catch (error) {
@@ -130,7 +133,7 @@ const JobDetail = () => {
     if (isEditMode) {
       const saveSuccess = await handleSave();
       if (!saveSuccess) {
-        toast.error("Please save your changes before printing");
+        toast.error(t.savePlease || "Please save your changes before printing");
         return;
       }
     }
@@ -164,7 +167,7 @@ const JobDetail = () => {
         className="mb-6 no-print"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Job Cards
+        {t.back} {t.jobCards}
       </Button>
 
       {isPreviewMode ? (

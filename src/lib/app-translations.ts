@@ -138,6 +138,18 @@ export interface AppTranslations {
   sendEmail: string;
   download: string;
   preview: string;
+
+  // Additional job detail specific translations
+  createdOn: string;
+  jobCardActions: string;
+  manageJobCard: string;
+  selectStatus: string;
+  jobCardNotFound: string;
+  failedToDeleteJobCard: string;
+  for: string;
+  contact: string;
+  savePlease: string;
+  finished: string;
 }
 
 export const translations: Record<Language, AppTranslations> = {
