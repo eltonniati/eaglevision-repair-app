@@ -289,7 +289,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Send Email',
     download: 'Download',
-    preview: 'Preview'
+    preview: 'Preview',
+
+    // Additional job detail specific translations
+    createdOn: 'Created on',
+    jobCardActions: 'Job Card Actions',
+    manageJobCard: 'Manage this job card',
+    selectStatus: 'Select a status',
+    jobCardNotFound: 'Job card not found',
+    failedToDeleteJobCard: 'Failed to delete job card',
+    for: 'for',
+    contact: 'Contact',
+    savePlease: 'Please save your changes before printing',
+    finished: 'Finished'
   },
   fr: {
     // Navigation
@@ -427,7 +439,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Envoyer par email',
     download: 'Télécharger',
-    preview: 'Aperçu'
+    preview: 'Aperçu',
+
+    // Additional job detail specific translations
+    createdOn: 'Créé le',
+    jobCardActions: 'Actions de la Fiche',
+    manageJobCard: 'Gérer cette fiche de travail',
+    selectStatus: 'Sélectionner un statut',
+    jobCardNotFound: 'Fiche de travail introuvable',
+    failedToDeleteJobCard: 'Échec de la suppression de la fiche',
+    for: 'pour',
+    contact: 'Contact',
+    savePlease: 'Veuillez sauvegarder avant d\'imprimer',
+    finished: 'Terminé'
   },
   pt: {
     // Navigation
@@ -565,7 +589,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Enviar por Email',
     download: 'Baixar',
-    preview: 'Visualizar'
+    preview: 'Visualizar',
+
+    // Additional job detail specific translations
+    createdOn: 'Criado em',
+    jobCardActions: 'Ações do Cartão',
+    manageJobCard: 'Gerenciar este cartão de trabalho',
+    selectStatus: 'Selecionar um status',
+    jobCardNotFound: 'Cartão de trabalho não encontrado',
+    failedToDeleteJobCard: 'Falha ao excluir cartão de trabalho',
+    for: 'para',
+    contact: 'Contato',
+    savePlease: 'Por favor salve antes de imprimir',
+    finished: 'Terminado'
   },
   es: {
     // Navigation
@@ -703,7 +739,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Enviar por Email',
     download: 'Descargar',
-    preview: 'Vista Previa'
+    preview: 'Vista Previa',
+
+    // Additional job detail specific translations
+    createdOn: 'Creado el',
+    jobCardActions: 'Acciones de Tarjeta',
+    manageJobCard: 'Gestionar esta tarjeta de trabajo',
+    selectStatus: 'Seleccionar un estado',
+    jobCardNotFound: 'Tarjeta de trabajo no encontrada',
+    failedToDeleteJobCard: 'Error al eliminar tarjeta de trabajo',
+    for: 'para',
+    contact: 'Contacto',
+    savePlease: 'Por favor guarde antes de imprimir',
+    finished: 'Terminado'
   },
   ln: {
     // Navigation
@@ -841,7 +889,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Kotinda na Email',
     download: 'Kokita',
-    preview: 'Botála Liboso'
+    preview: 'Botála Liboso',
+
+    // Additional job detail specific translations
+    createdOn: 'Esálemi na',
+    jobCardActions: 'Misála ya Mokanda',
+    manageJobCard: 'Boyangeli mokanda oyo ya mosála',
+    selectStatus: 'Kopóna lolenge',
+    jobCardNotFound: 'Mokanda ya mosála ezwami te',
+    failedToDeleteJobCard: 'Kolongola mokanda ekweyi',
+    for: 'mpo na',
+    contact: 'Komunikasyon',
+    savePlease: 'Bobatela liboso ya kobimisa',
+    finished: 'Esilisi'
   },
   kg: {
     // Navigation
@@ -979,7 +1039,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Tuma na Email',
     download: 'Kita',
-    preview: 'Mona Thete'
+    preview: 'Mona Thete',
+
+    // Additional job detail specific translations
+    createdOn: 'Kivangulu mu',
+    jobCardActions: 'Bisalu bya Nkarta',
+    manageJobCard: 'Vuanda nkarta yayi ya kisalu',
+    selectStatus: 'Sola mfumu',
+    jobCardNotFound: 'Nkarta ya kisalu imonanu ko',
+    failedToDeleteJobCard: 'Kubanzula nkarta kufuila',
+    for: 'mpo ya',
+    contact: 'Komunikasaun',
+    savePlease: 'Sunga thete ya kusoba',
+    finished: 'Imana'
   },
   sw: {
     // Navigation
@@ -1117,7 +1189,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Tuma kwa Barua Pepe',
     download: 'Pakua',
-    preview: 'Hakikisha'
+    preview: 'Hakikisha',
+
+    // Additional job detail specific translations
+    createdOn: 'Imeundwa tarehe',
+    jobCardActions: 'Vitendo vya Kadi',
+    manageJobCard: 'Simamia kadi hii ya kazi',
+    selectStatus: 'Chagua hali',
+    jobCardNotFound: 'Kadi ya kazi haijapatikana',
+    failedToDeleteJobCard: 'Imeshindwa kufuta kadi ya kazi',
+    for: 'kwa',
+    contact: 'Mawasiliano',
+    savePlease: 'Tafadhali hifadhi kabla ya kuchapisha',
+    finished: 'Imekamilika'
   },
   ts: {
     // Navigation
@@ -1255,7 +1339,19 @@ export const translations: Record<Language, AppTranslations> = {
     whatsapp: 'WhatsApp',
     sendEmail: 'Tuma ne Email',
     download: 'Kata',
-    preview: 'Mona kwanza'
+    preview: 'Mona kwanza',
+
+    // Additional job detail specific translations
+    createdOn: 'Kupangidi mua',
+    jobCardActions: 'Bisalu bya Mukanda',
+    manageJobCard: 'Kabidila mukanda lowu wa kisalu',
+    selectStatus: 'Sola mfumu',
+    jobCardNotFound: 'Mukanda wa kisalu wumonekanga bu',
+    failedToDeleteJobCard: 'Kubana mukanda kugunile',
+    for: 'mpo ya',
+    contact: 'Kutumila',
+    savePlease: 'Taya kwanza wa kukandika',
+    finished: 'Cimana'
   }
 };
 
