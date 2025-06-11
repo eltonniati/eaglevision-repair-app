@@ -1,5 +1,5 @@
 
-export type Language = 'en' | 'fr' | 'pt';
+export type Language = 'en' | 'fr' | 'pt' | 'es' | 'ln' | 'kg' | 'sw' | 'ts';
 
 export interface AppTranslations {
   // Navigation
@@ -101,6 +101,7 @@ export interface AppTranslations {
   french: string;
   portuguese: string;
   managePreferences: string;
+  congoleseLanguages: string;
   
   // Company Profile
   companyName: string;
@@ -109,12 +110,26 @@ export interface AppTranslations {
   companyEmail: string;
   updateProfile: string;
   profileUpdated: string;
+  companyProfileDescription: string;
+  contactInformation: string;
+  editProfile: string;
   
   // Status options
   pending: string;
   inProgress: string;
   completed: string;
   cancelled: string;
+  waitingForParts: string;
+  
+  // Dashboard specific
+  totalJobCards: string;
+  jobsInProgress: string;
+  jobsCompleted: string;
+  jobsWaitingParts: string;
+  recentJobCards: string;
+  viewAll: string;
+  recentJobsDescription: string;
+  customer: string;
   
   // Actions
   print: string;
@@ -226,6 +241,7 @@ export const translations: Record<Language, AppTranslations> = {
     french: 'Français',
     portuguese: 'Português',
     managePreferences: 'Manage your application preferences',
+    congoleseLanguages: 'Congolese Languages',
     
     // Company Profile
     companyName: 'Company Name',
@@ -234,12 +250,26 @@ export const translations: Record<Language, AppTranslations> = {
     companyEmail: 'Company Email',
     updateProfile: 'Update Profile',
     profileUpdated: 'Profile updated successfully',
+    companyProfileDescription: 'Manage your company information and settings',
+    contactInformation: 'Contact Information',
+    editProfile: 'Edit Profile',
     
     // Status options
     pending: 'Pending',
     inProgress: 'In Progress',
     completed: 'Completed',
     cancelled: 'Cancelled',
+    waitingForParts: 'Waiting for Parts',
+    
+    // Dashboard specific
+    totalJobCards: 'total job cards',
+    jobsInProgress: 'jobs in progress',
+    jobsCompleted: 'jobs completed',
+    jobsWaitingParts: 'jobs waiting for parts',
+    recentJobCards: 'Recent Job Cards',
+    viewAll: 'View All',
+    recentJobsDescription: 'Your most recent job cards and their status',
+    customer: 'Customer',
     
     // Actions
     print: 'Print',
@@ -349,6 +379,7 @@ export const translations: Record<Language, AppTranslations> = {
     french: 'Français',
     portuguese: 'Português',
     managePreferences: 'Gérez vos préférences d\'application',
+    congoleseLanguages: 'Langues Congolaises',
     
     // Company Profile
     companyName: 'Nom de l\'entreprise',
@@ -357,12 +388,26 @@ export const translations: Record<Language, AppTranslations> = {
     companyEmail: 'Email de l\'entreprise',
     updateProfile: 'Mettre à jour le profil',
     profileUpdated: 'Profil mis à jour avec succès',
+    companyProfileDescription: 'Gérez les informations et paramètres de votre entreprise',
+    contactInformation: 'Informations de contact',
+    editProfile: 'Modifier le profil',
     
     // Status options
     pending: 'En attente',
     inProgress: 'En cours',
     completed: 'Terminé',
     cancelled: 'Annulé',
+    waitingForParts: 'En attente de pièces',
+    
+    // Dashboard specific
+    totalJobCards: 'fiches de travail au total',
+    jobsInProgress: 'travaux en cours',
+    jobsCompleted: 'travaux terminés',
+    jobsWaitingParts: 'travaux en attente de pièces',
+    recentJobCards: 'Fiches de Travail Récentes',
+    viewAll: 'Voir Tout',
+    recentJobsDescription: 'Vos fiches de travail les plus récentes et leur statut',
+    customer: 'Client',
     
     // Actions
     print: 'Imprimer',
@@ -472,6 +517,7 @@ export const translations: Record<Language, AppTranslations> = {
     french: 'Français',
     portuguese: 'Português',
     managePreferences: 'Gerencie suas preferências do aplicativo',
+    congoleseLanguages: 'Línguas Congolesas',
     
     // Company Profile
     companyName: 'Nome da Empresa',
@@ -480,12 +526,26 @@ export const translations: Record<Language, AppTranslations> = {
     companyEmail: 'Email da Empresa',
     updateProfile: 'Atualizar Perfil',
     profileUpdated: 'Perfil atualizado com sucesso',
+    companyProfileDescription: 'Gerencie as informações e configurações da sua empresa',
+    contactInformation: 'Informações de Contato',
+    editProfile: 'Editar Perfil',
     
     // Status options
     pending: 'Pendente',
     inProgress: 'Em Andamento',
     completed: 'Concluído',
     cancelled: 'Cancelado',
+    waitingForParts: 'Esperando Peças',
+    
+    // Dashboard specific
+    totalJobCards: 'cartões de trabalho totais',
+    jobsInProgress: 'trabalhos em andamento',
+    jobsCompleted: 'trabalhos concluídos',
+    jobsWaitingParts: 'trabalhos esperando peças',
+    recentJobCards: 'Cartões de Trabalho Recentes',
+    viewAll: 'Ver Todos',
+    recentJobsDescription: 'Seus cartões de trabalho mais recentes e seu status',
+    customer: 'Cliente',
     
     // Actions
     print: 'Imprimir',
@@ -494,6 +554,696 @@ export const translations: Record<Language, AppTranslations> = {
     sendEmail: 'Enviar por Email',
     download: 'Baixar',
     preview: 'Visualizar'
+  },
+  es: {
+    // Navigation
+    dashboard: 'Panel',
+    jobCards: 'Tarjetas de Trabajo',
+    invoices: 'Facturas',
+    companyProfile: 'Perfil de Empresa',
+    settings: 'Configuraciones',
+    
+    // Common
+    save: 'Guardar',
+    cancel: 'Cancelar',
+    delete: 'Eliminar',
+    edit: 'Editar',
+    create: 'Crear',
+    search: 'Buscar',
+    loading: 'Cargando...',
+    error: 'Error',
+    success: 'Éxito',
+    back: 'Atrás',
+    next: 'Siguiente',
+    previous: 'Anterior',
+    close: 'Cerrar',
+    confirm: 'Confirmar',
+    
+    // Authentication & Landing
+    login: 'Iniciar Sesión',
+    register: 'Registrarse',
+    logout: 'Cerrar Sesión',
+    email: 'Email',
+    password: 'Contraseña',
+    confirmPassword: 'Confirmar Contraseña',
+    forgotPassword: '¿Olvidaste la contraseña?',
+    welcomeTitle: 'FixFlow Connect',
+    welcomeSubtitle: 'Gestión de taller de reparaciones simplificada',
+    appDescription: 'Optimiza las operaciones de tu taller de reparaciones',
+    features: {
+      jobManagement: 'Creación y gestión fácil de tarjetas de trabajo',
+      customerTracking: 'Seguimiento de información del cliente',
+      invoiceGeneration: 'Generación simple de facturas'
+    },
+    copyright: '© 2023 FixFlow Connect. Todos los derechos reservados.',
+    
+    // Job Cards
+    createJobCard: 'Crear Tarjeta de Trabajo',
+    jobCardNumber: 'Número de Tarjeta',
+    customerName: 'Nombre del Cliente',
+    customerPhone: 'Teléfono del Cliente',
+    customerEmail: 'Email del Cliente',
+    deviceName: 'Nombre del Dispositivo',
+    deviceModel: 'Modelo del Dispositivo',
+    deviceCondition: 'Condición del Dispositivo',
+    problem: 'Problema',
+    status: 'Estado',
+    handlingFees: 'Gastos de Manejo',
+    noJobCardsFound: 'No se encontraron tarjetas de trabajo',
+    createFirstJobCard: 'Crear Primera Tarjeta',
+    loadingJobCards: 'Cargando tarjetas...',
+    errorLoadingJobCards: 'Error al Cargar Tarjetas',
+    reloadPage: 'Recargar Página',
+    jobCardCreated: 'Tarjeta de trabajo creada exitosamente',
+    jobCardUpdated: 'Tarjeta de trabajo actualizada',
+    jobCardDeleted: 'Tarjeta de trabajo eliminada',
+    previewJob: 'Vista Previa',
+    printJob: 'Imprimir',
+    shareJob: 'Compartir',
+    deleteJob: 'Eliminar',
+    
+    // Invoices
+    invoice: 'FACTURA',
+    issueDate: 'Fecha de emisión',
+    dueDate: 'Fecha de vencimiento',
+    from: 'De',
+    billTo: 'Facturar a',
+    invoiceDetails: 'Detalles de la factura',
+    description: 'Descripción',
+    device: 'Dispositivo',
+    lineItems: 'Artículos',
+    qty: 'Cant',
+    unitPrice: 'Precio unitario',
+    amount: 'Cantidad',
+    subtotal: 'Subtotal',
+    total: 'Total',
+    notes: 'Notas',
+    termsConditions: 'Términos y condiciones',
+    thankYou: '¡Gracias por su negocio!',
+    generatedOn: 'Generado el',
+    companyInfoNotAvailable: 'Información de la empresa no disponible',
+    createInvoice: 'Crear Factura',
+    invoiceCreated: 'Factura creada exitosamente',
+    invoiceUpdated: 'Factura actualizada',
+    noInvoicesFound: 'No se encontraron facturas',
+    createFirstInvoice: 'Crear Primera Factura',
+    
+    // Settings
+    language: 'Idioma',
+    selectLanguage: 'Seleccionar Idioma',
+    english: 'English',
+    french: 'Français',
+    portuguese: 'Português',
+    managePreferences: 'Gestiona las preferencias de tu aplicación',
+    congoleseLanguages: 'Idiomas Congoleños',
+    
+    // Company Profile
+    companyName: 'Nombre de la Empresa',
+    companyAddress: 'Dirección de la Empresa',
+    companyPhone: 'Teléfono de la Empresa',
+    companyEmail: 'Email de la Empresa',
+    updateProfile: 'Actualizar Perfil',
+    profileUpdated: 'Perfil actualizado exitosamente',
+    companyProfileDescription: 'Gestiona la información y configuraciones de tu empresa',
+    contactInformation: 'Información de Contacto',
+    editProfile: 'Editar Perfil',
+    
+    // Status options
+    pending: 'Pendiente',
+    inProgress: 'En Progreso',
+    completed: 'Completado',
+    cancelled: 'Cancelado',
+    waitingForParts: 'Esperando Repuestos',
+    
+    // Dashboard specific
+    totalJobCards: 'tarjetas de trabajo totales',
+    jobsInProgress: 'trabajos en progreso',
+    jobsCompleted: 'trabajos completados',
+    jobsWaitingParts: 'trabajos esperando repuestos',
+    recentJobCards: 'Tarjetas de Trabajo Recientes',
+    viewAll: 'Ver Todas',
+    recentJobsDescription: 'Tus tarjetas de trabajo más recientes y su estado',
+    customer: 'Cliente',
+    
+    // Actions
+    print: 'Imprimir',
+    share: 'Compartir',
+    whatsapp: 'WhatsApp',
+    sendEmail: 'Enviar por Email',
+    download: 'Descargar',
+    preview: 'Vista Previa'
+  },
+  ln: {
+    // Navigation
+    dashboard: 'Likoló',
+    jobCards: 'Mikanda ya Mosála',
+    invoices: 'Bakwákísi',
+    companyProfile: 'Moposo ya Kompanyi',
+    settings: 'Makambo ya Bobongwani',
+    
+    // Common
+    save: 'Bobatela',
+    cancel: 'Kotika',
+    delete: 'Kolongola',
+    edit: 'Kobongisa',
+    create: 'Kosála',
+    search: 'Koluka',
+    loading: 'Kozala na boyei...',
+    error: 'Libunga',
+    success: 'Elongi',
+    back: 'Kozonga',
+    next: 'Oyo akoya',
+    previous: 'Oyo aleka',
+    close: 'Kokanga',
+    confirm: 'Kondima',
+    
+    // Authentication & Landing
+    login: 'Kokóta',
+    register: 'Komikoma',
+    logout: 'Kobima',
+    email: 'Email',
+    password: 'Mokanda ya kobombama',
+    confirmPassword: 'Kondima Mokanda ya Kobombama',
+    forgotPassword: 'Obosani mokanda ya kobombama?',
+    welcomeTitle: 'FixFlow Connect',
+    welcomeSubtitle: 'Boyangeli ya ndako ya kobongisa biloko epusáni',
+    appDescription: 'Salá misála ya ndako na yo ya kobongisa biloko malamu',
+    features: {
+      jobManagement: 'Kosála pe kobatela mikanda ya misála malamu',
+      customerTracking: 'Kolanda makambo ya bakiliya',
+      invoiceGeneration: 'Kosála bakwákísi na pete'
+    },
+    copyright: '© 2023 FixFlow Connect. Makoki nyonso ebatelami.',
+    
+    // Job Cards
+    createJobCard: 'Kosála Mokanda ya Mosála',
+    jobCardNumber: 'Motango ya Mokanda',
+    customerName: 'Nkómbó ya Mokiliya',
+    customerPhone: 'Telefoni ya Mokiliya',
+    customerEmail: 'Email ya Mokiliya',
+    deviceName: 'Nkómbó ya Eloko',
+    deviceModel: 'Lolenge ya Eloko',
+    deviceCondition: 'Lolenge ya Eloko',
+    problem: 'Mikakatano',
+    status: 'Lolenge',
+    handlingFees: 'Mbongo ya Bosimbi',
+    noJobCardsFound: 'Mikanda ya misála ezwami te',
+    createFirstJobCard: 'Kosála Mokanda ya Liboso',
+    loadingJobCards: 'Kozala kozwá mikanda...',
+    errorLoadingJobCards: 'Libunga na Kozwá Mikanda',
+    reloadPage: 'Kozongisa Nkásá',
+    jobCardCreated: 'Mokanda ya mosála esálemi malamu',
+    jobCardUpdated: 'Mokanda ya mosála ebongwani',
+    jobCardDeleted: 'Mokanda ya mosála elongolami',
+    previewJob: 'Botálá Liboso',
+    printJob: 'Kobimisa',
+    shareJob: 'Kokabola',
+    deleteJob: 'Kolongola',
+    
+    // Invoices
+    invoice: 'KWÁKÍSI',
+    issueDate: 'Mokolo ya Kobimisa',
+    dueDate: 'Mokolo ya Kofuta',
+    from: 'Uta',
+    billTo: 'Kwákísi epai ya',
+    invoiceDetails: 'Makambo ya Kwákísi',
+    description: 'Ndimbola',
+    device: 'Eloko',
+    lineItems: 'Biloko',
+    qty: 'Motango',
+    unitPrice: 'Ntalo ya Moko',
+    amount: 'Mbongo',
+    subtotal: 'Subtotal',
+    total: 'Nyonso',
+    notes: 'Bilembo',
+    termsConditions: 'Mibeko pe Malako',
+    thankYou: 'Tosépéli yo mpo na mombongo na yo!',
+    generatedOn: 'Esálemi na',
+    companyInfoNotAvailable: 'Makambo ya kompanyi ezali te',
+    createInvoice: 'Kosála Kwákísi',
+    invoiceCreated: 'Kwákísi esálemi malamu',
+    invoiceUpdated: 'Kwákísi ebongwani',
+    noInvoicesFound: 'Bakwákísi ezwami te',
+    createFirstInvoice: 'Kosála Kwákísi ya Liboso',
+    
+    // Settings
+    language: 'Lokóta',
+    selectLanguage: 'Kopóna Lokóta',
+    english: 'Lingɛlɛ́sa',
+    french: 'Lifalansé',
+    portuguese: 'Lipulutugalɛ́si',
+    managePreferences: 'Boyangeli makambo oyo olíngí',
+    congoleseLanguages: 'Mikóta ya Kongó',
+    
+    // Company Profile
+    companyName: 'Nkómbó ya Kompanyi',
+    companyAddress: 'Esika ya Kompanyi',
+    companyPhone: 'Telefoni ya Kompanyi',
+    companyEmail: 'Email ya Kompanyi',
+    updateProfile: 'Kobongisa Moposo',
+    profileUpdated: 'Moposo ebongwani malamu',
+    companyProfileDescription: 'Boyangeli makambo pe malako ya kompanyi na yo',
+    contactInformation: 'Makambo ya Komunikasyon',
+    editProfile: 'Kobongisa Moposo',
+    
+    // Status options
+    pending: 'Ezali kozela',
+    inProgress: 'Ezali kosálema',
+    completed: 'Esilisi',
+    cancelled: 'Ekatami',
+    waitingForParts: 'Ezali kozela biloko',
+    
+    // Dashboard specific
+    totalJobCards: 'mikanda ya misála nyonso',
+    jobsInProgress: 'misála ezali kosálema',
+    jobsCompleted: 'misála esilisi',
+    jobsWaitingParts: 'misála ezali kozela biloko',
+    recentJobCards: 'Mikanda ya Misála ya Sika',
+    viewAll: 'Botála Nyonso',
+    recentJobsDescription: 'Mikanda na yo ya misála ya sika pe lolenge na yango',
+    customer: 'Mokiliya',
+    
+    // Actions
+    print: 'Kobimisa',
+    share: 'Kokabola',
+    whatsapp: 'WhatsApp',
+    sendEmail: 'Kotinda na Email',
+    download: 'Kokita',
+    preview: 'Botála Liboso'
+  },
+  kg: {
+    // Navigation
+    dashboard: 'Mesa ya Kuvuanda',
+    jobCards: 'Makarta ya Kisalu',
+    invoices: 'Mafakture',
+    companyProfile: 'Ntangu ya Kompania',
+    settings: 'Mambu ma Kubongisa',
+    
+    // Common
+    save: 'Sunga',
+    cancel: 'Tula',
+    delete: 'Banzula',
+    edit: 'Bongisa',
+    create: 'Vanga',
+    search: 'Sosa',
+    loading: 'Ku yiza...',
+    error: 'Dizolo',
+    success: 'Mafumu',
+    back: 'Vutuka',
+    next: 'Wonso ukuiza',
+    previous: 'Wonso utedila',
+    close: 'Kangila',
+    confirm: 'Lundakana',
+    
+    // Authentication & Landing
+    login: 'Kota',
+    register: 'Songila',
+    logout: 'Fuma',
+    email: 'Email',
+    password: 'Nkutu wa sueka',
+    confirmPassword: 'Lundakana Nkutu wa Sueka',
+    forgotPassword: 'Uzebukidi nkutu wa sueka?',
+    welcomeTitle: 'FixFlow Connect',
+    welcomeSubtitle: 'Kuvuanda nzo ya kubongisa bima kisonga',
+    appDescription: 'Sala kisalu kia nzo ya yo ya kubongisa bima kimbote',
+    features: {
+      jobManagement: 'Kuvanga ye kusunga makarta ya bisalu kimbote',
+      customerTracking: 'Kulandila mambu ma banteki',
+      invoiceGeneration: 'Kuvanga mafakture kimbote'
+    },
+    copyright: '© 2023 FixFlow Connect. Mambu moso masungulu.',
+    
+    // Job Cards
+    createJobCard: 'Vanga Nkarta ya Kisalu',
+    jobCardNumber: 'Numeru ya Nkarta',
+    customerName: 'Dizina dya Nteki',
+    customerPhone: 'Telefoni ya Nteki',
+    customerEmail: 'Email ya Nteki',
+    deviceName: 'Dizina dya Kima',
+    deviceModel: 'Ndenge ya Kima',
+    deviceCondition: 'Mfumu ya Kima',
+    problem: 'Mambu ma nganga',
+    status: 'Mfumu',
+    handlingFees: 'Mbongo ya kuzikisa',
+    noJobCardsFound: 'Makarta ya bisalu mamonanu ko',
+    createFirstJobCard: 'Vanga Nkarta ya Thete',
+    loadingJobCards: 'Ku tambula makarta...',
+    errorLoadingJobCards: 'Dizolo mu Kutambula Makarta',
+    reloadPage: 'Vutisa Lukaya',
+    jobCardCreated: 'Nkarta ya kisalu ivangulu kimbote',
+    jobCardUpdated: 'Nkarta ya kisalu ibongisulu',
+    jobCardDeleted: 'Nkarta ya kisalu ibanzululu',
+    previewJob: 'Mona Thete',
+    printJob: 'Soba',
+    shareJob: 'Kabana',
+    deleteJob: 'Banzula',
+    
+    // Invoices
+    invoice: 'FAKTURE',
+    issueDate: 'Lumingu lua Kutotuka',
+    dueDate: 'Lumingu lua Kufuta',
+    from: 'Kuma kwa',
+    billTo: 'Fakture kwa',
+    invoiceDetails: 'Mambu ma Fakture',
+    description: 'Masonga',
+    device: 'Kima',
+    lineItems: 'Bima',
+    qty: 'Numeru',
+    unitPrice: 'Ntalu wa mosi',
+    amount: 'Mbongo',
+    subtotal: 'Subtotal',
+    total: 'Moso',
+    notes: 'Malembo',
+    termsConditions: 'Malaku ye Minsiku',
+    thankYou: 'Twasantuka mpo ya kisalu kiaku!',
+    generatedOn: 'Kivangulu mu',
+    companyInfoNotAvailable: 'Mambu ma kompania makadi ko',
+    createInvoice: 'Vanga Fakture',
+    invoiceCreated: 'Fakture ivangulu kimbote',
+    invoiceUpdated: 'Fakture ibongisulu',
+    noInvoicesFound: 'Mafakture mamonanu ko',
+    createFirstInvoice: 'Vanga Fakture ya Thete',
+    
+    // Settings
+    language: 'Ndinga',
+    selectLanguage: 'Sola Ndinga',
+    english: 'Kingereza',
+    french: 'Kifalansa',
+    portuguese: 'Kiputulugeza',
+    managePreferences: 'Vuanda mambu watondele',
+    congoleseLanguages: 'Mindinga ya Kongo',
+    
+    // Company Profile
+    companyName: 'Dizina dya Kompania',
+    companyAddress: 'Fulu ya Kompania',
+    companyPhone: 'Telefoni ya Kompania',
+    companyEmail: 'Email ya Kompania',
+    updateProfile: 'Bongisa Ntangu',
+    profileUpdated: 'Ntangu ibongisulu kimbote',
+    companyProfileDescription: 'Vuanda mambu ye malaku ma kompania yaku',
+    contactInformation: 'Mambu ma Komunikasaun',
+    editProfile: 'Bongisa Ntangu',
+    
+    // Status options
+    pending: 'Ikalanga',
+    inProgress: 'Isalanga',
+    completed: 'Imana',
+    cancelled: 'Itululu',
+    waitingForParts: 'Ikalanga bima',
+    
+    // Dashboard specific
+    totalJobCards: 'makarta ya bisalu moso',
+    jobsInProgress: 'bisalu bisalanga',
+    jobsCompleted: 'bisalu bimana',
+    jobsWaitingParts: 'bisalu bikalanga bima',
+    recentJobCards: 'Makarta ya Bisalu ya Kyese',
+    viewAll: 'Mona Moso',
+    recentJobsDescription: 'Makarta yaku ya bisalu ya kyese ye mfumu yawo',
+    customer: 'Nteki',
+    
+    // Actions
+    print: 'Soba',
+    share: 'Kabana',
+    whatsapp: 'WhatsApp',
+    sendEmail: 'Tuma na Email',
+    download: 'Kita',
+    preview: 'Mona Thete'
+  },
+  sw: {
+    // Navigation
+    dashboard: 'Dashbodi',
+    jobCards: 'Kadi za Kazi',
+    invoices: 'Ankara',
+    companyProfile: 'Wasifu wa Kampuni',
+    settings: 'Mipangilio',
+    
+    // Common
+    save: 'Hifadhi',
+    cancel: 'Ghairi',
+    delete: 'Futa',
+    edit: 'Hariri',
+    create: 'Unda',
+    search: 'Tafuta',
+    loading: 'Inapakia...',
+    error: 'Kosa',
+    success: 'Mafanikio',
+    back: 'Rudi',
+    next: 'Ifuatayo',
+    previous: 'Iliyotangulia',
+    close: 'Funga',
+    confirm: 'Thibitisha',
+    
+    // Authentication & Landing
+    login: 'Ingia',
+    register: 'Jisajili',
+    logout: 'Toka',
+    email: 'Barua Pepe',
+    password: 'Nenosiri',
+    confirmPassword: 'Thibitisha Nenosiri',
+    forgotPassword: 'Umesahau nenosiri?',
+    welcomeTitle: 'FixFlow Connect',
+    welcomeSubtitle: 'Usimamizi wa duka la ukarabati umerahisishwa',
+    appDescription: 'Boresha utendaji wa duka lako la ukarabati',
+    features: {
+      jobManagement: 'Uundaji na usimamizi rahisi wa kadi za kazi',
+      customerTracking: 'Ufuatiliaji wa taarifa za wateja',
+      invoiceGeneration: 'Uundaji rahisi wa ankara'
+    },
+    copyright: '© 2023 FixFlow Connect. Haki zote zimehifadhiwa.',
+    
+    // Job Cards
+    createJobCard: 'Unda Kadi ya Kazi',
+    jobCardNumber: 'Nambari ya Kadi',
+    customerName: 'Jina la Mteja',
+    customerPhone: 'Simu ya Mteja',
+    customerEmail: 'Barua Pepe ya Mteja',
+    deviceName: 'Jina la Kifaa',
+    deviceModel: 'Mfano wa Kifaa',
+    deviceCondition: 'Hali ya Kifaa',
+    problem: 'Tatizo',
+    status: 'Hali',
+    handlingFees: 'Ada za Ushughulikaji',
+    noJobCardsFound: 'Hakuna kadi za kazi zilizopatikana',
+    createFirstJobCard: 'Unda Kadi ya Kwanza',
+    loadingJobCards: 'Inapakia kadi...',
+    errorLoadingJobCards: 'Kosa la Kupakia Kadi',
+    reloadPage: 'Pakia Upya Ukurasa',
+    jobCardCreated: 'Kadi ya kazi imeundwa kwa mafanikio',
+    jobCardUpdated: 'Kadi ya kazi imesasishwa',
+    jobCardDeleted: 'Kadi ya kazi imefutwa',
+    previewJob: 'Hakikisha',
+    printJob: 'Chapisha',
+    shareJob: 'Shiriki',
+    deleteJob: 'Futa',
+    
+    // Invoices
+    invoice: 'ANKARA',
+    issueDate: 'Tarehe ya Kutoa',
+    dueDate: 'Tarehe ya Kulipa',
+    from: 'Kutoka',
+    billTo: 'Bili kwa',
+    invoiceDetails: 'Maelezo ya Ankara',
+    description: 'Maelezo',
+    device: 'Kifaa',
+    lineItems: 'Vitu',
+    qty: 'Kiwango',
+    unitPrice: 'Bei ya Kipande',
+    amount: 'Kiasi',
+    subtotal: 'Jumla ndogo',
+    total: 'Jumla',
+    notes: 'Maelezo',
+    termsConditions: 'Masharti na Hali',
+    thankYou: 'Asante kwa biashara yako!',
+    generatedOn: 'Imeundwa tarehe',
+    companyInfoNotAvailable: 'Taarifa za kampuni hazipatikani',
+    createInvoice: 'Unda Ankara',
+    invoiceCreated: 'Ankara imeundwa kwa mafanikio',
+    invoiceUpdated: 'Ankara imesasishwa',
+    noInvoicesFound: 'Hakuna ankara zilizopatikana',
+    createFirstInvoice: 'Unda Ankara ya Kwanza',
+    
+    // Settings
+    language: 'Lugha',
+    selectLanguage: 'Chagua Lugha',
+    english: 'Kiingereza',
+    french: 'Kifaransa',
+    portuguese: 'Kireno',
+    managePreferences: 'Simamia mapendeleo yako ya programu',
+    congoleseLanguages: 'Lugha za Kikongo',
+    
+    // Company Profile
+    companyName: 'Jina la Kampuni',
+    companyAddress: 'Anwani ya Kampuni',
+    companyPhone: 'Simu ya Kampuni',
+    companyEmail: 'Barua Pepe ya Kampuni',
+    updateProfile: 'Sasisha Wasifu',
+    profileUpdated: 'Wasifu umesasishwa kwa mafanikio',
+    companyProfileDescription: 'Simamia taarifa na mipangilio ya kampuni yako',
+    contactInformation: 'Taarifa za Mawasiliano',
+    editProfile: 'Hariri Wasifu',
+    
+    // Status options
+    pending: 'Inasubiri',
+    inProgress: 'Inaendelea',
+    completed: 'Imekamilika',
+    cancelled: 'Imeghairiwa',
+    waitingForParts: 'Inasubiri Vipande',
+    
+    // Dashboard specific
+    totalJobCards: 'kadi za kazi jumla',
+    jobsInProgress: 'kazi zinaendelea',
+    jobsCompleted: 'kazi zimekamilika',
+    jobsWaitingParts: 'kazi zinasubiri vipande',
+    recentJobCards: 'Kadi za Kazi za Hivi Karibuni',
+    viewAll: 'Ona Zote',
+    recentJobsDescription: 'Kadi zako za kazi za hivi karibuni na hali zao',
+    customer: 'Mteja',
+    
+    // Actions
+    print: 'Chapisha',
+    share: 'Shiriki',
+    whatsapp: 'WhatsApp',
+    sendEmail: 'Tuma kwa Barua Pepe',
+    download: 'Pakua',
+    preview: 'Hakikisha'
+  },
+  ts: {
+    // Navigation
+    dashboard: 'Mesa ya kulandila',
+    jobCards: 'Mikanda ya kisalu',
+    invoices: 'Mafakture',
+    companyProfile: 'Bilumbu bya kompanyi',
+    settings: 'Mambu ma kubongisa',
+    
+    // Common
+    save: 'Taya',
+    cancel: 'Kana',
+    delete: 'Bana',
+    edit: 'Bongisa',
+    create: 'Panga',
+    search: 'Saka',
+    loading: 'Ku yiza...',
+    error: 'Chibana',
+    success: 'Cibotu',
+    back: 'Buyela munyima',
+    next: 'Ditunga',
+    previous: 'Dituku',
+    close: 'Kangila',
+    confirm: 'Denga',
+    
+    // Authentication & Landing
+    login: 'Kena',
+    register: 'Koma',
+    logout: 'Toma',
+    email: 'Email',
+    password: 'Malemba ma kusisila',
+    confirmPassword: 'Denga Malemba ma Kusisila',
+    forgotPassword: 'Walebuka malemba ma kusisila?',
+    welcomeTitle: 'FixFlow Connect',
+    welcomeSubtitle: 'Kukabidila caha ca kubongisa bintu capambana',
+    appDescription: 'Salela kisalu kya caha ca yo ca kubongisa bintu cibotu',
+    features: {
+      jobManagement: 'Kupanga ne kutaya mikanda ya bisalu cibotu',
+      customerTracking: 'Kulandila mambu ma betu betu',
+      invoiceGeneration: 'Kupanga mafakture capambana'
+    },
+    copyright: '© 2023 FixFlow Connect. Mambu onso matayidi.',
+    
+    // Job Cards
+    createJobCard: 'Panga Mukanda wa Kisalu',
+    jobCardNumber: 'Nombolo ya Mukanda',
+    customerName: 'Dina dya Muetu',
+    customerPhone: 'Telefoni ya Muetu',
+    customerEmail: 'Email ya Muetu',
+    deviceName: 'Dina dya Cintu',
+    deviceModel: 'Ndenge ya Cintu',
+    deviceCondition: 'Mfumu ya Cintu',
+    problem: 'Mambu ma kufana',
+    status: 'Mfumu',
+    handlingFees: 'Mbongo ya kusimba',
+    noJobCardsFound: 'Mikanda ya bisalu imonekanga bu',
+    createFirstJobCard: 'Panga Mukanda wa Kwanza',
+    loadingJobCards: 'Ku tambula mikanda...',
+    errorLoadingJobCards: 'Chibana mu Kutambula Mikanda',
+    reloadPage: 'Vutukisa Lukasa',
+    jobCardCreated: 'Mukanda wa kisalu upangidi cibotu',
+    jobCardUpdated: 'Mukanda wa kisalu ubongisidi',
+    jobCardDeleted: 'Mukanda wa kisalu ubanidi',
+    previewJob: 'Mona kwanza',
+    printJob: 'Kandika',
+    shareJob: 'Kabana',
+    deleteJob: 'Bana',
+    
+    // Invoices
+    invoice: 'FAKTURE',
+    issueDate: 'Dina dya kutotola',
+    dueDate: 'Dina dya kufutila',
+    from: 'Kuma kwa',
+    billTo: 'Fakture kwa',
+    invoiceDetails: 'Mambu ma Fakture',
+    description: 'Ngonga',
+    device: 'Cintu',
+    lineItems: 'Bintu',
+    qty: 'Mutelu',
+    unitPrice: 'Ntalu wa umue',
+    amount: 'Mbongo',
+    subtotal: 'Subtotal',
+    total: 'Onso',
+    notes: 'Malemba',
+    termsConditions: 'Malaku ne Mateko',
+    thankYou: 'Twasanta mpo ya kisalu kyaku!',
+    generatedOn: 'Kupangidi mua',
+    companyInfoNotAvailable: 'Mambu ma kompanyi madi bu',
+    createInvoice: 'Panga Fakture',
+    invoiceCreated: 'Fakture ipangidi cibotu',
+    invoiceUpdated: 'Fakture ibongisidi',
+    noInvoicesFound: 'Mafakture amonekanga bu',
+    createFirstInvoice: 'Panga Fakture ya Kwanza',
+    
+    // Settings
+    language: 'Ndinga',
+    selectLanguage: 'Sola Ndinga',
+    english: 'Cilungu',
+    french: 'Cifalansa',
+    portuguese: 'Ciputulugezi',
+    managePreferences: 'Kabidila mambu wasakila',
+    congoleseLanguages: 'Mindinga ya Kongo',
+    
+    // Company Profile
+    companyName: 'Dina dya Kompanyi',
+    companyAddress: 'Fulu ya Kompanyi',
+    companyPhone: 'Telefoni ya Kompanyi',
+    companyEmail: 'Email ya Kompanyi',
+    updateProfile: 'Bongisa Bilumbu',
+    profileUpdated: 'Bilumbu bibongisidi cibotu',
+    companyProfileDescription: 'Kabidila mambu ne mateko ma kompanyi yaku',
+    contactInformation: 'Mambu ma Kutumila',
+    editProfile: 'Bongisa Bilumbu',
+    
+    // Status options
+    pending: 'Cilindile',
+    inProgress: 'Cisalela',
+    completed: 'Cimana',
+    cancelled: 'Cikanidi',
+    waitingForParts: 'Cilindile bintu',
+    
+    // Dashboard specific
+    totalJobCards: 'mikanda ya bisalu yonso',
+    jobsInProgress: 'bisalu bilasalela',
+    jobsCompleted: 'bisalu bimana',
+    jobsWaitingParts: 'bisalu bilindile bintu',
+    recentJobCards: 'Mikanda ya Bisalu ya Cisesele',
+    viewAll: 'Mona Yonso',
+    recentJobsDescription: 'Mikanda yaku ya bisalu ya cisesele ne mfumu yayi',
+    customer: 'Muetu',
+    
+    // Actions
+    print: 'Kandika',
+    share: 'Kabana',
+    whatsapp: 'WhatsApp',
+    sendEmail: 'Tuma ne Email',
+    download: 'Kata',
+    preview: 'Mona kwanza'
   }
 };
 
