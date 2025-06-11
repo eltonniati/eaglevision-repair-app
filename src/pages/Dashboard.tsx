@@ -22,7 +22,7 @@ export default function Dashboard() {
   const { session } = useAuth();
   const { jobs, loading: jobsLoading } = useJobs();
   const { company, loading: companyLoading } = useCompany();
-  const { t, language, changeLanguage } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
   const navigate = useNavigate();
 
@@ -129,25 +129,25 @@ export default function Dashboard() {
               <DropdownMenuLabel>{t.selectLanguage}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => changeLanguage("en")}
+                onClick={() => setLanguage("en")}
                 className={language === "en" ? "bg-gray-100" : ""}
               >
                 🇬🇧 English
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => changeLanguage("fr")}
+                onClick={() => setLanguage("fr")}
                 className={language === "fr" ? "bg-gray-100" : ""}
               >
                 🇫🇷 Français
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => changeLanguage("pt")}
+                onClick={() => setLanguage("pt")}
                 className={language === "pt" ? "bg-gray-100" : ""}
               >
                 🇵🇹 Português
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => changeLanguage("es")}
+                onClick={() => setLanguage("es")}
                 className={language === "es" ? "bg-gray-100" : ""}
               >
                 🇪🇸 Español
@@ -156,25 +156,25 @@ export default function Dashboard() {
               <DropdownMenuLabel>{t.congoleseLanguages}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => changeLanguage("ln")}
+                onClick={() => setLanguage("ln")}
                 className={language === "ln" ? "bg-gray-100" : ""}
               >
                 🇨🇩 Lingála
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => changeLanguage("kg")}
+                onClick={() => setLanguage("kg")}
                 className={language === "kg" ? "bg-gray-100" : ""}
               >
                 🇨🇩 Kikóngó
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => changeLanguage("sw")}
+                onClick={() => setLanguage("sw")}
                 className={language === "sw" ? "bg-gray-100" : ""}
               >
                 🇨🇩 Swahili
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => changeLanguage("ts")}
+                onClick={() => setLanguage("ts")}
                 className={language === "ts" ? "bg-gray-100" : ""}
               >
                 🇨🇩 Tshiluba
