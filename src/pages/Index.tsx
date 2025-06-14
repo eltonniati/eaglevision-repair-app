@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
+import LanguageSelect from "@/components/common/LanguageSelect";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("login");
@@ -23,6 +23,8 @@ export default function Index() {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <header className="py-6 bg-white shadow-sm">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Language picker in header, above title */}
+          <LanguageSelect />
           <h1 className="text-3xl font-bold text-gray-900">{t.welcomeTitle}</h1>
           <p className="text-gray-600 mt-1">{t.welcomeSubtitle}</p>
         </div>
