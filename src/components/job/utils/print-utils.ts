@@ -462,14 +462,7 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
 
 import { downloadPdf } from "./pdf-utils";
 import { toast } from "sonner";
-
-// Helper to detect if the user is on a mobile device
-function isMobileDevice() {
-  if (typeof navigator === "undefined") return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
-}
+import { isMobileDevice } from "./device-utils";
 
 // Export handlePrint as an alias for handleJobCardPrint for backward compatibility
 export const handlePrint = async (
