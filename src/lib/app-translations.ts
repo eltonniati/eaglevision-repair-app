@@ -1,4 +1,5 @@
-import { Language } from './app-translations';
+
+// Removed: import { Language } from './app-translations';
 
 export type Language = 'en' | 'fr' | 'pt' | 'es' | 'ln' | 'kg' | 'sw' | 'ts';
 
