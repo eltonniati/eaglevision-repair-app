@@ -4,12 +4,10 @@ import { Job } from "@/lib/types";
 import { PrintableJobCard } from "./PrintableJobCard";
 import { Button } from "@/components/ui/button";
 import { Printer, Share, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
-import { generatePdf, downloadPdf } from "./utils/pdf-utils";
+import { downloadJobCardPdf } from "./utils/job-pdf-utils";
 import { shareJobCard, emailJobCard } from "./utils/share-utils";
-import { handlePrint } from "./utils/print-utils";
 
 interface JobPreviewModeProps {
   job: Job;
@@ -43,10 +41,12 @@ export const JobPreviewMode = ({
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isMobile = useIsMobile();
 
-  // Print functionality
-  const onPrintButtonClick = () => {
-    handlePrint(printRef, job.job_card_number || "unknown");
-    return Promise.resolve();
+  // Print functionality - now generates cellphone-optimized PDF
+  const onPrintButtonClick = async () => {
+    console.log("Print button clicked - generating cellphone PDF for job:", job.job_card_number);
+    setIsGeneratingPdf(true);
+    await downloadJobCardPdf(printRef, job.job_card_number || "JobCard");
+    setIsGeneratingPdf(false);
   };
 
   // Share functionality: Generate & share PDF (on all devices)
@@ -68,7 +68,7 @@ export const JobPreviewMode = ({
   // PDF download handler
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
-    await downloadPdf(printRef, job.job_card_number || "");
+    await downloadJobCardPdf(printRef, job.job_card_number || "");
     setIsGeneratingPdf(false);
     setIsShareDialogOpen(false);
   };
@@ -97,8 +97,12 @@ export const JobPreviewMode = ({
             onClick={onPrintButtonClick}
             disabled={isGeneratingPdf}
           >
-            <Printer className="mr-2 h-4 w-4" />
-            {isMobile ? "Print" : "Print Now"}
+            {isGeneratingPdf ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Printer className="mr-2 h-4 w-4" />
+            )}
+            {isMobile ? "Print PDF" : "Print PDF (Mobile)"}
           </Button>
         </div>
       </div>

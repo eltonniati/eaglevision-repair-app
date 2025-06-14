@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer, Share2 } from "lucide-react";
 import { Job } from "@/lib/types";
-import { handlePrint } from "./utils/print-utils";
+import { downloadJobCardPdf } from "./utils/job-pdf-utils";
 import { useRef } from "react";
 
 interface JobPrintPreviewProps {
@@ -38,8 +38,11 @@ export function JobPrintPreview({
 }: JobPrintPreviewProps) {
   const printRef = useRef<HTMLDivElement>(null);
 
-  const handlePrintClick = () => {
-    handlePrint(printRef, job.job_card_number || "unknown");
+  const handlePrintClick = async () => {
+    console.log("Print button clicked for job card:", job.job_card_number);
+    
+    // Generate and download PDF in cellphone format
+    await downloadJobCardPdf(printRef, job.job_card_number || "JobCard");
   };
 
   return (
@@ -57,12 +60,12 @@ export function JobPrintPreview({
           </Button>
           <Button onClick={handlePrintClick}>
             <Printer className="mr-2 h-4 w-4" />
-            Print
+            Print PDF
           </Button>
         </div>
       </div>
 
-      {/* Printable content */}
+      {/* Printable content - optimized for cellphone PDF */}
       <div className="print-content bg-white p-6 rounded-lg shadow-sm print:p-0 print:shadow-none">
         <div ref={printRef}>
           <div className="mb-8 text-center print:mb-4">
@@ -70,7 +73,7 @@ export function JobPrintPreview({
             <p className="text-gray-600 print:text-gray-800">#{job.job_card_number}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 print:grid-cols-2 print:gap-4 print:mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 print:grid-cols-1 print:gap-4 print:mb-4">
             {/* Customer Information */}
             <div className="print-card p-4 border rounded print:p-2 print:border-gray-300">
               <h2 className="text-lg font-semibold mb-4 border-b pb-2 print:text-base print:mb-2 print:pb-1 print:border-gray-300">
