@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { jsPDF } from "jspdf";
@@ -62,7 +61,7 @@ const MANUALS = {
       {
         title: "Bienvenue",
         text: "Merci d’utiliser l’application créée par Elton Niati. Cette application aide les sociétés de réparation/service à organiser les fiches d’intervention, gérer les appareils et clients, et générer des factures facilement.",
-        imageDescription: "Page d'accueil ou d'accueil de l'application"
+        imageDescription: "Page d'accueil ou de boas-vindes de l'application"
       },
       {
         title: "1. Premiers pas",
@@ -241,7 +240,7 @@ const MANUALS = {
       },
       {
         title: "6. Makótá ya Lokóta",
-        text: "Landa Bibongisi > Lokóta mpo na kobongola na Lingɛlɛsa, Lifalansé, Lipulutugalɛ́si, Espanyoli, Lingála, Kikóngó, Tshiluba, to Swahili.",
+        text: "Landa Bibongisi > Lokóta mpo na kobongola na Lingɛlɛsa, Lifalansé, Lipulutugalɛ́si, Espanyoli, Lingála, Kikongo, Tshiluba, to Swahili.",
         imageDescription: "Menu ya lokóta"
       },
       {
@@ -271,8 +270,8 @@ const MANUALS = {
       },
       {
         title: "2. Mesa ya Kuvuanda",
-        text: "Munsi ya kota, vwanda na mesa sambu kudindila bisalu, makarta, mafakture ne kubongisa.",
-        imageDescription: "Ekaniseli ya mesa (dashboard)"
+        text: "Mu kena, landa mesa ya kulandila mu mona ne kulongolola mikanda, mafakture ne kubongisa.",
+        imageDescription: "Mesa ya dashboard"
       },
       {
         title: "3. Kubongisa Makarta",
@@ -291,7 +290,7 @@ const MANUALS = {
       },
       {
         title: "6. Ndinga",
-        text: "Semba Bibongisa > Ndinga sambu kusangana Kingereza, Kifalansa, Kiputulugeza, Kisipanye, Kikóngó, Lingála, Tshiluba ne Kiswahili.",
+        text: "Semba Bibongisa > Ndinga sambu kusangana Kingereza, Kifalansa, Kiputulugeza, Kisipanye, Kikongo, Lingala, Tshiluba ne Kiswahili.",
         imageDescription: "Menu ya ndinga"
       },
       {
@@ -408,6 +407,75 @@ const MANUALS = {
   }
 };
 
+// Map of section titles to recommended screenshot filenames
+const SECTION_IMAGES: Record<string, string> = {
+  "Welcome": "welcome.png",
+  "1. Getting Started": "login.png",
+  "1. Premiers pas": "login.png",
+  "1. Primeiros Passos": "login.png",
+  "1. Primeros pasos": "login.png",
+  "1. Kobanda": "login.png",
+  "1. Kutala Ntete": "login.png",
+  "1. Kupangila ku ntete": "login.png",
+  "1. Kuanza": "login.png",
+  "2. Dashboard": "dashboard.png",
+  "2. Tableau de bord": "dashboard.png",
+  "2. Painel Principal": "dashboard.png",
+  "2. Panel principal": "dashboard.png",
+  "2. Likoló": "dashboard.png",
+  "2. Mesa ya Kuvuanda": "dashboard.png",
+  "2. Mesa ya kulandila": "dashboard.png",
+  "2. Dashbodi": "dashboard.png",
+  "3. Managing Job Cards": "jobcards.png",
+  "3. Gérer les Fiches": "jobcards.png",
+  "3. Gerenciando Ordens": "jobcards.png",
+  "3. Gestión de Tarjetas de Trabajo": "jobcards.png",
+  "3. Kobongisa Mikanda": "jobcards.png",
+  "3. Kubongisa Makarta": "jobcards.png",
+  "3. Kulongolola Mikanda": "jobcards.png",
+  "3. Usimamizi wa Kadi": "jobcards.png",
+  "4. Managing Invoices": "invoices.png",
+  "4. Gérer les Factures": "invoices.png",
+  "4. Gerenciando Faturas": "invoices.png",
+  "4. Gestión de Facturas": "invoices.png",
+  "4. Kobongisa Bakwákísi": "invoices.png",
+  "4. Kubongisa Mafakture": "invoices.png",
+  "4. Kulongolola Mafakture": "invoices.png",
+  "4. Usimamizi wa Ankara": "invoices.png",
+  "5. Profile & Settings": "settings.png",
+  "5. Profil & Paramètres": "settings.png",
+  "5. Perfil e Configurações": "settings.png",
+  "5. Perfil y Configuración": "settings.png",
+  "5. Moposo na Bibongisi": "settings.png",
+  "5. Ntangu na Bibongisa": "settings.png",
+  "5. Bilumbu na Mabongisa": "settings.png",
+  "5. Wasifu na Mipangilio": "settings.png",
+  "6. Language Support": "language.png",
+  "6. Support des langues": "language.png",
+  "6. Idiomas": "language.png",
+  "6. Idiomas": "language.png",
+  "6. Makótá ya Lokóta": "language.png",
+  "6. Ndinga": "language.png",
+  "6. Mindinga": "language.png",
+  "6. Lugha": "language.png",
+  "7. Footer Signature": "signature.png",
+  "7. Signature pied-de-page": "signature.png",
+  "7. Assinatura no Rodapé": "signature.png",
+  "7. Firma en el pie de página": "signature.png",
+  "7. Signature ya nsuka": "signature.png",
+  "7. Signature ya Nse": "signature.png",
+  "7. Kanda mu dibaku": "signature.png",
+  "7. Sahihi ya Chini": "signature.png",
+  "8. Support": "support.png",
+  "8. Assistance": "support.png",
+  "8. Suporte": "support.png",
+  "8. Soporte": "support.png",
+  "8. Lisungi": "support.png",
+  "8. Sibota": "support.png",
+  "8. Bumbudi": "support.png",
+  "8. Msaada": "support.png",
+};
+
 const LANGS: { code: string; label: string }[] = [
   { code: "en", label: "English" },
   { code: "fr", label: "Français" },
@@ -467,13 +535,17 @@ export default function UserManualPage() {
         </Button>
       </div>
       <div className="mt-8 rounded bg-muted p-4 text-sm whitespace-pre-line">
-        {MANUALS[language].sections.map((section, idx) => (
-          <div key={section.title + idx} className="mb-8">
-            <div className="font-semibold text-base mb-2">{section.title}</div>
-            <div className="mb-2">{section.text}</div>
-            <ManualImage description={section.imageDescription} />
-          </div>
-        ))}
+        {MANUALS[language].sections.map((section, idx) => {
+          // Try to match recommended image name for the section
+          const imageName = SECTION_IMAGES[section.title] || `manual-step-${idx + 1}.png`;
+          return (
+            <div key={section.title + idx} className="mb-8">
+              <div className="font-semibold text-base mb-2">{section.title}</div>
+              <div className="mb-2">{section.text}</div>
+              <ManualImage imageName={imageName} description={section.imageDescription} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
