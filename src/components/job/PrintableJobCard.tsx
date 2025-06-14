@@ -2,6 +2,7 @@
 import { format } from "date-fns";
 import { Job } from "@/lib/types";
 import { Signature } from "@/components/common/Signature";
+// If you want a custom logo, upload an image (e.g., /logo.png) and update the import or path accordingly.
 
 interface PrintableJobCardProps { 
   job: Job, 
@@ -38,9 +39,21 @@ export const PrintableJobCard = ({
   <div className="p-6 print:block print:visible print:w-full print:text-black bg-white text-black">
     <div className="border-2 border-gray-200 p-6 print:border print:border-gray-300">
       <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-black">JOB CARD</h1>
-          <p className="text-lg font-medium text-black">#{job?.job_card_number}</p>
+        {/* LOGO SECTION */}
+        <div className="flex items-center gap-4">
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="h-14 w-14 object-contain"
+            style={{ minWidth: 56, minHeight: 56 }}
+            onError={e => {
+              (e.target as HTMLImageElement).src = "https://placehold.co/56x56?text=Logo";
+            }}
+          />
+          <div>
+            <h1 className="text-3xl font-bold text-black">JOB CARD</h1>
+            <p className="text-lg font-medium text-black">#{job?.job_card_number}</p>
+          </div>
         </div>
         <div className="text-right text-black">
           <p><strong>Created Date:</strong> {format(new Date(job?.created_at || new Date()), "MMMM d, yyyy")}</p>
@@ -83,3 +96,4 @@ export const PrintableJobCard = ({
     </div>
   </div>
 );
+
