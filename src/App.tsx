@@ -19,6 +19,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Settings from "./pages/Settings";
 import { Signature } from "./components/common/Signature";
 import UserManualPage from "./pages/UserManualPage";
+import { Link } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -87,12 +88,12 @@ const App = () => (
               <footer className="mt-auto py-4 border-t no-print">
                 <div className="flex justify-between items-center container mx-auto px-2">
                   <Signature />
-                  <a 
-                    href="/user-manual" 
+                  <Link 
+                    to="/user-manual"
                     className="text-xs underline text-muted-foreground hover:text-primary transition"
                   >
-                    Download User Manual
-                  </a>
+                    User Manual
+                  </Link>
                 </div>
               </footer>
             </div>
