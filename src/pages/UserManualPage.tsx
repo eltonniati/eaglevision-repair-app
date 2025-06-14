@@ -6,10 +6,20 @@ import UserManualHeader, { UserManualLanguageAndActions } from "./user-manual/Us
 import UserManualSections from "./user-manual/UserManualSections";
 import { MANUALS } from "./user-manual/ManualData";
 
+// Helper: List of valid language codes based on MANUALS keys
+const LANG_CODES = Object.keys(MANUALS);
+
 export default function UserManualPage() {
   const [language, setLanguage] = useState<keyof typeof MANUALS>("en");
   const navigate = useNavigate();
   const manualRef = useRef<HTMLDivElement>(null);
+
+  // Accept only valid codes
+  const handleChangeLanguage = (lang: string) => {
+    if (LANG_CODES.includes(lang)) {
+      setLanguage(lang as keyof typeof MANUALS);
+    }
+  };
 
   // Download PDF handler (text only)
   const handleDownload = () => {
@@ -94,14 +104,14 @@ export default function UserManualPage() {
     <div className="max-w-2xl mx-auto my-8 px-2 sm:px-4 w-full">
       <UserManualHeader
         language={language}
-        setLanguage={setLanguage}
+        setLanguage={handleChangeLanguage}
         onDownload={handleDownload}
         onPrint={handlePrint}
         onBack={handleExitManual}
       />
       <UserManualLanguageAndActions
         language={language}
-        setLanguage={setLanguage}
+        setLanguage={handleChangeLanguage}
         onDownload={handleDownload}
         onPrint={handlePrint}
       />
