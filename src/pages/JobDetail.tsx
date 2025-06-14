@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -90,9 +89,7 @@ const JobDetail = () => {
 
   const handleShare = async (): Promise<void> => {
     if (!job) return Promise.resolve();
-    
     const text = `${t.jobCardNumber} #${job.job_card_number} ${t.for || "for"} ${editedCustomerName}\n${t.device}: ${editedDeviceName} ${editedDeviceModel}\n${t.problem}: ${editedProblem}\n${t.contact || "Contact"}: ${editedCustomerPhone}`;
-    
     try {
       if (navigator.share) {
         await navigator.share({
@@ -106,38 +103,26 @@ const JobDetail = () => {
       console.error('Error sharing:', err);
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
-    
     setIsShareDialogOpen(false);
     return Promise.resolve();
   };
   
   const handleEmail = async (): Promise<void> => {
     if (!job) return Promise.resolve();
-    
     try {
       const subject = `${t.jobCardNumber} #${job.job_card_number} ${t.for || "for"} ${editedCustomerName}`;
       const body = `${t.jobCardNumber} #${job.job_card_number}\n\n${t.customer}: ${editedCustomerName}\n${t.customerPhone}: ${editedCustomerPhone}\n${t.customerEmail}: ${editedCustomerEmail}\n\n${t.device}: ${editedDeviceName} ${editedDeviceModel}\n${t.deviceCondition}: ${editedDeviceCondition}\n\n${t.problem}: ${editedProblem}\n\n${t.handlingFees}: ${editedHandlingFees}\n\n${t.companyName}: ${editedCompanyName}`;
-      
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     } catch (error) {
       console.error("Email error:", error);
     }
-    
     setIsShareDialogOpen(false);
     return Promise.resolve();
   };
 
   const handlePrint = async () => {
     setIsPrintDialogOpen(false);
-    
-    if (isEditMode) {
-      const saveSuccess = await handleSave();
-      if (!saveSuccess) {
-        toast.error(t.savePlease || "Please save your changes before printing");
-        return;
-      }
-    }
-    
+    // No save required before printing: just open the preview mode directly
     setTimeout(() => {
       setIsPreviewMode(true);
     }, 100);
@@ -208,7 +193,7 @@ const JobDetail = () => {
         isShareDialogOpen={isShareDialogOpen}
         setIsShareDialogOpen={setIsShareDialogOpen}
         onDelete={handleDelete}
-        onPrint={handlePrint}
+        onPrint={handlePrint}   {/* Will now always open preview for print/share */}
         onShare={handleShare}
         onEmail={handleEmail}
         onPreview={() => setIsPreviewMode(true)}
