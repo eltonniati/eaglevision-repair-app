@@ -193,7 +193,7 @@ const JobDetail = () => {
         isShareDialogOpen={isShareDialogOpen}
         setIsShareDialogOpen={setIsShareDialogOpen}
         onDelete={handleDelete}
-        onPrint={handlePrint}   {/* Will now always open preview for print/share */}
+        onPrint={handlePrint}
         onShare={handleShare}
         onEmail={handleEmail}
         onPreview={() => setIsPreviewMode(true)}
