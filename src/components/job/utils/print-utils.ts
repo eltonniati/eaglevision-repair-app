@@ -1,4 +1,3 @@
-
 export const handleJobCardPrint = (content: string, jobNumber?: string) => {
   try {
     const printWindow = window.open('', '_blank');
@@ -461,12 +460,36 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
   }
 };
 
+import { downloadPdf } from "./pdf-utils";
+import { toast } from "sonner";
+
+// Helper to detect if the user is on a mobile device
+function isMobileDevice() {
+  if (typeof navigator === "undefined") return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
+
 // Export handlePrint as an alias for handleJobCardPrint for backward compatibility
-export const handlePrint = (printRef: React.RefObject<HTMLDivElement>, jobNumber?: string) => {
+export const handlePrint = async (
+  printRef: React.RefObject<HTMLDivElement>,
+  jobNumber?: string
+) => {
   if (!printRef.current) {
     throw new Error('Print reference is not available');
   }
-  
+
+  // If on mobile, generate/download PDF instead of direct print
+  if (isMobileDevice()) {
+    await downloadPdf(printRef, jobNumber || "JobCard");
+    toast.info(
+      "For the best results on mobile, use the PDF viewer's print/share button after download."
+    );
+    return;
+  }
+
+  // Legacy desktop print flow
   const content = printRef.current.innerHTML;
   return handleJobCardPrint(content, jobNumber);
 };
