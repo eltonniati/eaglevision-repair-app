@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { jsPDF } from "jspdf";
 import ManualImage from "@/components/user-manual/ManualImage";
 
@@ -203,7 +203,7 @@ const MANUALS = {
       {
         title: "8. Soporte",
         text: "Contacto: eaglevision.dev30.com | WhatsApp: 027659132527 | Facebook/Twitter: eaglevisiondev30",
-        imageDescription: "Página de contacto o soporte"
+        imageDescription: "Tela de contacto/suporte"
       }
     ]
   },
@@ -491,8 +491,9 @@ const LANGS: { code: string; label: string }[] = [
 export default function UserManualPage() {
   const [language, setLanguage] = useState<"en" | "fr" | "pt" | "es" | "ln" | "kg" | "ts" | "sw">("en");
   const navigate = useNavigate();
+  const manualRef = useRef<HTMLDivElement>(null);
 
-  // Handle PDF download with only text
+  // Download PDF handler
   const handleDownload = () => {
     const doc = new jsPDF();
     doc.setFont("helvetica", "bold");
@@ -518,12 +519,47 @@ export default function UserManualPage() {
     );
   };
 
-  // Improved handler for reliable "Exit" button
+  // Print handler: prints the div containing the manual
+  const handlePrint = () => {
+    if (!manualRef.current) return;
+    const printContents = manualRef.current.innerHTML;
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(`
+      <html>
+        <head>
+          <title>User Manual</title>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <style>
+            body { font-family: Arial, sans-serif; color: #111; background: #fff }
+            .manual-content { max-width: 700px; margin: auto; padding: 32px 8px; }
+            .font-semibold { font-weight: 600 }
+            .mb-2 { margin-bottom: 8px }
+            .mb-8 { margin-bottom: 32px }
+            .whitespace-pre-line { white-space: pre-line }
+            .text-base { font-size: 1rem }
+            img { max-width: 100%; height: auto; margin-bottom: 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="manual-content">
+            <h1 style="font-size:2em;font-weight:bold;margin-bottom:1em; text-align:center;">User Manual</h1>
+            ${printContents}
+          </div>
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+      </html>
+    `);
+    win.document.close();
+  };
+
+  // Exit handler (improved for reliability)
   const handleExitManual = () => {
-    // Always try history.back, but ensure landing on dashboard if nothing happens
     if (window.history.length > 2) {
       navigate(-1);
-      // After a brief timeout, force route to dashboard
       setTimeout(() => {
         if (window.location.pathname === "/user-manual") {
           navigate("/dashboard");
@@ -535,7 +571,7 @@ export default function UserManualPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto my-8 px-4">
+    <div className="max-w-2xl mx-auto my-8 px-2 sm:px-4 w-full">
       <div className="mb-4 flex items-center">
         <Button
           variant="ghost"
@@ -562,11 +598,21 @@ export default function UserManualPage() {
             <option key={lang.code} value={lang.code}>{lang.label}</option>
           ))}
         </select>
-        <Button className="mt-2" onClick={handleDownload}>
-          Download PDF
-        </Button>
+        <div className="flex gap-2 mt-2">
+          <Button onClick={handleDownload}>
+            Download PDF
+          </Button>
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="w-4 h-4 mr-1" />
+            Print
+          </Button>
+        </div>
       </div>
-      <div className="mt-8 rounded bg-muted p-4 text-sm whitespace-pre-line">
+      <div
+        className="mt-8 rounded bg-muted p-4 text-sm whitespace-pre-line manual-content"
+        ref={manualRef}
+        style={{ background: "#fafbfc" }}
+      >
         {MANUALS[language].sections.map((section, idx) => {
           const imageName = SECTION_IMAGES[section.title] || `manual-step-${idx + 1}.png`;
           return (
