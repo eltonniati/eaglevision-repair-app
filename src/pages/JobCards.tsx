@@ -106,6 +106,11 @@ const JobCards = () => {
     return Promise.resolve();
   };
 
+  // Callback to go to dashboard from print preview/share dialog
+  const backToDashboard = () => {
+    navigate("/dashboard");
+  };
+
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -153,7 +158,7 @@ const JobCards = () => {
           handlingFees={selectedJob.details.handling_fees}
           companyName={getCompanyName(selectedJob.company_id)}
           status={selectedJob.details.status}
-          onBack={() => setIsPreviewMode(false)}
+          onBack={backToDashboard}
           onShare={() => setIsShareDialogOpen(true)}
         />
       ) : (
@@ -178,7 +183,12 @@ const JobCards = () => {
       
       <ShareDialog
         open={isShareDialogOpen}
-        onOpenChange={setIsShareDialogOpen}
+        onOpenChange={(open: boolean) => {
+          setIsShareDialogOpen(open);
+          if (!open) {
+            navigate("/dashboard");
+          }
+        }}
         onShare={handleShare}
         onEmail={handleEmail}
         invoiceNumber={selectedJob?.job_card_number || ""}
