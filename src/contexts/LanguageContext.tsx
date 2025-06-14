@@ -1,6 +1,5 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Language, getTranslations, AppTranslations } from '@/lib/app-translations';
+import React, { createContext, useContext, useState } from 'react';
+import { Language, translations, AppTranslations } from '@/lib/app-translations';
 
 interface LanguageContextType {
   language: Language;
@@ -21,7 +20,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('app-language', newLanguage);
   };
 
-  const t = getTranslations(language);
+  const t = translations[language];
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

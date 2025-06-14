@@ -916,7 +916,7 @@ export const translations: Record<Language, AppTranslations> = {
     savePlease: 'Bobatela liboso ya kobimisa',
     finished: 'Esilisi',
 
-    heroLongDescription: "Landa misála, bongisa bakiliya, pe salá bakwákísi nyonso esika moko. FixFlow Connect esalelaka yo na boyangeli ya ndako ya kobongisa biloko malamu.",
+    heroLongDescription: "Landa misalu, bongisa bakiliya, pe salá bakwákísi nyonso esika moko. FixFlow Connect esalelaka yo na boyangeli ya ndako ya kobongisa biloko malamu.",
   },
   kg: {
     // Navigation
@@ -1045,7 +1045,7 @@ export const translations: Record<Language, AppTranslations> = {
     jobsWaitingParts: 'bisalu bikalanga bima',
     recentJobCards: 'Makarta ya Bisalu ya Kyese',
     viewAll: 'Mona Moso',
-    recentJobsDescription: 'Makarta yaku ya bisalu ya kyese ye mfumu yawo',
+    recentJobsDescription: 'Makarta yaku ya bisalu ya kyese pe mfumu yawo',
     customer: 'Nteki',
     
     // Actions
@@ -1060,15 +1060,15 @@ export const translations: Record<Language, AppTranslations> = {
     createdOn: 'Kivangulu mu',
     jobCardActions: 'Bisalu bya Nkarta',
     manageJobCard: 'Vuanda nkarta yayi ya kisalu',
-    selectStatus: 'Sola mfumu',
-    jobCardNotFound: 'Nkarta ya kisalu imonanu bu',
-    failedToDeleteJobCard: 'Kubanzula nkarta kufuila',
-    for: 'mpo ya',
+    selectStatus: 'Kopóna lolenge',
+    jobCardNotFound: 'Nkarta ya kisalu ezwami te',
+    failedToDeleteJobCard: 'Kubanzula nkarta ekweyi',
+    for: 'mpo na',
     contact: 'Komunikasaun',
-    savePlease: 'Sunga thete ya kusoba',
-    finished: 'Imana',
+    savePlease: 'Bobatela liboso ya kobimisa',
+    finished: 'Esilisi',
 
-    heroLongDescription: "Landila bisalu, bayangisa banseke, ye kuvanga mafakture na esika mosi. FixFlow Connect kusadisa nge kuvandila kisalu kia kubongisa bima kimbote.",
+    heroLongDescription: "Landa bisalu, bongisa banseke, ye kuvanga mafakture na esika mosi. FixFlow Connect kusadisa nge kuvandila kisalu kia kubongisa bima kimbote.",
   },
   sw: {
     // Navigation
