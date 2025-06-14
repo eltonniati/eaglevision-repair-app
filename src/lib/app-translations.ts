@@ -1,3 +1,4 @@
+import { Language } from './app-translations';
 
 export type Language = 'en' | 'fr' | 'pt' | 'es' | 'ln' | 'kg' | 'sw' | 'ts';
 
@@ -150,6 +151,9 @@ export interface AppTranslations {
   contact: string;
   savePlease: string;
   finished: string;
+
+  // Add new key:
+  heroLongDescription: string;
 }
 
 export const translations: Record<Language, AppTranslations> = {
@@ -301,7 +305,10 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'for',
     contact: 'Contact',
     savePlease: 'Please save your changes before printing',
-    finished: 'Finished'
+    finished: 'Finished',
+
+    // NEW TRANSLATION:
+    heroLongDescription: 'Track jobs, manage customers, and handle invoices all in one place. FixFlow Connect helps you run your repair business efficiently.',
   },
   fr: {
     // Navigation
@@ -385,8 +392,8 @@ export const translations: Record<Language, AppTranslations> = {
     amount: 'Montant',
     subtotal: 'Sous-total',
     total: 'Total',
-    notes: 'Notes',
-    termsConditions: 'Termes et conditions',
+    notes: 'Bilembo',
+    termsConditions: 'Mibeko pe Malako',
     thankYou: 'Merci pour votre confiance!',
     generatedOn: 'Généré le',
     companyInfoNotAvailable: 'Informations de l\'entreprise non disponibles',
@@ -451,7 +458,9 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'pour',
     contact: 'Contact',
     savePlease: 'Veuillez sauvegarder avant d\'imprimer',
-    finished: 'Terminé'
+    finished: 'Terminé',
+
+    heroLongDescription: "Suivez les jobs, gérez les clients et faites les factures au même endroit. FixFlow Connect vous aide à gérer efficacement votre atelier de réparation.",
   },
   pt: {
     // Navigation
@@ -601,7 +610,9 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'para',
     contact: 'Contato',
     savePlease: 'Por favor salve antes de imprimir',
-    finished: 'Terminado'
+    finished: 'Terminado',
+
+    heroLongDescription: 'Gerencie trabalhos, clientes e faturas em um só lugar. FixFlow Connect ajuda você a administrar sua oficina de reparos de forma eficiente.',
   },
   es: {
     // Navigation
@@ -751,7 +762,9 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'para',
     contact: 'Contacto',
     savePlease: 'Por favor guarde antes de imprimir',
-    finished: 'Terminado'
+    finished: 'Terminado',
+
+    heroLongDescription: 'Supervisa trabajos, gestiona clientes y maneja facturas todo en un solo lugar. FixFlow Connect te ayuda a administrar eficientemente tu taller de reparaciones.',
   },
   ln: {
     // Navigation
@@ -901,7 +914,9 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'mpo na',
     contact: 'Komunikasyon',
     savePlease: 'Bobatela liboso ya kobimisa',
-    finished: 'Esilisi'
+    finished: 'Esilisi',
+
+    heroLongDescription: "Landa misála, bongisa bakiliya, pe salá bakwákísi nyonso esika moko. FixFlow Connect esalelaka yo na boyangeli ya ndako ya kobongisa biloko malamu.",
   },
   kg: {
     // Navigation
@@ -1012,7 +1027,7 @@ export const translations: Record<Language, AppTranslations> = {
     companyEmail: 'Email ya Kompania',
     updateProfile: 'Bongisa Ntangu',
     profileUpdated: 'Ntangu ibongisulu kimbote',
-    companyProfileDescription: 'Vuanda mambu ye malaku ma kompania yaku',
+    companyProfileDescription: 'Vuanda mambu ye malaku ma kompanyi yaku',
     contactInformation: 'Mambu ma Komunikasaun',
     editProfile: 'Bongisa Ntangu',
     
@@ -1046,12 +1061,14 @@ export const translations: Record<Language, AppTranslations> = {
     jobCardActions: 'Bisalu bya Nkarta',
     manageJobCard: 'Vuanda nkarta yayi ya kisalu',
     selectStatus: 'Sola mfumu',
-    jobCardNotFound: 'Nkarta ya kisalu imonanu ko',
+    jobCardNotFound: 'Nkarta ya kisalu imonanu bu',
     failedToDeleteJobCard: 'Kubanzula nkarta kufuila',
     for: 'mpo ya',
     contact: 'Komunikasaun',
     savePlease: 'Sunga thete ya kusoba',
-    finished: 'Imana'
+    finished: 'Imana',
+
+    heroLongDescription: "Landila bisalu, bayangisa banseke, ye kuvanga mafakture na esika mosi. FixFlow Connect kusadisa nge kuvandila kisalu kia kubongisa bima kimbote.",
   },
   sw: {
     // Navigation
@@ -1201,7 +1218,9 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'kwa',
     contact: 'Mawasiliano',
     savePlease: 'Tafadhali hifadhi kabla ya kuchapisha',
-    finished: 'Imekamilika'
+    finished: 'Imekamilika',
+
+    heroLongDescription: "Fuatilia kazi, simamia wateja na dhibiti ankara zote mahali pamoja. FixFlow Connect inakusaidia kuendesha duka lako la ukarabati kwa ufanisi.",
   },
   ts: {
     // Navigation
@@ -1351,10 +1370,8 @@ export const translations: Record<Language, AppTranslations> = {
     for: 'mpo ya',
     contact: 'Kutumila',
     savePlease: 'Taya kwanza wa kukandika',
-    finished: 'Cimana'
-  }
-};
+    finished: 'Cimana',
 
-export const getTranslations = (language: Language): AppTranslations => {
-  return translations[language];
+    heroLongDescription: "Landila misalu, bongisa babetu ne mafakture yonso na esika ko. FixFlow Connect isiza wena kusalela caha ca kubongisa bintu cibotu.",
+  }
 };

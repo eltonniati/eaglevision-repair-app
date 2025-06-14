@@ -38,8 +38,7 @@ export default function Index() {
                 {t.appDescription}
               </h2>
               <p className="text-xl text-gray-600">
-                Track jobs, manage customers, and handle invoices all in one place.
-                FixFlow Connect helps you run your repair business efficiently.
+                {t.heroLongDescription}
               </p>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center">
