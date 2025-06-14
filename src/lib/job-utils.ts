@@ -1,4 +1,3 @@
-
 // Cryptographic random string generator
 export const generateRandomString = (length: number): string => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -35,7 +34,10 @@ export const mapDatabaseJobToJob = (dbJob: any): Job => ({
 
 // Frontend to database mapper with validation
 export const validateJobPhone = (phone: string): boolean => {
-  return /^\d{10,}$/.test(phone);
+  // Remove all non-digit characters
+  const digitCount = phone.replace(/\D/g, '').length;
+  // Valid if there are at least 10 digits
+  return digitCount >= 10;
 };
 
 // Job number generator
