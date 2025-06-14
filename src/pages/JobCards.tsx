@@ -1,11 +1,12 @@
+
 import { useState, useMemo, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Job } from "@/lib/types";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import { JobCardList } from "@/components/job/JobCardList";
 import { JobPrintPreview } from "@/components/job/JobPrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
@@ -30,6 +31,7 @@ const JobCards = () => {
   // --- NEW: Get the status filter from navigation ---
   const location = useLocation();
   const statusLabel = location?.state?.status || null;
+  const navigate = useNavigate();
 
   // --- NEW: Compute filter based on status ---
   const statusFilter = useMemo(() => {
@@ -107,6 +109,11 @@ const JobCards = () => {
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        {/* Back to Dashboard Button */}
+        <Button variant="ghost" className="mb-4" onClick={() => navigate("/dashboard")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t.back} {t.dashboard}
+        </Button>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold tracking-tight">{t.jobCards}</h1>
           <Link to="/job-cards/new">
@@ -127,6 +134,12 @@ const JobCards = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+      {/* Back to Dashboard Button */}
+      <Button variant="ghost" className="mb-4" onClick={() => navigate("/dashboard")}>
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        {t.back} {t.dashboard}
+      </Button>
+
       {isPreviewMode && selectedJob ? (
         <JobPrintPreview
           job={selectedJob}
@@ -175,3 +188,4 @@ const JobCards = () => {
 };
 
 export default JobCards;
+
