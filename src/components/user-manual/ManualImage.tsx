@@ -21,17 +21,15 @@ const PLACEHOLDERS: Record<string, string> = {
 
 /**
  * ManualImage shows either an uploaded screenshot (if provided) or a relevant Unsplash demo photo as placeholder.
- * Put your real image files in /public/manual/ (e.g. public/manual/dashboard.png) to override the placeholder.
  */
 const ManualImage: React.FC<ManualImageProps> = ({ imageName, description }) => {
   const imgSrc = `/manual/${imageName}`;
   const [showPlaceholder, setShowPlaceholder] = React.useState(false);
 
   // On error loading the real image, show Unsplash/placeholder photo for this section
-  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleImgError = () => {
     setShowPlaceholder(true);
   };
-
   // Placeholder per imageName, fallback to default Unsplash if not mapped
   const placeholder =
     PLACEHOLDERS[imageName] ||
@@ -46,25 +44,10 @@ const ManualImage: React.FC<ManualImageProps> = ({ imageName, description }) => 
           className="w-full max-w-md h-56 object-contain rounded shadow mb-2 border bg-white"
           onError={handleImgError}
         />
-        <span className="text-xs text-muted-foreground text-center">
-          {description}
-          <br />
-          {showPlaceholder ? (
-            <span className="italic">
-              {" "}
-              (Showing example image. To replace, upload <b>{imageName}</b> to <b>public/manual/</b>)
-            </span>
-          ) : (
-            <span className="italic">
-              {" "}
-              (Upload screenshot as <b>{imageName}</b> to <b>public/manual/</b> to show here)
-            </span>
-          )}
-        </span>
+        <span className="text-xs text-muted-foreground text-center">{description}</span>
       </div>
     </div>
   );
 };
 
 export default ManualImage;
-
