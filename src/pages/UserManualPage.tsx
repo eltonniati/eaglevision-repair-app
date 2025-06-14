@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { jsPDF } from "jspdf";
 import ManualImage from "@/components/user-manual/ManualImage";
 
@@ -488,6 +490,7 @@ const LANGS: { code: string; label: string }[] = [
 
 export default function UserManualPage() {
   const [language, setLanguage] = useState<"en" | "fr" | "pt" | "es" | "ln" | "kg" | "ts" | "sw">("en");
+  const navigate = useNavigate();
 
   // Handle PDF download with only text
   const handleDownload = () => {
@@ -515,9 +518,31 @@ export default function UserManualPage() {
     );
   };
 
+  // Handler for exiting/back
+  const handleExitManual = () => {
+    if (window.history.state && window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto my-8 px-4">
-      <h1 className="text-3xl font-bold mb-4 text-center">User Manual</h1>
+      <div className="mb-4 flex items-center">
+        <Button
+          variant="ghost"
+          onClick={handleExitManual}
+          className="flex items-center gap-2"
+          aria-label="Back to previous page"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Back</span>
+        </Button>
+        <h1 className="text-3xl font-bold flex-1 text-center -ml-10">
+          User Manual
+        </h1>
+      </div>
       <div className="mb-6 flex flex-col items-center gap-2">
         <label className="font-medium">Choose your language:</label>
         <select
@@ -535,7 +560,6 @@ export default function UserManualPage() {
       </div>
       <div className="mt-8 rounded bg-muted p-4 text-sm whitespace-pre-line">
         {MANUALS[language].sections.map((section, idx) => {
-          // Try to match recommended image name for the section
           const imageName = SECTION_IMAGES[section.title] || `manual-step-${idx + 1}.png`;
           return (
             <div key={section.title + idx} className="mb-8">
