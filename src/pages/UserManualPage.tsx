@@ -132,7 +132,7 @@ const MANUALS = {
       },
       {
         title: "4. Gerenciando Faturas",
-        text: "Visualize ou crie faturas, imprima ou compartilhe (email, WhatsApp).",
+        text: "Visualize ou crie faturas, imprime ou compartilhe (email, WhatsApp).",
         imageDescription: "Visão geral de faturas e ações"
       },
       {
@@ -518,10 +518,17 @@ export default function UserManualPage() {
     );
   };
 
-  // Handler for exiting/back
+  // Improved handler for reliable "Exit" button
   const handleExitManual = () => {
-    if (window.history.state && window.history.length > 1) {
+    // Always try history.back, but ensure landing on dashboard if nothing happens
+    if (window.history.length > 2) {
       navigate(-1);
+      // After a brief timeout, force route to dashboard
+      setTimeout(() => {
+        if (window.location.pathname === "/user-manual") {
+          navigate("/dashboard");
+        }
+      }, 200);
     } else {
       navigate("/dashboard");
     }
@@ -534,7 +541,8 @@ export default function UserManualPage() {
           variant="ghost"
           onClick={handleExitManual}
           className="flex items-center gap-2"
-          aria-label="Back to previous page"
+          aria-label="Back to dashboard"
+          title="Exit manual and return to dashboard"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="hidden sm:inline">Back</span>
