@@ -103,6 +103,12 @@ export default function Dashboard() {
   const isLoading = jobsLoading || companyLoading;
   const recentJobs = jobs.slice(0, 5);
 
+  // Helper to handle metric card click
+  const handleCardClick = (status: string | null) => {
+    // status: null means "all" (total job cards)
+    navigate("/job-cards", { state: status ? { status } : undefined });
+  };
+
   if (!session) {
     navigate("/");
     return null;
@@ -211,7 +217,15 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          {/* Total Job Cards */}
+          <Card
+            role="button"
+            tabIndex={0}
+            className="hover:shadow-md cursor-pointer transition"
+            onClick={() => handleCardClick(null)}
+            onKeyDown={e => { if (e.key === 'Enter') handleCardClick(null); }}
+            aria-label={t.totalJobCards}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-500">
                 {t.jobCards}
@@ -223,8 +237,17 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
+          {/* Jobs By Status */}
           {Object.entries(jobsByStatus).map(([status, count]) => (
-            <Card key={status}>
+            <Card
+              key={status}
+              role="button"
+              tabIndex={0}
+              className="hover:shadow-md cursor-pointer transition"
+              onClick={() => handleCardClick(status)}
+              onKeyDown={e => { if (e.key === 'Enter') handleCardClick(status); }}
+              aria-label={status}
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-gray-500">
                   <div className="flex items-center gap-2">

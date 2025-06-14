@@ -1,6 +1,5 @@
-
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
@@ -11,6 +10,15 @@ import { JobCardList } from "@/components/job/JobCardList";
 import { JobPrintPreview } from "@/components/job/JobPrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 
+// --- NEW: Filtering by status from location.state ---
+const getJobStatusByLabel = (label: string, t: any) => {
+  // Map the dashboard label back to the actual JobStatus value
+  if ([t.inProgress, "In Progress"].includes(label)) return "In Progress";
+  if ([t.completed, "Completed", "Finished"].includes(label)) return "Finished";
+  if ([t.waitingForParts, "Waiting for Parts"].includes(label)) return "Waiting for Parts";
+  return null;
+};
+
 const JobCards = () => {
   const { jobs, loading, error } = useJobs();
   const { companies, loading: companiesLoading } = useCompanies();
@@ -18,6 +26,27 @@ const JobCards = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+
+  // --- NEW: Get the status filter from navigation ---
+  const location = useLocation();
+  const statusLabel = location?.state?.status || null;
+
+  // --- NEW: Compute filter based on status ---
+  const statusFilter = useMemo(() => {
+    if (!statusLabel) return null;
+    return getJobStatusByLabel(statusLabel, t);
+  }, [statusLabel, t]);
+
+  // --- NEW: Filter jobs for display ---
+  const filteredJobs = useMemo(() => {
+    if (!statusFilter) return jobs;
+    return jobs.filter(job => job.details.status === statusFilter);
+  }, [jobs, statusFilter]);
+
+  useEffect(() => {
+    // Focus/scroll to top when filter changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [statusLabel]);
 
   console.log("JobCards component state:", { 
     jobsCount: jobs.length, 
@@ -127,7 +156,7 @@ const JobCards = () => {
           </div>
 
           <JobCardList 
-            jobs={jobs}
+            jobs={filteredJobs}
             loading={loading}
             onPreview={handlePreviewJob}
           />
