@@ -49,7 +49,7 @@ export const JobPreviewMode = ({
     return Promise.resolve();
   };
 
-  // Share functionality
+  // Share functionality: Generate & share PDF (on all devices)
   const handleShare = async () => {
     setIsGeneratingPdf(true);
     await shareJobCard(printRef, job.job_card_number || "", customerName);
