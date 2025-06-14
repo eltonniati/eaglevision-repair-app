@@ -453,7 +453,6 @@ const SECTION_IMAGES: Record<string, string> = {
   "6. Language Support": "language.png",
   "6. Support des langues": "language.png",
   "6. Idiomas": "language.png",
-  "6. Idiomas": "language.png",
   "6. Makótá ya Lokóta": "language.png",
   "6. Ndinga": "language.png",
   "6. Mindinga": "language.png",
