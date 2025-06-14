@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import RequireAuth from "./components/auth/RequireAuth";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Settings from "./pages/Settings";
 import { Signature } from "./components/common/Signature";
+import UserManualPage from "./pages/UserManualPage";
 
 const queryClient = new QueryClient();
 
@@ -80,11 +80,20 @@ const App = () => (
                     </RequireAuth>
                   } />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="/user-manual" element={<UserManualPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
               <footer className="mt-auto py-4 border-t no-print">
-                <Signature />
+                <div className="flex justify-between items-center container mx-auto px-2">
+                  <Signature />
+                  <a 
+                    href="/user-manual" 
+                    className="text-xs underline text-muted-foreground hover:text-primary transition"
+                  >
+                    Download User Manual
+                  </a>
+                </div>
               </footer>
             </div>
           </AuthProvider>
