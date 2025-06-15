@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Job, JobStatus } from "@/lib/types";
@@ -89,19 +90,15 @@ export const JobDetails = ({
   onDeleteDialogOpen
 }: JobDetailsProps) => {
   const { t } = useLanguage();
-  const { getStatusColor, getStatusBackgroundColor } = useStatusManagement();
+  const { getStatusColor } = useStatusManagement();
 
   // Handle status change and auto-save when not in edit mode
   const handleStatusChangeAndSave = async (newStatus: JobStatus) => {
-    console.log("Status changing from", editedStatus, "to", newStatus);
     onStatusChange(newStatus);
-    
-    // If not in edit mode, automatically save the status change
     if (!isEditMode) {
       setTimeout(async () => {
-        const success = await onSave();
-        console.log("Auto-save status change result:", success);
-      }, 100); // Small delay to ensure state update
+        await onSave();
+      }, 100);
     }
   };
 
@@ -134,7 +131,11 @@ export const JobDetails = ({
                 </Button>
               </div>
             ) : (
-              <Button onClick={onEditToggle}>
+              <Button 
+                onClick={onEditToggle} 
+                disabled={isSaving}
+                data-testid="edit-job-btn"
+              >
                 <Edit className="mr-2 h-4 w-4" />
                 {t.edit}
               </Button>
@@ -152,6 +153,7 @@ export const JobDetails = ({
                     id="customer-name"
                     value={editedCustomerName}
                     onChange={(e) => onCustomerNameChange(e.target.value)}
+                    data-testid="customer-name-input"
                   />
                 ) : (
                   <p className="text-sm text-gray-600">{editedCustomerName}</p>
@@ -237,6 +239,7 @@ export const JobDetails = ({
                   value={editedProblem}
                   onChange={(e) => onProblemChange(e.target.value)}
                   rows={4}
+                  data-testid="problem-input"
                 />
               ) : (
                 <p className="text-sm text-gray-600">{editedProblem}</p>
