@@ -85,8 +85,14 @@ const InvoiceDetail = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
       <div className="flex flex-col space-y-4 w-full">
+        {/* Header with back and print buttons */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <Button variant="outline" size="sm" onClick={handleBackToList} className="w-full sm:w-auto">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleBackToList}
+            className="w-full sm:w-auto"
+          >
             <ChevronLeft className="mr-1 h-4 w-4" />
             {t.back}
           </Button>
@@ -96,19 +102,30 @@ const InvoiceDetail = () => {
             size="sm" 
             onClick={() => setShowPrintDialog(true)}
             className="w-full sm:w-auto"
+            disabled={isPrinting}
           >
             <Printer className="mr-1 h-4 w-4" />
             {isMobile ? t.download : t.print}
           </Button>
         </div>
         
+        {/* Printable invoice content */}
         <div className="w-full overflow-x-auto">
           <div 
             ref={printableInvoiceRef} 
             id="print-content"
-            className={`print-content rounded-lg shadow-sm bg-white w-full max-w-[210mm] mx-auto ${
-              isPrinting ? 'printing' : ''
-            }`}
+            className={`
+              print-content 
+              rounded-lg 
+              shadow-sm 
+              bg-white 
+              w-full 
+              max-w-[210mm] 
+              mx-auto
+              ${isPrinting ? 'printing' : ''}
+              p-4
+              sm:p-6
+            `}
             style={{
               wordBreak: 'break-word',
               overflowWrap: 'break-word'
@@ -119,6 +136,7 @@ const InvoiceDetail = () => {
         </div>
       </div>
 
+      {/* Print dialog */}
       <PrintDialog 
         open={showPrintDialog} 
         onOpenChange={setShowPrintDialog}
