@@ -1,7 +1,18 @@
-
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
+
+// Utility to wait for all images (especially the logo) to load in an element before rendering
+const waitForImagesToLoad = async (element: HTMLElement) => {
+  const images = Array.from(element.querySelectorAll("img"));
+  await Promise.all(images.map((img) => {
+    if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Resolve even on error so it doesn't hang
+    });
+  }));
+};
 
 // PDF generation utility for job cards - optimized for mobile/cellphone format
 export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElement>) => {
@@ -74,8 +85,11 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
     // Append to body temporarily
     document.body.appendChild(clonedElement);
 
-    // Wait for styles to apply and fonts to load
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait for all images inside clonedElement to load before rendering
+    await waitForImagesToLoad(clonedElement);
+
+    // Wait a little for fonts/styles, if needed
+    await new Promise(resolve => setTimeout(resolve, 150));
 
     // Generate canvas with cellphone dimensions
     const canvasWidth = 375;
