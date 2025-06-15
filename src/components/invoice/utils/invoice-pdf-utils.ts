@@ -1,282 +1,140 @@
+import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
-import { Invoice, InvoiceLineItem, InvoiceTax } from "@/lib/types";
 
-// Utility to paginate invoice table for jsPDF export
-function paginateLineItems(
-  doc: jsPDF, 
-  startY: number, 
-  items: InvoiceLineItem[], 
-  taxes: InvoiceTax[],
-  subtotal: number,
-  total: number,
-  maxRowsPerPage: number = 18
-) {
-  let y = startY;
-  let page = 1;
-  const rowHeight = 9;
-  const left = 20, right = 190;
-  doc.setFontSize(10);
-  let shownRows = 0;
-
-  // Table headers
-  function drawHeader(curY: number) {
-    doc.setFont("helvetica", "bold");
-    doc.text("Description", left, curY);
-    doc.text("Qty", 115, curY, { align: "center" });
-    doc.text("Unit Price", 140, curY, { align: "right" });
-    doc.text("Amount", right, curY, { align: "right" });
-    doc.setDrawColor(200);
-    doc.line(left, curY + 2, right, curY + 2);
-    doc.setFont("helvetica", "normal");
-  }
-
-  drawHeader(y);
-  y += rowHeight;
-
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    // Draw row
-    doc.setFont("helvetica", "normal");
-    doc.text(String(item.description), left, y);
-    doc.text(String(item.quantity), 115, y, { align: "center" });
-    doc.text(
-      (item.unit_price as number).toFixed(2), 
-      140, 
-      y, 
-      { align: "right" }
-    );
-    doc.text(
-      (item.amount as number).toFixed(2), 
-      right, 
-      y, 
-      { align: "right" }
-    );
-    y += rowHeight;
-    shownRows++;
-
-    if (shownRows >= maxRowsPerPage && i < items.length - 1) {
-      // Add page, repeat header
-      doc.addPage();
-      y = 30;
-      drawHeader(y);
-      y += rowHeight;
-      shownRows = 0;
-      page++;
-    }
-  }
-
-  // Summary box (new page if needed)
-  const afterTable = y + 24;
-  if (afterTable > 275) {
-    doc.addPage();
-    y = 30;
-  }
-
-  // Totals and taxes summary
-  doc.setFont("helvetica", "bold");
-  doc.text("Subtotal:", 155, y + 6, { align: "right" });
-  doc.text(subtotal.toFixed(2), right, y + 6, { align: "right" });
-  let ty = y + 15;
-  for (const tax of taxes) {
-    doc.setFont("helvetica", "normal");
-    doc.text(`${tax.name} (${tax.rate}%):`, 155, ty, { align: "right" });
-    doc.text(Number(tax.amount).toFixed(2), right, ty, { align: "right" });
-    ty += 9;
-  }
-  doc.setFont("helvetica", "bold");
-  doc.text("TOTAL:", 155, ty, { align: "right" });
-  doc.text(total.toFixed(2), right, ty, { align: "right" });
-
-  return ty + 10;
-}
-
-// Generate PDF for Invoice
-export const generateInvoicePdf = async (
-  invoice: Invoice,
-  company?: { name?: string; address?: string; phone?: string; email?: string },
-  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
-) => {
+// PDF generation utility for invoices
+export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElement>) => {
+  if (!printRef.current) return null;
+  
   try {
-    // PDF dimensions
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+    // Create a clone of the element to avoid modifying the original
+    const originalElement = printRef.current;
+    const clonedElement = originalElement.cloneNode(true) as HTMLDivElement;
+    
+    // Detect if we're on mobile
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Apply proper styling for PDF generation - optimized for mobile viewing
+    clonedElement.style.cssText = `
+      width: ${isMobile ? '375px' : '794px'} !important;
+      height: ${isMobile ? '667px' : '1123px'} !important;
+      min-height: ${isMobile ? '667px' : '1123px'} !important;
+      max-width: ${isMobile ? '375px' : '794px'} !important;
+      max-height: ${isMobile ? '667px' : '1123px'} !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transform: scale(1) !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      background: white !important;
+      font-size: ${isMobile ? '8px' : '12px'} !important;
+      line-height: 1.2 !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      font-family: Arial, sans-serif !important;
+      color: black !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      visibility: visible !important;
+    `;
+
+    // Apply styles to all child elements with mobile optimization
+    const allElements = clonedElement.querySelectorAll('*');
+    allElements.forEach((element) => {
+      const el = element as HTMLElement;
+      el.style.color = 'black';
+      el.style.backgroundColor = 'transparent';
+      el.style.visibility = 'visible';
+      el.style.display = el.style.display === 'none' ? 'block' : el.style.display;
+      
+      // Remove any left margins that might cause offset
+      if (el.style.marginLeft) {
+        el.style.marginLeft = '0';
+      }
+      if (el.style.paddingLeft && el !== clonedElement) {
+        el.style.paddingLeft = el.style.paddingLeft;
+      }
+    });
+
+    // Append to body temporarily
+    document.body.appendChild(clonedElement);
+
+    // Wait for styles to apply and fonts to load
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Generate canvas with device-appropriate dimensions
+    const canvasWidth = isMobile ? 375 : 794;
+    const canvasHeight = isMobile ? 667 : 1123;
+    
+    const canvas = await html2canvas(clonedElement, {
+      scale: isMobile ? 4 : 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      allowTaint: false,
+      foreignObjectRendering: false,
+      width: canvasWidth,
+      height: canvasHeight,
+      windowWidth: canvasWidth,
+      windowHeight: canvasHeight,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
+    });
+
+    // Remove the cloned element
+    document.body.removeChild(clonedElement);
+
+    // Create PDF with appropriate dimensions
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: isMobile ? [100, 177] : 'a4',
       compress: true
     });
 
-    // Margins
-    const left = 20, right = 190;
-    let y = 18;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.text("INVOICE", left, y);
-
-    doc.setFontSize(10);
-
-    // Invoice number and dates
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    doc.text(`Invoice #: ${invoice.invoice_number || ""}`, left, y);
-    y += 6;
-    doc.text(`Date: ${invoice.issue_date ? invoice.issue_date : ""}`, left, y);
-    doc.text(`Due: ${invoice.due_date ? invoice.due_date : ""}`, left + 46, y);
-
-    // Company and Customer
-    y += 10;
-    doc.setFont("helvetica", "bold");
-    doc.text("From:", left, y);
-    doc.text("Bill To:", left + 70, y);
-
-    doc.setFont("helvetica", "normal");
-    if (company) {
-      doc.text(company.name || "", left, y + 6);
-      doc.text(company.address || "", left, y + 11);
-      doc.text(company.phone || "", left, y + 16);
-      doc.text(company.email || "", left, y + 21);
-    }
-    if (job && job.customer) {
-      doc.text(job.customer.name || "", left + 70, y + 6);
-      doc.text(job.customer.phone || "", left + 70, y + 11);
-      if (job.customer.email) doc.text(job.customer.email, left + 70, y + 16);
-    }
-
-    // Job Details
-    y += 28;
-    doc.setFont("helvetica", "bold");
-    doc.text("Job Details:", left, y);
-    doc.setFont("helvetica", "normal");
-    y += 6;
-    if (job && job.job_card_number) {
-      doc.text(`Job Card #: ${job.job_card_number}`, left, y);
-      if (job.device) {
-        doc.text(
-          `Device: ${job.device.name} ${job.device.model || ""}`,
-          left,
-          y + 6
-        );
-      }
-    }
-
-    // Table
-    y += 14;
-    y = paginateLineItems(
-      doc,
-      y,
-      invoice.line_items,
-      invoice.taxes || [],
-      invoice.subtotal || 0,
-      invoice.total
-    );
-
-    // Notes/Terms
-    doc.setFont("helvetica", "bold");
-    y += 8;
-    if (invoice.notes) {
-      doc.text("Notes:", left, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(invoice.notes, left, y + 6, {
-        maxWidth: right - left
-      });
-      y += 11;
-    }
-    if (invoice.terms) {
-      doc.setFont("helvetica", "bold");
-      doc.text("Terms & Conditions:", left, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(invoice.terms, left, y + 6, {
-        maxWidth: right - left
-      });
-      y += 11;
-    }
-
-    // Footer
-    doc.setFontSize(9);
-    doc.setTextColor(120);
-    doc.text(
-      `Generated on: ${new Date().toLocaleString()}`,
-      left,
-      287
-    );
-
-    return doc;
-  } catch (e) {
-    toast.error("Failed to generate invoice PDF");
-    throw e;
-  }
-};
-
-// Download invoice as PDF
-export const downloadInvoicePdf = async (
-  invoice: Invoice, 
-  company?: { name?: string; address?: string; phone?: string; email?: string },
-  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
-) => {
-  try {
-    const pdf = await generateInvoicePdf(invoice, company, job);
-    pdf.save(`Invoice_${invoice.invoice_number || ""}.pdf`);
-    toast.success("Invoice downloaded successfully");
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-// Share invoice via native share API or fallback
-export const shareInvoice = async (
-  invoice: Invoice,
-  customerName: string,
-  company?: { name?: string; address?: string; phone?: string; email?: string },
-  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
-) => {
-  try {
-    const text = `Invoice #${invoice.invoice_number} for ${customerName}\nAmount: ${invoice.total}\nDue: ${invoice.due_date}`;
+    const imgData = canvas.toDataURL('image/png', 1.0);
     
-    if (navigator.share) {
-      const { blob } = await getInvoicePdfAsBlob(invoice, company, job);
-      await navigator.share({
-        title: `Invoice #${invoice.invoice_number}`,
-        text: text,
-        files: [new File([blob], `Invoice_${invoice.invoice_number}.pdf`, { type: 'application/pdf' })]
-      });
+    // Add image to fill the page dimensions completely
+    if (isMobile) {
+      pdf.addImage(imgData, 'PNG', 0, 0, 100, 177, '', 'FAST');
     } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST');
     }
-  } catch (err) {
-    console.error('Error sharing:', err);
-    throw err;
-  }
-};
 
-// Email invoice
-export const emailInvoice = async (
-  invoice: Invoice,
-  customerName: string,
-  customerEmail?: string,
-  company?: { name?: string; address?: string; phone?: string; email?: string },
-  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
-) => {
-  try {
-    const subject = `Invoice #${invoice.invoice_number} for ${customerName}`;
-    const body = `Invoice #${invoice.invoice_number}\n\nCustomer: ${customerName}\nAmount: ${invoice.total}\nDue Date: ${invoice.due_date}\n\nPlease find attached your invoice.`;
-    
-    window.location.href = `mailto:${customerEmail || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return pdf;
   } catch (error) {
-    console.error("Email error:", error);
-    throw error;
+    console.error("PDF generation error:", error);
+    toast.error("Failed to generate PDF");
+    return null;
   }
 };
 
-// Get invoice PDF as blob for sharing/email
-export const getInvoicePdfAsBlob = async (
-  invoice: Invoice,
-  company?: { name?: string; address?: string; phone?: string; email?: string },
-  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
+export const downloadInvoicePdf = async (
+  printRef: React.RefObject<HTMLDivElement>, 
+  invoiceNumber: string
 ) => {
-  const pdf = await generateInvoicePdf(invoice, company, job);
+  const pdf = await generateInvoicePdf(printRef);
+  if (pdf) {
+    pdf.save(`Invoice_${invoiceNumber}.pdf`);
+    toast.success("PDF downloaded successfully");
+    return true;
+  }
+  return false;
+};
+
+export const getInvoicePdfAsBlob = async (
+  printRef: React.RefObject<HTMLDivElement>
+) => {
+  const pdf = await generateInvoicePdf(printRef);
+  if (!pdf) return null;
+  
   return {
-    blob: pdf.output("blob"),
+    blob: pdf.output('blob'),
     pdf
   };
 };
