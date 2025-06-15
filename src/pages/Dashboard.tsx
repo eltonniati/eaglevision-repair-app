@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
@@ -6,6 +7,7 @@ import DashboardStats from "@/components/dashboard/DashboardStats";
 import RecentJobCards from "@/components/dashboard/RecentJobCards";
 import CompanyProfileCard from "@/components/dashboard/CompanyProfileCard";
 import { toast } from "sonner";
+import { useCallback } from "react";
 
 export default function Dashboard() {
   const { session } = useAuth();
@@ -20,8 +22,17 @@ export default function Dashboard() {
     reverseStatusTranslations,
     updateJob,
     setJobs,
+    fetchJobs, // NEW: fetch jobs for refresh
     t
   } = useDashboardData();
+
+  // NEW: Refresh jobs list
+  const refreshJobs = useCallback(async () => {
+    if (fetchJobs) {
+      await fetchJobs();
+      toast.success(t.jobsRefreshed || "Jobs refreshed");
+    }
+  }, [fetchJobs, t]);
 
   const handleStatusChange = async (jobId: string, newStatus: string) => {
     try {
@@ -45,26 +56,38 @@ export default function Dashboard() {
         }
       };
 
+      // Optimistic update: update UI state before backend call
+      const optimisticJobs = jobs.map(job =>
+        job.id === jobId ? updatedJob : job
+      );
+      if (setJobs) {
+        setJobs(optimisticJobs);
+      }
+
       // Update in database
       const result = await updateJob(jobId, updatedJob);
-      
+
       if (result) {
-        // Update local state
-        const updatedJobs = jobs.map(job => 
+        // Replace with the backend-confirmed updated job (in case backend changed other fields)
+        const updatedJobs = optimisticJobs.map(job => 
           job.id === jobId ? result : job
         );
-        
         if (setJobs) {
           setJobs(updatedJobs);
         }
-        
         toast.success(t.statusUpdatedSuccessfully);
+        // Optionally refresh from backend to pull real-time updates from others
+        // await refreshJobs();
       } else {
         toast.error(t.statusUpdateFailed);
+        // Optionally, rollback optimistic update by refreshing jobs from backend:
+        await refreshJobs();
       }
     } catch (error) {
       console.error("Error updating job status:", error);
       toast.error(t.statusUpdateFailed);
+      // Optionally, rollback optimistic update by refreshing jobs from backend:
+      await refreshJobs();
     }
   };
 
@@ -102,6 +125,12 @@ export default function Dashboard() {
             isLoading={isLoading}
             t={t}
           />
+          <button
+            onClick={refreshJobs}
+            className="mt-4 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded transition"
+          >
+            {t.refreshJobs || "Refresh Jobs"}
+          </button>
         </div>
       </div>
     </div>

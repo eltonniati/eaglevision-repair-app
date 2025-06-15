@@ -5,7 +5,7 @@ import { useCompany } from "@/hooks/use-company";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export function useDashboardData() {
-  const { jobs, loading: jobsLoading, updateJob, setJobs } = useJobs();
+  const { jobs, loading: jobsLoading, updateJob, setJobs, fetchJobs } = useJobs(); // ADD fetchJobs
   const { company, loading: companyLoading } = useCompany();
   const { t } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
@@ -61,6 +61,7 @@ export function useDashboardData() {
     reverseStatusTranslations,
     updateJob,
     setJobs,
+    fetchJobs, // Expose fetchJobs for refreshJobs
     t
   };
 }
