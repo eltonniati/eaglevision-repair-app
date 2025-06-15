@@ -25,14 +25,14 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
     
     // Detect if we're on mobile
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    // Make sure styles are consistent with preview
+    
+    // Apply cellphone-optimized styling for PDF generation
     clonedElement.style.cssText = `
-      width: ${isMobile ? '375px' : '210mm'} !important;
-      height: ${isMobile ? '667px' : '297mm'} !important;
-      min-height: ${isMobile ? '667px' : '297mm'} !important;
-      max-width: ${isMobile ? '375px' : '210mm'} !important;
-      max-height: ${isMobile ? '667px' : '297mm'} !important;
+      width: 375px !important;
+      height: 667px !important;
+      min-height: 667px !important;
+      max-width: 375px !important;
+      max-height: 667px !important;
       padding: 0 !important;
       margin: 0 !important;
       transform: scale(1) !important;
@@ -40,8 +40,8 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
       top: 0 !important;
       left: 0 !important;
       background: white !important;
-      font-size: ${isMobile ? '12px' : '14px'} !important;
-      line-height: 1.5 !important;
+      font-size: 10px !important;
+      line-height: 1.3 !important;
       box-sizing: border-box !important;
       overflow: hidden !important;
       font-family: Arial, sans-serif !important;
@@ -53,7 +53,7 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
       visibility: visible !important;
     `;
 
-    // Apply styles to all child elements - optimized for target
+    // Apply styles to all child elements - cellphone optimized
     const allElements = clonedElement.querySelectorAll('*');
     allElements.forEach((element) => {
       const el = element as HTMLElement;
@@ -62,7 +62,21 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
       el.style.visibility = 'visible';
       el.style.display = el.style.display === 'none' ? 'block' : el.style.display;
       
-      // Just in case, reset odd margins and fonts
+      // Optimize for cellphone viewing
+      if (el.tagName === 'H1') {
+        el.style.fontSize = '16px';
+        el.style.fontWeight = 'bold';
+      } else if (el.tagName === 'H2') {
+        el.style.fontSize = '14px';
+        el.style.fontWeight = 'bold';
+      } else if (el.tagName === 'H3') {
+        el.style.fontSize = '12px';
+        el.style.fontWeight = 'bold';
+      } else if (el.tagName === 'P' || el.tagName === 'SPAN') {
+        el.style.fontSize = '10px';
+      }
+      
+      // Remove margins that might cause offset
       if (el.style.marginLeft) {
         el.style.marginLeft = '0';
       }
@@ -71,19 +85,18 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
     // Append to body temporarily
     document.body.appendChild(clonedElement);
 
-    // Wait for all images (incl. logo) to load before rendering canvas!
+    // Wait for all images inside clonedElement to load before rendering
     await waitForImagesToLoad(clonedElement);
 
-    // Wait a short time for any fonts/styles
-    await new Promise(resolve => setTimeout(resolve, 140));
+    // Wait a little for fonts/styles, if needed
+    await new Promise(resolve => setTimeout(resolve, 150));
 
-    // Generate canvas with mobile or A4 dimensions
-    const canvasWidth = isMobile ? 375 : 794; // 210mm = 794px at 96dpi
-    const canvasHeight = isMobile ? 667 : 1123; // 297mm = 1123px at 96dpi
-    const scale = isMobile ? 4 : 2;
+    // Generate canvas with cellphone dimensions
+    const canvasWidth = 375;
+    const canvasHeight = 667;
     
     const canvas = await html2canvas(clonedElement, {
-      scale,
+      scale: 4, // High scale for better quality on mobile
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
@@ -102,22 +115,18 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
     // Remove the cloned element
     document.body.removeChild(clonedElement);
 
-    // Create PDF (A4 or mobile format)
+    // Create PDF with cellphone format (mobile-friendly dimensions)
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: isMobile ? [100, 177] : 'a4', // 100mm x 177mm or standard A4
+      format: [100, 177], // Cellphone format dimensions
       compress: true
     });
 
     const imgData = canvas.toDataURL('image/png', 1.0);
-
-    // Add image to fill the page
-    if (isMobile) {
-      pdf.addImage(imgData, 'PNG', 0, 0, 100, 177, '', 'FAST');
-    } else {
-      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST');
-    }
+    
+    // Add image to fill the cellphone page dimensions
+    pdf.addImage(imgData, 'PNG', 0, 0, 100, 177, '', 'FAST');
 
     return pdf;
   } catch (error) {
