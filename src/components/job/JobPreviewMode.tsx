@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Job } from "@/lib/types";
+import { Job, Company } from "@/lib/types";
 import { JobPrintPreview } from "./JobPrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { toast } from "sonner";
@@ -16,8 +16,7 @@ interface JobPreviewModeProps {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  companyName: string;
-  companyLogo: string;
+  company: Company | null;
   onBack: () => void;
 }
 
@@ -31,8 +30,7 @@ export const JobPreviewMode = ({
   deviceCondition,
   problem,
   handlingFees,
-  companyName,
-  companyLogo,
+  company,
   onBack
 }: JobPreviewModeProps) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -69,7 +67,7 @@ export const JobPreviewMode = ({
   const handleEmail = async (): Promise<void> => {
     try {
       const subject = `Job Card #${job.job_card_number} for ${customerName}`;
-      const body = `Job Card #${job.job_card_number}\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail}\n\nDevice: ${deviceName} ${deviceModel}\nCondition: ${deviceCondition}\n\nProblem: ${problem}\n\nHandling Fees: ${handlingFees}\n\nCompany: ${companyName}`;
+      const body = `Job Card #${job.job_card_number}\n\nCustomer: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail}\n\nDevice: ${deviceName} ${deviceModel}\nCondition: ${deviceCondition}\n\nProblem: ${problem}\n\nHandling Fees: ${handlingFees}\n\nCompany: ${company?.name || "N/A"}`;
       
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       toast.success("Email client opened");
@@ -93,8 +91,7 @@ export const JobPreviewMode = ({
         deviceCondition={deviceCondition}
         problem={problem}
         handlingFees={handlingFees}
-        companyName={companyName}
-        companyLogo={companyLogo}
+        company={company}
         status={job.details.status}
         onBack={onBack}
         onShare={() => setIsShareDialogOpen(true)}

@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer, Share2 } from "lucide-react";
-import { Job } from "@/lib/types";
+import { Job, Company } from "@/lib/types";
 import { downloadJobCardPdf } from "./utils/job-pdf-utils";
 import { PrintableJobCardV2 } from "./PrintableJobCardV2";
 import { useRef } from "react";
@@ -16,8 +16,7 @@ interface JobPrintPreviewProps {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  companyName: string;
-  companyLogo: string;
+  company: Company | null;
   status: string;
   onBack: () => void;
   onShare: () => void;
@@ -33,8 +32,7 @@ export function JobPrintPreview({
   deviceCondition,
   problem,
   handlingFees,
-  companyName,
-  companyLogo,
+  company,
   status,
   onBack,
   onShare,
@@ -43,16 +41,8 @@ export function JobPrintPreview({
 
   const handlePrintClick = async () => {
     console.log("Print button clicked for job card:", job.job_card_number);
+    console.log("Company data:", company);
     await downloadJobCardPdf(printRef, job.job_card_number || "JobCard");
-  };
-
-  // Create a company object to pass to PrintableJobCardV2
-  const company = {
-    name: companyName,
-    logo_url: companyLogo,
-    address: "",
-    phone: "",
-    email: ""
   };
 
   return (

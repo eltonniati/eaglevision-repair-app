@@ -1,5 +1,5 @@
 
-import { Job } from "@/lib/types";
+import { Job, Company } from "@/lib/types";
 import { PrintableJobCardV2 } from "./PrintableJobCardV2";
 import { forwardRef } from "react";
 
@@ -13,8 +13,7 @@ interface PrintPreviewContentProps {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  companyName: string;
-  companyLogo: string;
+  company: Company | null;
 }
 
 export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewContentProps>(({
@@ -27,18 +26,8 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
   deviceCondition,
   problem,
   handlingFees,
-  companyName,
-  companyLogo,
+  company,
 }, ref) => {
-  // Create a company object to pass to PrintableJobCardV2
-  const company = {
-    name: companyName,
-    logo_url: companyLogo,
-    address: "",
-    phone: "",
-    email: ""
-  };
-
   return (
     <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
       <div ref={ref} className="print-area">

@@ -60,10 +60,10 @@ export default function JobDetailMain({ job, companies }: any) {
   };
   const handlePreview = () => setIsPreviewMode(true);
 
-  // Helper function to get company logo
-  const getCompanyLogo = (companyId?: string) => {
-    if (!companyId || !companies.length) return "";
-    return companies.find((c: any) => c.id === companyId)?.logo_url || "";
+  // Helper function to get company data
+  const getCompany = (companyId?: string) => {
+    if (!companyId || !companies.length) return null;
+    return companies.find((c: any) => c.id === companyId) || null;
   };
 
   // Share/email shortcuts using current form state
@@ -115,8 +115,7 @@ export default function JobDetailMain({ job, companies }: any) {
           deviceCondition={editedDeviceCondition}
           problem={editedProblem}
           handlingFees={editedHandlingFees}
-          companyName={editedCompanyName}
-          companyLogo={getCompanyLogo(job.company_id)}
+          company={getCompany(job.company_id)}
           onBack={() => setIsPreviewMode(false)}
         />
       ) : (

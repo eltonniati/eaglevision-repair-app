@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Job } from "@/lib/types";
+import { Job, Company } from "@/lib/types";
 import { JobCardList } from "./JobCardList";
 import { JobPrintPreview } from "./JobPrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
@@ -8,8 +8,7 @@ import { ShareDialog } from "@/components/invoice/ShareDialog";
 interface JobCardsContentProps {
   filteredJobs: Job[];
   loading: boolean;
-  getCompanyName: (companyId?: string) => string;
-  getCompanyLogo: (companyId?: string) => string;
+  companies: Company[];
   onPreview: (job: Job) => void;
   t: any;
 }
@@ -17,8 +16,7 @@ interface JobCardsContentProps {
 export const JobCardsContent = ({ 
   filteredJobs, 
   loading, 
-  getCompanyName, 
-  getCompanyLogo, 
+  companies,
   onPreview,
   t 
 }: JobCardsContentProps) => {
@@ -26,8 +24,14 @@ export const JobCardsContent = ({
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
+  const getCompany = (companyId?: string): Company | null => {
+    if (!companyId || !companies.length) return null;
+    return companies.find((c: Company) => c.id === companyId) || null;
+  };
+
   const handlePreviewJob = (job: Job) => {
     console.log("Preview job selected:", job.job_card_number);
+    console.log("Company for job:", getCompany(job.company_id));
     setSelectedJob(job);
     setIsPreviewMode(true);
     onPreview(job);
@@ -59,8 +63,9 @@ export const JobCardsContent = ({
     if (!selectedJob) return Promise.resolve();
     
     try {
+      const company = getCompany(selectedJob.company_id);
       const subject = `Job Card #${selectedJob.job_card_number} for ${selectedJob.customer.name}`;
-      const body = `Job Card #${selectedJob.job_card_number}\n\nCustomer: ${selectedJob.customer.name}\nPhone: ${selectedJob.customer.phone}\nEmail: ${selectedJob.customer.email || ""}\n\nDevice: ${selectedJob.device.name} ${selectedJob.device.model}\nCondition: ${selectedJob.device.condition}\n\nProblem: ${selectedJob.details.problem}\n\nHandling Fees: ${selectedJob.details.handling_fees}`;
+      const body = `Job Card #${selectedJob.job_card_number}\n\nCustomer: ${selectedJob.customer.name}\nPhone: ${selectedJob.customer.phone}\nEmail: ${selectedJob.customer.email || ""}\n\nDevice: ${selectedJob.device.name} ${selectedJob.device.model}\nCondition: ${selectedJob.device.condition}\n\nProblem: ${selectedJob.details.problem}\n\nHandling Fees: ${selectedJob.details.handling_fees}\n\nCompany: ${company?.name || "N/A"}`;
       
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     } catch (error) {
@@ -89,8 +94,7 @@ export const JobCardsContent = ({
           deviceCondition={selectedJob.device.condition}
           problem={selectedJob.details.problem}
           handlingFees={selectedJob.details.handling_fees}
-          companyName={getCompanyName(selectedJob.company_id)}
-          companyLogo={getCompanyLogo(selectedJob.company_id)}
+          company={getCompany(selectedJob.company_id)}
           status={selectedJob.details.status}
           onBack={handleBackToJobList}
           onShare={() => setIsShareDialogOpen(true)}
