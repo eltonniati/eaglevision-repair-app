@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Job } from "@/lib/types";
@@ -83,7 +84,7 @@ export function useJobDetails() {
       fetchingRef.current = null;
       abortControllerRef.current = null;
     }
-  }, [job, loading]);
+  }, []); // Removed job and loading from dependencies to prevent infinite loop
 
   const clearJobError = useCallback(() => {
     setError(null);

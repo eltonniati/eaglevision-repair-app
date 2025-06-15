@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import type { Job, JobStatus } from "@/lib/types";
+import { JobCardActions } from "@/components/job/JobCardActions";
 
 export default function EditJobCard() {
   const { id } = useParams();
@@ -162,6 +163,20 @@ export default function EditJobCard() {
         <h1 className="text-3xl font-bold text-gray-900">Edit Job Card #{jobCardNumber}</h1>
         <p className="text-gray-500">Update details for this repair job</p>
       </div>
+
+      {/* Job Card Actions */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Job Card Actions</CardTitle>
+          <CardDescription>Manage this job card</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <JobCardActions 
+            jobId={id || ""} 
+            jobCardNumber={jobCardNumber}
+          />
+        </CardContent>
+      </Card>
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
