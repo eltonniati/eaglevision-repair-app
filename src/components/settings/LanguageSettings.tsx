@@ -7,6 +7,17 @@ import { Language } from "@/lib/app-translations";
 export const LanguageSettings = () => {
   const { language, setLanguage, t } = useLanguage();
 
+  const languages = [
+    { code: "en", name: t.english, flag: "🇬🇧" },
+    { code: "fr", name: t.french, flag: "🇫🇷" },
+    { code: "pt", name: t.portuguese, flag: "🇵🇹" },
+    { code: "es", name: "Español", flag: "🇪🇸" },
+    { code: "ln", name: "Lingála", flag: "🇨🇩" },
+    { code: "kg", name: "Kikóngó", flag: "🇨🇩" },
+    { code: "sw", name: "Swahili", flag: "🇨🇩" },
+    { code: "ts", name: "Tshiluba", flag: "🇨🇩" },
+  ];
+
   return (
     <Card>
       <CardHeader>
@@ -19,9 +30,11 @@ export const LanguageSettings = () => {
             <SelectValue placeholder={t.selectLanguage} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="en">{t.english}</SelectItem>
-            <SelectItem value="fr">{t.french}</SelectItem>
-            <SelectItem value="pt">{t.portuguese}</SelectItem>
+            {languages.map((lang) => (
+              <SelectItem key={lang.code} value={lang.code}>
+                {lang.flag} {lang.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </CardContent>

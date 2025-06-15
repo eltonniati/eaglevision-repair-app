@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { Language, translations, AppTranslations } from '@/lib/app-translations';
 
@@ -18,6 +19,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage);
     localStorage.setItem('app-language', newLanguage);
+    // Force a re-render to update all translations immediately
+    window.location.reload();
   };
 
   const t = translations[language];

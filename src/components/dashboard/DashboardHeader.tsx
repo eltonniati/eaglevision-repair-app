@@ -51,7 +51,7 @@ export default function DashboardHeader({ companyName }: DashboardHeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>{t.selectLanguage || "Select language"}</DropdownMenuLabel>
+            <DropdownMenuLabel>{t.selectLanguage}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {languages.map((lang) => (
               <DropdownMenuItem 
