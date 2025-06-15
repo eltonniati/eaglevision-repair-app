@@ -45,7 +45,7 @@ export function useJobDetails() {
         .select("*, companies(*)")
         .eq("id", id)
         .maybeSingle()
-        .abortSignal(abortControllerRef.current.signal);
+        .signal(abortControllerRef.current.signal);
 
       if (error) {
         console.error("Job fetch error:", error);
