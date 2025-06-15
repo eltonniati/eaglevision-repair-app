@@ -1,6 +1,5 @@
-
 import { useState, useMemo, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
@@ -10,6 +9,7 @@ import { Plus, ArrowLeft } from "lucide-react";
 import { JobCardList } from "@/components/job/JobCardList";
 import { JobPrintPreview } from "@/components/job/JobPrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
+import JobCardEditForm from "@/components/job/JobCardEditForm";
 
 // --- NEW: Filtering by status from location.state ---
 const getJobStatusByLabel = (label: string, t: any) => {
@@ -161,6 +161,14 @@ const JobCards = () => {
         </div>
       </div>
     );
+  }
+
+  // Add route-based rendering for "edit"
+  const { id } = useParams<{ id?: string }>();
+  const isEdit = window.location.pathname.match(/\/job-cards\/[^/]+\/edit$/);
+
+  if (isEdit && id) {
+    return <JobCardEditForm />;
   }
 
   return (

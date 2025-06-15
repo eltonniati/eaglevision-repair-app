@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Job } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -48,7 +47,16 @@ export const JobCardList = ({ jobs, loading, onPreview }: JobCardListProps) => {
   return (
     <div className="grid gap-4">
       {jobs.map(job => (
-        <JobCardItem key={job.id} job={job} onPreview={onPreview} />
+        <div key={job.id} className="relative">
+          <JobCardItem job={job} onPreview={onPreview} />
+          <div className="absolute top-2 right-2 z-10 flex gap-1">
+            <Link to={`/job-cards/${job.id}/edit`}>
+              <Button size="sm" variant="outline">
+                Edit
+              </Button>
+            </Link>
+          </div>
+        </div>
       ))}
     </div>
   );
