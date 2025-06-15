@@ -20,7 +20,7 @@ import {
 
 export default function Dashboard() {
   const { session } = useAuth();
-  const { jobs, loading: jobsLoading, updateJobStatus } = useJobs();
+  const { jobs, loading: jobsLoading, updateJob, fetchJobs } = useJobs();
   const { company, loading: companyLoading } = useCompany();
   const { t, language, setLanguage } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
@@ -113,10 +113,24 @@ export default function Dashboard() {
 
   const handleStatusChange = async (jobId: string, newStatus: string) => {
     try {
-      // Convert translated status back to original status
+      // Convert translated status back to original status in string
       const originalStatus = reverseStatusTranslations[newStatus] || newStatus;
-      await updateJobStatus(jobId, originalStatus);
-      updateStatusCounts(); // Refresh the counts after update
+      // Find the job to get its current data for the update 
+      const jobToUpdate = jobs.find(j => j.id === jobId);
+      if (!jobToUpdate) return;
+      // Only status is changing here (for dashboard quick action)
+      const updates = {
+        ...jobToUpdate,
+        details: {
+          ...jobToUpdate.details,
+          status: originalStatus,
+        },
+      };
+      // Push to Supabase!
+      await updateJob(jobId, updates);
+
+      // Optionally refetch jobs to update numbers right away (Supabase realtime should also keep sync)
+      fetchJobs && fetchJobs();
     } catch (error) {
       console.error("Error updating job status:", error);
     }
