@@ -1,6 +1,6 @@
 
 import { Job } from "@/lib/types";
-import { PrintableJobCard } from "./PrintableJobCard";
+import { PrintableJobCardV2 } from "./PrintableJobCardV2";
 import { forwardRef } from "react";
 
 interface PrintPreviewContentProps {
@@ -14,6 +14,7 @@ interface PrintPreviewContentProps {
   problem: string;
   handlingFees: number;
   companyName: string;
+  companyLogoUrl?: string;
 }
 
 export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewContentProps>(({
@@ -27,11 +28,12 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
   problem,
   handlingFees,
   companyName,
+  companyLogoUrl
 }, ref) => {
   return (
     <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
       <div ref={ref} className="print-area">
-        <PrintableJobCard 
+        <PrintableJobCardV2
           job={job}
           customerName={customerName}
           customerPhone={customerPhone}
@@ -42,6 +44,7 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
           problem={problem}
           handlingFees={handlingFees}
           companyName={companyName}
+          companyLogoUrl={companyLogoUrl}
         />
       </div>
     </div>
