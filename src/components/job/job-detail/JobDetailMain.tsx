@@ -30,7 +30,14 @@ export default function JobDetailMain({ job, companies }: any) {
     editedDeviceName,
     editedDeviceModel,
     editedDeviceCondition,
+    setEditedProblem,
     setEditedHandlingFees,
+    setEditedCustomerName,
+    setEditedCustomerPhone,
+    setEditedCustomerEmail,
+    setEditedDeviceName,
+    setEditedDeviceModel,
+    setEditedDeviceCondition,
     initializeFormData,
     handleEditToggle,
     handleStatusChange,
@@ -119,10 +126,24 @@ export default function JobDetailMain({ job, companies }: any) {
           isSaving={isSaving}
           editedStatus={editedStatus}
           editedHandlingFees={editedHandlingFees}
+          editedCustomerName={editedCustomerName}
+          editedCustomerPhone={editedCustomerPhone}
+          editedCustomerEmail={editedCustomerEmail}
+          editedDeviceName={editedDeviceName}
+          editedDeviceModel={editedDeviceModel}
+          editedDeviceCondition={editedDeviceCondition}
+          editedProblem={editedProblem}
           onEditToggle={handleEditToggle}
           onSave={handleSave}
           onStatusChange={handleStatusChange}
           onHandlingFeesChange={setEditedHandlingFees}
+          onCustomerNameChange={setEditedCustomerName}
+          onCustomerPhoneChange={setEditedCustomerPhone}
+          onCustomerEmailChange={setEditedCustomerEmail}
+          onDeviceNameChange={setEditedDeviceName}
+          onDeviceModelChange={setEditedDeviceModel}
+          onDeviceConditionChange={setEditedDeviceCondition}
+          onProblemChange={setEditedProblem}
           onPrintDialogOpen={() => setIsPrintDialogOpen(true)}
           onDeleteDialogOpen={() => setIsDeleteDialogOpen(true)}
         />

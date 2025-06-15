@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Select, 
   SelectContent, 
@@ -31,10 +32,24 @@ interface JobDetailsProps {
   isSaving: boolean;
   editedStatus: JobStatus;
   editedHandlingFees: number;
+  editedCustomerName: string;
+  editedCustomerPhone: string;
+  editedCustomerEmail: string;
+  editedDeviceName: string;
+  editedDeviceModel: string;
+  editedDeviceCondition: string;
+  editedProblem: string;
   onEditToggle: () => void;
   onSave: () => Promise<boolean>;
   onStatusChange: (status: JobStatus) => void;
   onHandlingFeesChange: (fees: number) => void;
+  onCustomerNameChange: (name: string) => void;
+  onCustomerPhoneChange: (phone: string) => void;
+  onCustomerEmailChange: (email: string) => void;
+  onDeviceNameChange: (name: string) => void;
+  onDeviceModelChange: (model: string) => void;
+  onDeviceConditionChange: (condition: string) => void;
+  onProblemChange: (problem: string) => void;
   onPrintDialogOpen: () => void;
   onDeleteDialogOpen: () => void;
 }
@@ -52,10 +67,24 @@ export const JobDetails = ({
   isSaving,
   editedStatus,
   editedHandlingFees,
+  editedCustomerName,
+  editedCustomerPhone,
+  editedCustomerEmail,
+  editedDeviceName,
+  editedDeviceModel,
+  editedDeviceCondition,
+  editedProblem,
   onEditToggle,
   onSave,
   onStatusChange,
   onHandlingFeesChange,
+  onCustomerNameChange,
+  onCustomerPhoneChange,
+  onCustomerEmailChange,
+  onDeviceNameChange,
+  onDeviceModelChange,
+  onDeviceConditionChange,
+  onProblemChange,
   onPrintDialogOpen,
   onDeleteDialogOpen
 }: JobDetailsProps) => {
@@ -98,7 +127,110 @@ export const JobDetails = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Customer and device details would go here */}
+          {/* Customer Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">{t.customerInformation}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="customer-name">{t.customerName}</Label>
+                {isEditMode ? (
+                  <Input
+                    id="customer-name"
+                    value={editedCustomerName}
+                    onChange={(e) => onCustomerNameChange(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">{editedCustomerName}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="customer-phone">{t.customerPhone}</Label>
+                {isEditMode ? (
+                  <Input
+                    id="customer-phone"
+                    value={editedCustomerPhone}
+                    onChange={(e) => onCustomerPhoneChange(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">{editedCustomerPhone}</p>
+                )}
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="customer-email">{t.customerEmail}</Label>
+                {isEditMode ? (
+                  <Input
+                    id="customer-email"
+                    type="email"
+                    value={editedCustomerEmail}
+                    onChange={(e) => onCustomerEmailChange(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">{editedCustomerEmail || "N/A"}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Device Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">{t.deviceInformation}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="device-name">{t.deviceName}</Label>
+                {isEditMode ? (
+                  <Input
+                    id="device-name"
+                    value={editedDeviceName}
+                    onChange={(e) => onDeviceNameChange(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">{editedDeviceName}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="device-model">{t.deviceModel}</Label>
+                {isEditMode ? (
+                  <Input
+                    id="device-model"
+                    value={editedDeviceModel}
+                    onChange={(e) => onDeviceModelChange(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">{editedDeviceModel}</p>
+                )}
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="device-condition">{t.deviceCondition}</Label>
+                {isEditMode ? (
+                  <Input
+                    id="device-condition"
+                    value={editedDeviceCondition}
+                    onChange={(e) => onDeviceConditionChange(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">{editedDeviceCondition}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Problem Description */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">{t.problemDescription}</h3>
+            <div>
+              <Label htmlFor="problem">{t.problem}</Label>
+              {isEditMode ? (
+                <Textarea
+                  id="problem"
+                  value={editedProblem}
+                  onChange={(e) => onProblemChange(e.target.value)}
+                  rows={4}
+                />
+              ) : (
+                <p className="text-sm text-gray-600">{editedProblem}</p>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
