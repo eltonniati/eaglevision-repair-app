@@ -2,21 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Printer } from "lucide-react";
+import { ChevronLeft, Share } from "lucide-react";
 import { useInvoiceDetails } from "@/hooks/use-invoice-details";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { PrintableInvoice } from "@/components/invoice/PrintableInvoice";
 import { InvoiceNotFound } from "@/components/invoice/InvoiceNotFound";
 import { PrintDialog } from "@/components/invoice/PrintDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { handleInvoicePrint } from "@/components/job/utils/print-utils";
 import { DatabaseInvoice } from "@/lib/types";
+import { shareInvoice, emailInvoice } from "@/components/invoice/utils/invoice-share-utils";
+import { downloadInvoicePdf } from "@/components/invoice/utils/invoice-pdf-utils";
 
 const InvoiceDetail = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const navigate = useNavigate();
   const { invoice, loading, getInvoice } = useInvoiceDetails();
-  const { t } = useLanguage();
   const [isPrinting, setIsPrinting] = useState(false);
   const [showPrintDialog, setShowPrintDialog] = useState(false);
   const printableInvoiceRef = useRef<HTMLDivElement>(null);
@@ -28,29 +27,62 @@ const InvoiceDetail = () => {
     }
   }, [invoiceId]);
 
-  const handlePrintOrPDF = () => {
+  const handlePrintOrPDF = async () => {
     if (!printableInvoiceRef.current || !invoice) {
-      toast.error(t.error);
+      toast.error('Unable to print invoice. Content not found.');
       return;
     }
 
     setIsPrinting(true);
-    const content = printableInvoiceRef.current.innerHTML;
-    handleInvoicePrint(content, invoice.invoice_number);
-    setIsPrinting(false);
-    setShowPrintDialog(false);
-    toast.success(t.success);
+    try {
+      await downloadInvoicePdf(printableInvoiceRef, invoice.invoice_number || 'INV');
+    } catch (error) {
+      console.error('Print/PDF error:', error);
+      toast.error('Failed to generate PDF');
+    } finally {
+      setIsPrinting(false);
+      setShowPrintDialog(false);
+    }
   };
 
   const handleBackToList = () => {
     navigate("/job-cards");
   };
 
+  const handleShare = async () => {
+    if (!invoice) return;
+    
+    try {
+      const invoiceWithJobs = invoice as any;
+      const customerName = invoiceWithJobs.jobs?.customer_name || 'Customer';
+      await shareInvoice(printableInvoiceRef, invoice.invoice_number || 'INV', customerName);
+    } catch (error) {
+      console.error("Error sharing:", error);
+      toast.error("Failed to share invoice");
+    }
+    setShowPrintDialog(false);
+  };
+
+  const handleEmail = async () => {
+    if (!invoice) return;
+    
+    try {
+      const invoiceWithJobs = invoice as any;
+      const customerName = invoiceWithJobs.jobs?.customer_name || 'Customer';
+      const customerEmail = invoiceWithJobs.jobs?.customer_email;
+      await emailInvoice(printableInvoiceRef, invoice.invoice_number || 'INV', customerName, customerEmail);
+    } catch (error) {
+      console.error("Email error:", error);
+      toast.error("Failed to prepare email");
+    }
+    setShowPrintDialog(false);
+  };
+
   if (loading) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="flex justify-center items-center h-64">
-          <p className="text-muted-foreground">{t.loading}</p>
+          <p className="text-muted-foreground">Loading invoice...</p>
         </div>
       </div>
     );
@@ -79,56 +111,50 @@ const InvoiceDetail = () => {
       tax_total: invoice.tax_total,
       notes: invoice.notes,
       terms: invoice.terms
-    }
+    },
+    jobs: (invoice as any).jobs
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 mx-auto w-full">
       <div className="flex flex-col space-y-4 w-full">
-        {/* Header with back and print buttons */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleBackToList}
-            className="w-full sm:w-auto"
-          >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+          <Button variant="outline" size="sm" onClick={handleBackToList} className="no-print">
             <ChevronLeft className="mr-1 h-4 w-4" />
-            {t.back}
+            Back to Job Cards
           </Button>
           
           <Button 
             variant="default" 
             size="sm" 
             onClick={() => setShowPrintDialog(true)}
-            className="w-full sm:w-auto"
+            className="no-print"
             disabled={isPrinting}
           >
-            <Printer className="mr-1 h-4 w-4" />
-            {isMobile ? t.download : t.print}
+            {isMobile ? (
+              <>
+                <Share className="mr-1 h-4 w-4" />
+                Share PDF
+              </>
+            ) : (
+              <>
+                <Share className="mr-1 h-4 w-4" />
+                Print/Share PDF
+              </>
+            )}
           </Button>
         </div>
         
-        {/* Printable invoice content */}
-        <div className="w-full overflow-x-auto">
+        <div className="w-full flex justify-center overflow-x-auto">
           <div 
             ref={printableInvoiceRef} 
             id="print-content"
-            className={`
-              print-content 
-              rounded-lg 
-              shadow-sm 
-              bg-white 
-              w-full 
-              max-w-[210mm] 
-              mx-auto
-              ${isPrinting ? 'printing' : ''}
-              p-4
-              sm:p-6
-            `}
+            className="print-content bg-white shadow-sm"
             style={{
-              wordBreak: 'break-word',
-              overflowWrap: 'break-word'
+              maxWidth: isMobile ? '100vw' : '210mm',
+              transform: isMobile ? 'scale(0.4)' : 'scale(1)',
+              transformOrigin: 'top center',
+              margin: isMobile ? '-40% auto' : '0 auto'
             }}
           >
             <PrintableInvoice invoice={databaseInvoice} />
@@ -136,11 +162,13 @@ const InvoiceDetail = () => {
         </div>
       </div>
 
-      {/* Print dialog */}
       <PrintDialog 
         open={showPrintDialog} 
         onOpenChange={setShowPrintDialog}
         onPrint={handlePrintOrPDF}
+        onShare={handleShare}
+        onEmail={handleEmail}
+        invoiceNumber={invoice.invoice_number || 'INV'}
       />
     </div>
   );
