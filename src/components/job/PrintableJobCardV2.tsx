@@ -23,46 +23,54 @@ const formatCurrency = (amount: number) => {
 };
 
 export const PrintableJobCardV2 = ({
-  job, 
-  customerName, 
-  customerPhone, 
-  customerEmail, 
-  deviceName, 
-  deviceModel, 
-  deviceCondition, 
+  job,
+  customerName,
+  customerPhone,
+  customerEmail,
+  deviceName,
+  deviceModel,
+  deviceCondition,
   problem,
   handlingFees,
   company,
 }: PrintableJobCardV2Props) => {
+  // A4 in px at 96dpi ≈ 794x1123
+  const A4_WIDTH_PX = 794;
+  const CARD_PADDING = 24;
+
   return (
-    <div 
-      className="w-full bg-white text-black print-container" 
-      style={{ 
-        width: '100%',
+    <div
+      // Outer container: Center everything, white BG, 100vw/100vh, so html2canvas takes correct bounds
+      style={{
+        width: '100vw',
         minHeight: '100vh',
-        margin: '0',
-        padding: '20px',
-        fontSize: '12px',
-        lineHeight: '1.4',
-        fontFamily: 'Arial, sans-serif',
-        boxSizing: 'border-box',
-        background: 'white',
-        color: 'black',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
-      <div style={{ 
-        border: '2px solid #333',
-        padding: '20px',
-        height: 'calc(100vh - 40px)',
-        width: '100%',
-        boxSizing: 'border-box',
         background: 'white',
         display: 'flex',
         flexDirection: 'column',
-        margin: '0'
-      }}>
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        margin: 0,
+        padding: 0,
+        boxSizing: 'border-box'
+      }}
+      className="print-pdf-root"
+    >
+      <div
+        // Inner job card: centered, full A4 width on desktop/tablet, 100% on mobile
+        style={{
+          width: '100%',
+          maxWidth: `${A4_WIDTH_PX}px`,
+          minHeight: '1100px',
+          background: 'white',
+          border: '2px solid #333',
+          borderRadius: '8px',
+          margin: 0,
+          boxSizing: 'border-box',
+          padding: `${CARD_PADDING}px`,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {/* Header with Company Info and Logo */}
         <div style={{ 
           display: 'flex', 
@@ -180,7 +188,7 @@ export const PrintableJobCardV2 = ({
             <div style={{ lineHeight: '1.6' }}>
               <p style={{ margin: '0 0 6px 0', fontWeight: 'bold', fontSize: '14px', color: '#000' }}>{customerName}</p>
               <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#333' }}>Phone: {customerPhone}</p>
-              {customerEmail && <p style={{ margin: '0', fontSize: '12px', color: '#333' }}>Email: {customerEmail}</p>}
+              {customerEmail && <p style={{ margin: '0', fontSize: '12px', color: '#333' }}>{customerEmail}</p>}
             </div>
           </div>
         </div>
