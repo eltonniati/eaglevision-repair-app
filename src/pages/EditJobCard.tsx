@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
@@ -29,12 +30,14 @@ import { JobCardActions } from "@/components/job/JobCardActions";
 
 export default function EditJobCard() {
   const { id } = useParams();
-  const { getJob, updateJob } = useJobs();
+  const { updateJob } = useJobs();
   const { companies, loading: loadingCompanies } = useCompanies();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const fetchedRef = useRef<string | null>(null);
 
   // Form state
   const [customerName, setCustomerName] = useState("");
@@ -49,59 +52,83 @@ export default function EditJobCard() {
   const [status, setStatus] = useState<JobStatus>("In Progress");
   const [jobCardNumber, setJobCardNumber] = useState("");
 
-  // Load job data when component mounts
-  useEffect(() => {
-    let isMounted = true;
+  // Direct job loading function to avoid hook dependency issues
+  const loadJobData = async (jobId: string) => {
+    if (!jobId || fetchedRef.current === jobId) return;
     
-    const loadJob = async () => {
-      if (!id || !isMounted) return;
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+      fetchedRef.current = jobId;
       
-      try {
-        setIsLoading(true);
-        const job = await getJob(id);
-        
-        if (job && isMounted) {
-          setCustomerName(job.customer.name);
-          setCustomerPhone(job.customer.phone);
-          setCustomerEmail(job.customer.email || "");
-          setDeviceName(job.device.name);
-          setDeviceModel(job.device.model);
-          setDeviceCondition(job.device.condition);
-          setProblem(job.details.problem);
-          setHandlingFees(job.details.handling_fees || 0);
-          setCompanyId(job.company_id || "none");
-          setStatus(job.details.status);
-          setJobCardNumber(job.job_card_number || "");
-        }
-      } catch (error) {
-        if (isMounted) {
-          toast.error(t.error);
-          console.error("Error loading job:", error);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      console.log("Loading job data for ID:", jobId);
+      
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { mapDatabaseJobToJob } = await import("@/lib/job-utils");
+      
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*, companies(*)")
+        .eq("id", jobId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Job fetch error:", error);
+        setLoadError(error.message);
+        toast.error(`${t.failedToLoad}: ${error.message}`);
+        return;
       }
-    };
+      
+      if (!data) {
+        console.log("No job found with ID:", jobId);
+        setLoadError(t.jobNotFound || "Job not found");
+        toast.error(t.jobNotFound || "Job not found");
+        return;
+      }
 
-    loadJob();
+      console.log("Job data retrieved successfully");
+      const job = mapDatabaseJobToJob(data);
+      
+      // Populate form fields
+      setCustomerName(job.customer.name);
+      setCustomerPhone(job.customer.phone);
+      setCustomerEmail(job.customer.email || "");
+      setDeviceName(job.device.name);
+      setDeviceModel(job.device.model);
+      setDeviceCondition(job.device.condition);
+      setProblem(job.details.problem);
+      setHandlingFees(job.details.handling_fees || 0);
+      setCompanyId(job.company_id || "none");
+      setStatus(job.details.status);
+      setJobCardNumber(job.job_card_number || "");
+      
+    } catch (error) {
+      console.error("Error loading job:", error);
+      const errorMessage = error instanceof Error ? error.message : t.error || "An error occurred";
+      setLoadError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
+  // Load job data when component mounts - only run once per ID
+  useEffect(() => {
+    if (id && id !== fetchedRef.current) {
+      loadJobData(id);
+    }
+  }, [id]); // Only depend on id, not on functions
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!customerName || !customerPhone || !deviceName || !deviceModel || !deviceCondition || !problem) {
-      toast.error("Please fill in all required fields");
+      toast.error(t.fillAllFields || "Please fill in all required fields");
       return;
     }
 
     if (!id) {
-      toast.error("No job ID found");
+      toast.error(t.noJobId || "No job ID found");
       return;
     }
 
@@ -130,14 +157,14 @@ export default function EditJobCard() {
       const result = await updateJob(id, updatedJobData);
       
       if (result) {
-        toast.success(`${t.jobCardUpdated}: ${jobCardNumber}`);
+        toast.success(`${t.jobCardUpdated || "Job card updated"}: ${jobCardNumber}`);
         navigate("/job-cards");
       } else {
-        toast.error("Failed to update job card");
+        toast.error(t.failedToUpdateJobCard || "Failed to update job card");
       }
     } catch (error) {
       console.error("Error updating job:", error);
-      toast.error("An error occurred while updating the job card");
+      toast.error(t.errorUpdatingJobCard || "An error occurred while updating the job card");
     } finally {
       setIsSubmitting(false);
     }
@@ -146,6 +173,28 @@ export default function EditJobCard() {
   const handleBackClick = () => {
     navigate("/job-cards");
   };
+
+  if (loadError) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
+        <Button
+          variant="ghost"
+          onClick={handleBackClick}
+          className="mb-6"
+          type="button"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t.back} {t.jobCards}
+        </Button>
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{loadError}</p>
+          <Button onClick={() => loadJobData(id || "")} disabled={!id}>
+            {t.retry || "Retry"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -172,7 +221,7 @@ export default function EditJobCard() {
 
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">{t.edit} {t.jobCards} #{jobCardNumber}</h1>
-        <p className="text-gray-500">Update details for this repair job</p>
+        <p className="text-gray-500">{t.updateJobDetails || "Update details for this repair job"}</p>
       </div>
 
       {/* Job Card Actions */}
@@ -193,8 +242,8 @@ export default function EditJobCard() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t.customer} Information</CardTitle>
-              <CardDescription>Update the customer's contact details</CardDescription>
+              <CardTitle>{t.customer} {t.information || "Information"}</CardTitle>
+              <CardDescription>{t.updateCustomerDetails || "Update the customer's contact details"}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -220,7 +269,7 @@ export default function EditJobCard() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customerEmail">{t.customerEmail} (optional)</Label>
+                <Label htmlFor="customerEmail">{t.customerEmail} ({t.optional || "optional"})</Label>
                 <Input
                   id="customerEmail"
                   type="email"
@@ -234,8 +283,8 @@ export default function EditJobCard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t.device} Information</CardTitle>
-              <CardDescription>Update details about the device being repaired</CardDescription>
+              <CardTitle>{t.device} {t.information || "Information"}</CardTitle>
+              <CardDescription>{t.updateDeviceDetails || "Update details about the device being repaired"}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -275,17 +324,17 @@ export default function EditJobCard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t.problem} Details</CardTitle>
-              <CardDescription>Update the issue with the device</CardDescription>
+              <CardTitle>{t.problem} {t.details || "Details"}</CardTitle>
+              <CardDescription>{t.updateProblemDetails || "Update the issue with the device"}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="problem">{t.description} of {t.problem} *</Label>
+                <Label htmlFor="problem">{t.description} {t.of || "of"} {t.problem} *</Label>
                 <Textarea
                   id="problem"
                   value={problem}
                   onChange={(e) => setProblem(e.target.value)}
-                  placeholder="Describe the issue with the device..."
+                  placeholder={t.describeProblem || "Describe the issue with the device..."}
                   className="min-h-[100px]"
                   required
                 />
@@ -303,13 +352,13 @@ export default function EditJobCard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company">Company (Optional)</Label>
+                <Label htmlFor="company">{t.company} ({t.optional || "Optional"})</Label>
                 <Select value={companyId} onValueChange={setCompanyId} disabled={loadingCompanies}>
                   <SelectTrigger id="company">
-                    <SelectValue placeholder={loadingCompanies ? "Loading companies..." : "Select a company"} />
+                    <SelectValue placeholder={loadingCompanies ? t.loadingCompanies || "Loading companies..." : t.selectCompany || "Select a company"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">No company</SelectItem>
+                    <SelectItem value="none">{t.noCompany || "No company"}</SelectItem>
                     {companies.map(company => (
                       <SelectItem key={company.id} value={company.id || ""}>
                         {company.name}
@@ -343,7 +392,7 @@ export default function EditJobCard() {
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    {t.save} Changes
+                    {t.save} {t.changes || "Changes"}
                   </>
                 )}
               </Button>
