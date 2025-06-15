@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Printer } from "lucide-react";
+import { useStatusManagement } from "@/hooks/dashboard/use-status-management";
 
 interface JobCardItemProps {
   job: Job;
@@ -21,18 +22,10 @@ interface JobCardItemProps {
 
 export const JobCardItem = ({ job, onPreview }: JobCardItemProps) => {
   const navigate = useNavigate();
+  const { getStatusColor } = useStatusManagement();
 
   const renderStatusBadge = (status: JobStatus) => {
-    switch (status) {
-      case "Finished":
-        return <Badge className="bg-green-500">Finished</Badge>;
-      case "In Progress":
-        return <Badge className="bg-blue-500">In Progress</Badge>;
-      case "Waiting for Parts":
-        return <Badge className="bg-amber-500">Waiting for Parts</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
+    return <Badge className={getStatusColor(status)}>{status}</Badge>;
   };
 
   return (

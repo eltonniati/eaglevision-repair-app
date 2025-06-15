@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Job, JobStatus } from "@/lib/types";
@@ -25,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useStatusManagement } from "@/hooks/dashboard/use-status-management";
 
 interface JobDetailsProps {
   job: Job;
@@ -89,6 +89,7 @@ export const JobDetails = ({
   onDeleteDialogOpen
 }: JobDetailsProps) => {
   const { t } = useLanguage();
+  const { getStatusColor, getStatusBackgroundColor } = useStatusManagement();
 
   // Handle status change and auto-save when not in edit mode
   const handleStatusChangeAndSave = async (newStatus: JobStatus) => {
@@ -141,7 +142,6 @@ export const JobDetails = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Customer Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">{t.customer}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -185,7 +185,6 @@ export const JobDetails = ({
             </div>
           </div>
 
-          {/* Device Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">{t.device}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -228,7 +227,6 @@ export const JobDetails = ({
             </div>
           </div>
 
-          {/* Problem Description */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">{t.problem}</h3>
             <div>
@@ -269,7 +267,7 @@ export const JobDetails = ({
               </Select>
             ) : (
               <div className="space-y-2">
-                <Badge className="mb-2">{editedStatus}</Badge>
+                <Badge className={`mb-2 ${getStatusColor(editedStatus)}`}>{editedStatus}</Badge>
                 <Select value={editedStatus} onValueChange={handleStatusChangeAndSave}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder={t.selectStatus || "Select a status"} />
