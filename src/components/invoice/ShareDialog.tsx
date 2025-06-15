@@ -1,7 +1,7 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Share, Mail, Download } from "lucide-react";
+import { Share, Mail, Download, MessageCircle } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 interface ShareDialogProps {
@@ -9,7 +9,8 @@ interface ShareDialogProps {
   onOpenChange: (open: boolean) => void;
   onShare: () => Promise<void>;
   onEmail: () => Promise<void>;
-  onDownloadPdf?: () => Promise<void>;  // Using the correct Promise<void> type
+  onWhatsApp?: () => Promise<void>;
+  onDownloadPdf?: () => Promise<void>;
   invoiceNumber: string;
   invoiceName?: string;
   isGeneratingPdf?: boolean;
@@ -20,6 +21,7 @@ export const ShareDialog = ({
   onOpenChange, 
   onShare,
   onEmail,
+  onWhatsApp,
   onDownloadPdf,
   invoiceNumber,
   invoiceName,
@@ -35,7 +37,7 @@ export const ShareDialog = ({
       <DialogContent className="no-print">
         <DialogHeader>
           <DialogTitle>Share {itemType} {displayName}</DialogTitle>
-          <DialogDescription>Share this {itemType.toLowerCase()} via WhatsApp or email</DialogDescription>
+          <DialogDescription>Share this {itemType.toLowerCase()} PDF via different methods</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <Button 
@@ -48,8 +50,25 @@ export const ShareDialog = ({
             ) : (
               <Share className="mr-2 h-4 w-4" />
             )}
-            Share via WhatsApp
+            Share PDF
           </Button>
+          
+          {onWhatsApp && (
+            <Button 
+              onClick={onWhatsApp}
+              variant="outline"
+              className="w-full"
+              disabled={isGeneratingPdf}
+            >
+              {isGeneratingPdf ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <MessageCircle className="mr-2 h-4 w-4" />
+              )}
+              Share via WhatsApp
+            </Button>
+          )}
+          
           <Button 
             onClick={onEmail}
             variant="outline"
@@ -63,6 +82,7 @@ export const ShareDialog = ({
             )}
             Send via Email
           </Button>
+          
           {onDownloadPdf && (
             <Button 
               onClick={onDownloadPdf}
