@@ -1,4 +1,5 @@
 
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -63,7 +64,7 @@ const App = () => (
                   } />
                   <Route path="/job-cards/:id/edit" element={
                     <RequireAuth>
-                      <JobCards />
+                      <CreateJobCard />
                     </RequireAuth>
                   } />
                   <Route path="/job-cards/:id" element={
@@ -110,3 +111,4 @@ const App = () => (
 );
 
 export default App;
+
