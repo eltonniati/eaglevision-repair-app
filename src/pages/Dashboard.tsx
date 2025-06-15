@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
@@ -8,6 +7,7 @@ import RecentJobCards from "@/components/dashboard/RecentJobCards";
 import CompanyProfileCard from "@/components/dashboard/CompanyProfileCard";
 import { toast } from "sonner";
 import { useCallback } from "react";
+import { JobStatus } from "@/lib/types";
 
 export default function Dashboard() {
   const { session } = useAuth();
@@ -30,15 +30,20 @@ export default function Dashboard() {
   const refreshJobs = useCallback(async () => {
     if (fetchJobs) {
       await fetchJobs();
-      toast.success(t.jobsRefreshed || "Jobs refreshed");
+      toast.success(t.jobsRefreshed);
     }
   }, [fetchJobs, t]);
 
   const handleStatusChange = async (jobId: string, newStatus: string) => {
     try {
-      // Convert translated status back to original status
-      const originalStatus = reverseStatusTranslations[newStatus] || newStatus;
-      
+      // Convert translated status back to original status (and enforce type)
+      let originalStatusString = reverseStatusTranslations[newStatus] || newStatus;
+      // Ensure that originalStatusString is JobStatus type
+      const allowedStatus: JobStatus[] = ["In Progress", "Finished", "Waiting for Parts"];
+      const originalStatus = allowedStatus.includes(originalStatusString as JobStatus)
+        ? (originalStatusString as JobStatus)
+        : "In Progress"; // fallback to In Progress
+
       // Find the job to update
       const jobToUpdate = jobs.find(j => j.id === jobId);
       if (!jobToUpdate) {
@@ -61,7 +66,7 @@ export default function Dashboard() {
         job.id === jobId ? updatedJob : job
       );
       if (setJobs) {
-        setJobs(optimisticJobs);
+        setJobs(optimisticJobs as typeof jobs);
       }
 
       // Update in database
@@ -69,11 +74,11 @@ export default function Dashboard() {
 
       if (result) {
         // Replace with the backend-confirmed updated job (in case backend changed other fields)
-        const updatedJobs = optimisticJobs.map(job => 
+        const updatedJobs = optimisticJobs.map(job =>
           job.id === jobId ? result : job
         );
         if (setJobs) {
-          setJobs(updatedJobs);
+          setJobs(updatedJobs as typeof jobs);
         }
         toast.success(t.statusUpdatedSuccessfully);
         // Optionally refresh from backend to pull real-time updates from others

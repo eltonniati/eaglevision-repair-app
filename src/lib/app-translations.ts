@@ -1,4 +1,3 @@
-
 // Removed: import { Language } from './app-translations';
 
 export type Language = 'en' | 'fr' | 'pt' | 'es' | 'ln' | 'kg' | 'sw' | 'ts';
@@ -155,6 +154,13 @@ export interface AppTranslations {
 
   // Add new key:
   heroLongDescription: string;
+
+  /*** ADDED FOR DASHBOARD JOB STATUS/REFRESH UX BELOW ***/
+  jobsRefreshed: string;
+  jobNotFound: string;
+  statusUpdatedSuccessfully: string;
+  statusUpdateFailed: string;
+  refreshJobs: string;
 }
 
 export const translations: Record<Language, AppTranslations> = {
@@ -310,6 +316,13 @@ export const translations: Record<Language, AppTranslations> = {
 
     // NEW TRANSLATION:
     heroLongDescription: 'Track jobs, manage customers, and handle invoices all in one place. FixFlow Connect helps you run your repair business efficiently.',
+
+    // ADDED:
+    jobsRefreshed: "Jobs refreshed",
+    jobNotFound: "Job not found",
+    statusUpdatedSuccessfully: "Status updated successfully",
+    statusUpdateFailed: "Failed to update status",
+    refreshJobs: "Refresh Jobs"
   },
   fr: {
     // Navigation
@@ -385,24 +398,24 @@ export const translations: Record<Language, AppTranslations> = {
     from: 'De',
     billTo: 'Facturer à',
     invoiceDetails: 'Détails de la facture',
-    description: 'Description',
-    device: 'Appareil',
-    lineItems: 'Articles',
-    qty: 'Qté',
-    unitPrice: 'Prix unitaire',
-    amount: 'Montant',
+    description: 'Ndimbola',
+    device: 'Eloko',
+    lineItems: 'Biloko',
+    qty: 'Motango',
+    unitPrice: 'Ntalo ya Moko',
+    amount: 'Mbongo',
     subtotal: 'Sous-total',
-    total: 'Total',
+    total: 'Nyonso',
     notes: 'Bilembo',
     termsConditions: 'Mibeko pe Malako',
     thankYou: 'Merci pour votre confiance!',
-    generatedOn: 'Généré le',
-    companyInfoNotAvailable: 'Informations de l\'entreprise non disponibles',
-    createInvoice: 'Créer une facture',
-    invoiceCreated: 'Facture créée avec succès',
-    invoiceUpdated: 'Facture mise à jour',
-    noInvoicesFound: 'Aucune facture trouvée',
-    createFirstInvoice: 'Créer la première facture',
+    generatedOn: 'Esálemi na',
+    companyInfoNotAvailable: 'Makambo ya kompanyi ezali te',
+    createInvoice: 'Kosála Kwákísi',
+    invoiceCreated: 'Kwákísi esálemi malamu',
+    invoiceUpdated: 'Kwákísi ebongwani',
+    noInvoicesFound: 'Bakwákísi ezwami te',
+    createFirstInvoice: 'Kosála Kwákísi ya Liboso',
     
     // Settings
     language: 'Langue',
@@ -462,6 +475,13 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Terminé',
 
     heroLongDescription: "Suivez les jobs, gérez les clients et faites les factures au même endroit. FixFlow Connect vous aide à gérer efficacement votre atelier de réparation.",
+
+    // ADDED:
+    jobsRefreshed: "Jobs actualisés",
+    jobNotFound: "Fiche de travail introuvable",
+    statusUpdatedSuccessfully: "Statut mis à jour avec succès",
+    statusUpdateFailed: "Échec de la mise à jour du statut",
+    refreshJobs: "Actualiser les jobs"
   },
   pt: {
     // Navigation
@@ -614,6 +634,13 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Terminado',
 
     heroLongDescription: 'Gerencie trabalhos, clientes e faturas em um só lugar. FixFlow Connect ajuda você a administrar sua oficina de reparos de forma eficiente.',
+
+    // ADDED:
+    jobsRefreshed: "Trabalhos atualizados",
+    jobNotFound: "Cartão de trabalho não encontrado",
+    statusUpdatedSuccessfully: "Status atualizado com sucesso",
+    statusUpdateFailed: "Falha ao atualizar status",
+    refreshJobs: "Atualizar trabalhos"
   },
   es: {
     // Navigation
@@ -766,6 +793,13 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Terminado',
 
     heroLongDescription: 'Supervisa trabajos, gestiona clientes y maneja facturas todo en un solo lugar. FixFlow Connect te ayuda a administrar eficientemente tu taller de reparaciones.',
+
+    // ADDED:
+    jobsRefreshed: "Trabajos actualizados",
+    jobNotFound: "Tarjeta de trabajo no encontrada",
+    statusUpdatedSuccessfully: "Estado actualizado correctamente",
+    statusUpdateFailed: "Fallo al actualizar el estado",
+    refreshJobs: "Actualizar trabajos"
   },
   ln: {
     // Navigation
@@ -918,6 +952,13 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Esilisi',
 
     heroLongDescription: "Landa misalu, bongisa bakiliya, pe salá bakwákísi nyonso esika moko. FixFlow Connect esalelaka yo na boyangeli ya ndako ya kobongisa biloko malamu.",
+
+    // ADDED:
+    jobsRefreshed: "Misala mibongwani",
+    jobNotFound: "Mokanda ya mosála ezwami te",
+    statusUpdatedSuccessfully: "Lolenge ebongwani malamu",
+    statusUpdateFailed: "Kobongisa lolenge ekweyi",
+    refreshJobs: "Bongisa misala"
   },
   kg: {
     // Navigation
@@ -1070,6 +1111,13 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Esilisi',
 
     heroLongDescription: "Landa bisalu, bongisa banseke, ye kuvanga mafakture na esika mosi. FixFlow Connect kusadisa nge kuvandila kisalu kia kubongisa bima kimbote.",
+
+    // ADDED:
+    jobsRefreshed: "Bisalu bibongwani",
+    jobNotFound: "Nkarta ya kisalu imonekanga ko",
+    statusUpdatedSuccessfully: "Mfumu ibongwani kimbote",
+    statusUpdateFailed: "Kubongisa mfumu kunangani",
+    refreshJobs: "Bongisa bisalu"
   },
   sw: {
     // Navigation
@@ -1222,6 +1270,13 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Imekamilika',
 
     heroLongDescription: "Fuatilia kazi, simamia wateja na dhibiti ankara zote mahali pamoja. FixFlow Connect inakusaidia kuendesha duka lako la ukarabati kwa ufanisi.",
+
+    // ADDED:
+    jobsRefreshed: "Kazi zimesasishwa",
+    jobNotFound: "Kadi ya kazi haijapatikana",
+    statusUpdatedSuccessfully: "Hali imesasishwa",
+    statusUpdateFailed: "Imeshindwa kusasisha hali",
+    refreshJobs: "Sasisha kazi"
   },
   ts: {
     // Navigation
@@ -1374,5 +1429,12 @@ export const translations: Record<Language, AppTranslations> = {
     finished: 'Cimana',
 
     heroLongDescription: "Landila misalu, bongisa babetu ne mafakture yonso na esika ko. FixFlow Connect isiza wena kusalela caha ca kubongisa bintu cibotu.",
+
+    // ADDED:
+    jobsRefreshed: "Misalu yatuswa",
+    jobNotFound: "Mukanda wa kisalu wumonekanga bu",
+    statusUpdatedSuccessfully: "Mfumu yatuswa cibotu",
+    statusUpdateFailed: "Kutuswa mfumu kunangani",
+    refreshJobs: "Tusa misalu"
   }
 };
