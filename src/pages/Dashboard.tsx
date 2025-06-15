@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
@@ -6,6 +5,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import RecentJobCards from "@/components/dashboard/RecentJobCards";
 import CompanyProfileCard from "@/components/dashboard/CompanyProfileCard";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { session } = useAuth();
@@ -25,34 +25,46 @@ export default function Dashboard() {
 
   const handleStatusChange = async (jobId: string, newStatus: string) => {
     try {
-      // Convert translated status back to original status in string
+      // Convert translated status back to original status
       const originalStatus = reverseStatusTranslations[newStatus] || newStatus;
-      // Find the job to get its current data for the update 
-      const jobToUpdate = jobs.find(j => j.id === jobId);
-      if (!jobToUpdate) return;
       
-      // Only status is changing here (for dashboard quick action)
-      const updates = {
+      // Find the job to update
+      const jobToUpdate = jobs.find(j => j.id === jobId);
+      if (!jobToUpdate) {
+        toast.error(t.jobNotFound);
+        return;
+      }
+
+      // Create updated job object
+      const updatedJob = {
         ...jobToUpdate,
         details: {
           ...jobToUpdate.details,
-          status: originalStatus as import("@/lib/types").JobStatus,
-        },
+          status: originalStatus,
+          updated_at: new Date().toISOString()
+        }
       };
+
+      // Update in database
+      const result = await updateJob(jobId, updatedJob);
       
-      // Push to Supabase!
-      const updatedJob = await updateJob(jobId, updates);
-      
-      if (updatedJob && setJobs) {
-        // Immediately update the local jobs array
+      if (result) {
+        // Update local state
         const updatedJobs = jobs.map(job => 
-          job.id === jobId ? updatedJob : job
+          job.id === jobId ? result : job
         );
-        setJobs(updatedJobs);
-        console.log("Job status updated successfully:", updatedJob);
+        
+        if (setJobs) {
+          setJobs(updatedJobs);
+        }
+        
+        toast.success(t.statusUpdatedSuccessfully);
+      } else {
+        toast.error(t.statusUpdateFailed);
       }
     } catch (error) {
       console.error("Error updating job status:", error);
+      toast.error(t.statusUpdateFailed);
     }
   };
 
