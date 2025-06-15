@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,9 +10,7 @@ import { JobCardList } from "@/components/job/JobCardList";
 import { JobPrintPreview } from "@/components/job/JobPrintPreview";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 
-// --- NEW: Filtering by status from location.state ---
 const getJobStatusByLabel = (label: string, t: any) => {
-  // Map the dashboard label back to the actual JobStatus value
   if ([t.inProgress, "In Progress"].includes(label)) return "In Progress";
   if ([t.completed, "Completed", "Finished"].includes(label)) return "Finished";
   if ([t.waitingForParts, "Waiting for Parts"].includes(label)) return "Waiting for Parts";
@@ -28,29 +25,24 @@ const JobCards = () => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
-  // --- NEW: Get the status filter from navigation ---
   const location = useLocation();
   const statusLabel = location?.state?.status || null;
   const navigate = useNavigate();
 
-  // --- NEW: Compute filter based on status ---
   const statusFilter = useMemo(() => {
     if (!statusLabel) return null;
     return getJobStatusByLabel(statusLabel, t);
   }, [statusLabel, t]);
 
-  // --- NEW: Filter jobs for display ---
   const filteredJobs = useMemo(() => {
     if (!statusFilter) return jobs;
     return jobs.filter(job => job.details.status === statusFilter);
   }, [jobs, statusFilter]);
 
   useEffect(() => {
-    // Focus/scroll to top when filter changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [statusLabel]);
 
-  // Clear job data when component unmounts or navigates away
   useEffect(() => {
     return () => {
       if (selectedJob) {
@@ -59,13 +51,6 @@ const JobCards = () => {
       }
     };
   }, [selectedJob]);
-
-  console.log("JobCards component state:", { 
-    jobsCount: jobs.length, 
-    loading, 
-    error,
-    isPreviewMode 
-  });
 
   const getCompanyName = (companyId?: string) => {
     if (!companyId || companiesLoading) return "";
@@ -78,7 +63,6 @@ const JobCards = () => {
   };
 
   const handlePreviewJob = (job: Job) => {
-    console.log("Preview job selected:", job.job_card_number);
     setSelectedJob(job);
     setIsPreviewMode(true);
   };
@@ -121,12 +105,8 @@ const JobCards = () => {
     return Promise.resolve();
   };
 
-  // Callback to go to dashboard from print preview/share dialog
   const backToDashboard = () => {
-    // Clear job data before navigating
-    if (clearJob) {
-      clearJob();
-    }
+    if (clearJob) clearJob();
     setSelectedJob(null);
     setIsPreviewMode(false);
     navigate("/dashboard");
@@ -139,72 +119,84 @@ const JobCards = () => {
 
   if (error) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-        {/* Back to Dashboard Button */}
-        <Button variant="ghost" className="mb-4" onClick={backToDashboard}>
+      <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+        <Button variant="ghost" className="mb-4 w-full sm:w-auto" onClick={backToDashboard}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t.back} {t.dashboard}
         </Button>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">{t.jobCards}</h1>
-          <Link to="/job-cards/new">
-            <Button>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t.jobCards}</h1>
+          <Link to="/job-cards/new" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
               {t.createJobCard}
             </Button>
           </Link>
         </div>
         <div className="text-center p-6">
-          <h2 className="text-2xl font-semibold text-destructive">{t.errorLoadingJobCards}</h2>
-          <p className="text-muted-foreground mt-2">{error}</p>
-          <Button onClick={() => window.location.reload()} className="mt-4">{t.reloadPage}</Button>
+          <h2 className="text-xl sm:text-2xl font-semibold text-destructive">{t.errorLoadingJobCards}</h2>
+          <p className="text-muted-foreground mt-2 break-words">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            {t.reloadPage}
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-      {/* Back to Dashboard Button */}
-      <Button variant="ghost" className="mb-4" onClick={backToDashboard}>
+    <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+      <Button variant="ghost" className="mb-4 w-full sm:w-auto" onClick={backToDashboard}>
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t.back} {t.dashboard}
       </Button>
 
       {isPreviewMode && selectedJob ? (
-        <JobPrintPreview
-          job={selectedJob}
-          customerName={selectedJob.customer.name}
-          customerPhone={selectedJob.customer.phone}
-          customerEmail={selectedJob.customer.email || ""}
-          deviceName={selectedJob.device.name}
-          deviceModel={selectedJob.device.model}
-          deviceCondition={selectedJob.device.condition}
-          problem={selectedJob.details.problem}
-          handlingFees={selectedJob.details.handling_fees}
-          companyName={getCompanyName(selectedJob.company_id)}
-          companyLogo={getCompanyLogo(selectedJob.company_id)}
-          status={selectedJob.details.status}
-          onBack={handleBackToJobList}
-          onShare={() => setIsShareDialogOpen(true)}
-        />
+        <div className="w-full overflow-x-auto">
+          <div 
+            className="bg-white p-4 sm:p-6 rounded-lg shadow-sm w-full max-w-[210mm] mx-auto"
+            style={{
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word'
+            }}
+          >
+            <JobPrintPreview
+              job={selectedJob}
+              customerName={selectedJob.customer.name}
+              customerPhone={selectedJob.customer.phone}
+              customerEmail={selectedJob.customer.email || ""}
+              deviceName={selectedJob.device.name}
+              deviceModel={selectedJob.device.model}
+              deviceCondition={selectedJob.device.condition}
+              problem={selectedJob.details.problem}
+              handlingFees={selectedJob.details.handling_fees}
+              companyName={getCompanyName(selectedJob.company_id)}
+              companyLogo={getCompanyLogo(selectedJob.company_id)}
+              status={selectedJob.details.status}
+              onBack={handleBackToJobList}
+              onShare={() => setIsShareDialogOpen(true)}
+            />
+          </div>
+        </div>
       ) : (
         <>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold tracking-tight">{t.jobCards}</h1>
-            <Link to="/job-cards/new">
-              <Button>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t.jobCards}</h1>
+            <Link to="/job-cards/new" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 {t.createJobCard}
               </Button>
             </Link>
           </div>
 
-          <JobCardList 
-            jobs={filteredJobs}
-            loading={loading}
-            onPreview={handlePreviewJob}
-          />
+          <div className="w-full overflow-x-auto">
+            <JobCardList 
+              jobs={filteredJobs}
+              loading={loading}
+              onPreview={handlePreviewJob}
+            />
+          </div>
         </>
       )}
       
