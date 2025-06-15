@@ -1,6 +1,7 @@
 
 import { format } from "date-fns";
 import { Job } from "@/lib/types";
+import { useCompany } from "@/hooks/use-company";
 
 interface PrintableJobCardV2Props {
   job: Job;
@@ -12,8 +13,7 @@ interface PrintableJobCardV2Props {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  companyName: string;
-  companyLogoUrl?: string;
+  // Removed companyName, companyLogoUrl
 }
 
 const formatCurrency = (amount: number) => {
@@ -33,9 +33,8 @@ export const PrintableJobCardV2 = ({
   deviceCondition, 
   problem,
   handlingFees,
-  companyName,
-  companyLogoUrl,
 }: PrintableJobCardV2Props) => {
+  const { company } = useCompany(); // Always use current company
   // Detect mobile for responsive styling
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -85,9 +84,9 @@ export const PrintableJobCardV2 = ({
           borderBottom: '1px solid #ddd'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '3vw' : '12px' }}>
-            {companyLogoUrl && (
+            {company?.logo_url && (
               <img 
-                src={companyLogoUrl}
+                src={company.logo_url}
                 alt="Company Logo" 
                 style={{ 
                   height: isMobile ? '10vw' : '45px', 
@@ -153,7 +152,16 @@ export const PrintableJobCardV2 = ({
               color: '#000'
             }}>Company</h2>
             <div style={{ lineHeight: '1.6' }}>
-              <p style={{ margin: '0 0 6px 0', fontWeight: 'bold', fontSize: isMobile ? '3.5vw' : '14px', color: '#000' }}>{companyName}</p>
+              <p style={{ margin: '0 0 6px 0', fontWeight: 'bold', fontSize: isMobile ? '3.5vw' : '14px', color: '#000' }}>{company?.name ?? "Company Name"}</p>
+              {company?.address && (
+                <p style={{ margin: '0 0 4px 0', fontSize: isMobile ? '3vw' : '12px', color: '#333' }}>{company.address}</p>
+              )}
+              {company?.phone && (
+                <p style={{ margin: '0 0 4px 0', fontSize: isMobile ? '3vw' : '12px', color: '#333' }}>{company.phone}</p>
+              )}
+              {company?.email && (
+                <p style={{ margin: '0', fontSize: isMobile ? '3vw' : '12px', color: '#333' }}>{company.email}</p>
+              )}
             </div>
           </div>
           <div style={{ 

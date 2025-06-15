@@ -13,8 +13,7 @@ interface PrintPreviewContentProps {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  companyName: string;
-  companyLogoUrl?: string;
+  // Removed companyName, companyLogoUrl
 }
 
 export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewContentProps>(({
@@ -27,8 +26,6 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
   deviceCondition,
   problem,
   handlingFees,
-  companyName,
-  companyLogoUrl
 }, ref) => {
   return (
     <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
@@ -43,8 +40,6 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
           deviceCondition={deviceCondition}
           problem={problem}
           handlingFees={handlingFees}
-          companyName={companyName}
-          companyLogoUrl={companyLogoUrl}
         />
       </div>
     </div>

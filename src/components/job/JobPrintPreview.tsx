@@ -32,12 +32,9 @@ export function JobPrintPreview({
   deviceCondition,
   problem,
   handlingFees,
-  companyName,
-  status,
   onBack,
   onShare,
-  companyLogoUrl,
-}: JobPrintPreviewProps) {
+}: any) {
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrintClick = async () => {
@@ -75,8 +72,6 @@ export function JobPrintPreview({
             deviceCondition={deviceCondition}
             problem={problem}
             handlingFees={handlingFees}
-            companyName={companyName}
-            companyLogoUrl={companyLogoUrl}
           />
         </div>
       </div>

@@ -18,9 +18,7 @@ interface JobPreviewModeProps {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  companyName: string;
   onBack: () => void;
-  companyLogoUrl?: string;
 }
 
 export const JobPreviewMode = ({
@@ -33,10 +31,8 @@ export const JobPreviewMode = ({
   deviceCondition,
   problem,
   handlingFees,
-  companyName,
   onBack,
-  companyLogoUrl,
-}: JobPreviewModeProps) => {
+}: any) => {
   const printRef = useRef<HTMLDivElement>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -115,8 +111,6 @@ export const JobPreviewMode = ({
             deviceCondition={deviceCondition}
             problem={problem}
             handlingFees={handlingFees}
-            companyName={companyName}
-            companyLogoUrl={companyLogoUrl}
           />
         </div>
       </div>
