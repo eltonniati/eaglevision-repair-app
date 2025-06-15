@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { Job, Company } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
@@ -37,40 +36,56 @@ export const PrintableJobCardV2 = ({
 }: PrintableJobCardV2Props) => {
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+  // If text content is especially long, shrink font size
+  const manyLines =
+    [problem, customerName, deviceName, deviceModel].some(str => (str || "").length > 120);
+
   return (
     <div 
       className="w-full bg-white text-black print-container" 
-      style={{ 
-        width: isMobile ? '100vw' : '210mm',
-        height: isMobile ? '100vh' : '297mm',
-        minHeight: isMobile ? '100vh' : '297mm',
-        maxWidth: isMobile ? '100vw' : '210mm',
-        padding: '0',
-        margin: '0 auto',
-        fontSize: isMobile ? '4vw' : '14px',
-        lineHeight: '1.5',
-        fontFamily: 'Arial, sans-serif',
-        boxSizing: 'border-box',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'white',
-        color: 'black',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start'
+      style={{
+        width: isMobile ? "100vw" : "210mm",
+        height: isMobile ? "100vh" : "297mm",
+        minHeight: isMobile ? "100vh" : "297mm",
+        maxWidth: isMobile ? "100vw" : "210mm",
+        padding: "0",
+        margin: "0 auto",
+        fontSize: manyLines ? (isMobile ? "2.7vw" : "10px") : (isMobile ? "4vw" : "14px"),
+        lineHeight: "1.5",
+        fontFamily: "Arial, sans-serif",
+        boxSizing: "border-box",
+        position: "relative",
+        overflow: "hidden",
+        background: "white",
+        color: "black",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start"
       }}
     >
-      <div style={{ 
-        border: isMobile ? '0.8vw solid #333' : '2px solid #333',
-        padding: isMobile ? '4vw' : '20px',
-        height: '100%',
-        width: '100%',
-        boxSizing: 'border-box',
-        background: 'white',
-        display: 'flex',
-        flexDirection: 'column',
-        margin: '0'
-      }}>
+      <style>
+        {`
+        @media print {
+          .print-page-break {
+            break-after: page;
+            page-break-after: always;
+          }
+        }
+        `}
+      </style>
+      <div
+        style={{
+          border: isMobile ? "0.8vw solid #333" : "2px solid #333",
+          padding: isMobile ? "4vw" : "20px",
+          height: "100%",
+          width: "100%",
+          boxSizing: "border-box",
+          background: "white",
+          display: "flex",
+          flexDirection: "column",
+          margin: "0"
+        }}
+      >
         {/* Header with Company Info and Logo */}
         <div style={{
           display: "flex",
@@ -263,14 +278,17 @@ export const PrintableJobCardV2 = ({
         </div>
 
         {/* Problem and Fees */}
-        <div style={{
-          marginBottom: isMobile ? "4vw" : "20px",
-          minHeight: isMobile ? "10vw" : "50px",
-          padding: isMobile ? "3vw" : "12px",
-          backgroundColor: "#f8f9fa",
-          borderRadius: "6px",
-          border: "1px solid #e9ecef"
-        }}>
+        <div
+          className={manyLines ? "print-page-break" : ""}
+          style={{
+            marginBottom: isMobile ? "4vw" : "20px",
+            minHeight: isMobile ? "10vw" : "50px",
+            padding: isMobile ? "3vw" : "12px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "6px",
+            border: "1px solid #e9ecef"
+          }}
+        >
           <h2 style={{
             fontSize: isMobile ? "4vw" : "16px",
             fontWeight: "bold",
@@ -313,4 +331,3 @@ export const PrintableJobCardV2 = ({
     </div>
   );
 };
-

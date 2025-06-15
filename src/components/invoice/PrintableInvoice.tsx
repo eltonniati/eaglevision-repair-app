@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { DatabaseInvoice } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
@@ -40,40 +39,60 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
   // Device detection for responsive styling
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+  // New: determine if we have a lot of lines and should shrink font size
+  const manyLines = (invoiceData.line_items?.length || 0) > 12;
+
   return (
     <div 
-      className="w-full bg-white text-black print-container" 
-      style={{ 
-        width: isMobile ? '100vw' : '210mm',
-        height: isMobile ? '100vh' : '297mm',
-        minHeight: isMobile ? '100vh' : '297mm',
-        maxWidth: isMobile ? '100vw' : '210mm',
-        padding: '0',
-        margin: '0 auto',
-        fontSize: isMobile ? '4vw' : '14px',
-        lineHeight: '1.5',
-        fontFamily: 'Arial, sans-serif',
-        boxSizing: 'border-box',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'white',
-        color: 'black',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start'
+      className={`w-full bg-white text-black print-container`}
+      style={{
+        width: isMobile ? "100vw" : "210mm",
+        height: isMobile ? "100vh" : "297mm",
+        minHeight: isMobile ? "100vh" : "297mm",
+        maxWidth: isMobile ? "100vw" : "210mm",
+        padding: "0",
+        margin: "0 auto",
+        fontSize: manyLines ? (isMobile ? "2.6vw" : "10px") : (isMobile ? "4vw" : "14px"),
+        lineHeight: "1.5",
+        fontFamily: "Arial, sans-serif",
+        boxSizing: "border-box",
+        position: "relative",
+        overflow: "hidden",
+        background: "white",
+        color: "black",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start"
       }}
     >
-      <div style={{ 
-        border: isMobile ? '0.8vw solid #333' : '2px solid #333',
-        padding: isMobile ? '4vw' : '20px',
-        height: '100%',
-        width: '100%',
-        boxSizing: 'border-box',
-        background: 'white',
-        display: 'flex',
-        flexDirection: "column",
-        margin: '0'
-      }}>
+      <style>
+        {`
+        @media print {
+          .print-page-break {
+            break-after: page;
+            page-break-after: always;
+          }
+          .print-container th, 
+          .print-container td {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+        }
+        `}
+      </style>
+      <div
+        style={{
+          border: isMobile ? "0.8vw solid #333" : "2px solid #333",
+          padding: isMobile ? "4vw" : "20px",
+          height: "100%",
+          width: "100%",
+          boxSizing: "border-box",
+          background: "white",
+          display: "flex",
+          flexDirection: "column",
+          margin: "0"
+        }}
+      >
         {/* HEADER */}
         <div
           style={{
@@ -249,13 +268,16 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
 
         {/* LINE ITEMS TABLE */}
         {invoiceData.line_items && invoiceData.line_items.length > 0 && (
-          <div style={{
-            marginBottom: isMobile ? "4vw" : "20px",
-            flex: "1",
-            minHeight: isMobile ? "35vw" : "180px",
-            width: "100%",
-            overflowX: "auto"
-          }}>
+          <div
+            className={manyLines ? "print-page-break" : ""}
+            style={{
+              marginBottom: isMobile ? "4vw" : "20px",
+              flex: "1",
+              minHeight: isMobile ? "35vw" : "180px",
+              width: "100%",
+              overflowX: "auto"
+            }}
+          >
             <h2 style={{
               fontSize: isMobile ? "4vw" : "16px",
               fontWeight: "bold",
@@ -345,7 +367,7 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
           </div>
         )}
 
-        {/* TOTALS SECTION - always at the bottom for mobile */}
+        {/* TOTALS SECTION */}
         <div style={{
           marginBottom: isMobile ? "4vw" : "20px",
           minHeight: isMobile ? "18vw" : "90px",
@@ -470,4 +492,3 @@ export const PrintableInvoice = ({ invoice }: PrintableInvoiceProps) => {
     </div>
   );
 };
-
