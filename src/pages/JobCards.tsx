@@ -62,6 +62,11 @@ const JobCards = () => {
     return companies.find(c => c.id === companyId)?.name || "";
   };
 
+  const getCompanyLogo = (companyId?: string) => {
+    if (!companyId || companiesLoading) return "";
+    return companies.find(c => c.id === companyId)?.logo_url || "";
+  };
+
   const handlePreviewJob = (job: Job) => {
     console.log("Preview job selected:", job.job_card_number);
     setSelectedJob(job);
@@ -157,6 +162,7 @@ const JobCards = () => {
           problem={selectedJob.details.problem}
           handlingFees={selectedJob.details.handling_fees}
           companyName={getCompanyName(selectedJob.company_id)}
+          companyLogo={getCompanyLogo(selectedJob.company_id)}
           status={selectedJob.details.status}
           onBack={backToDashboard}
           onShare={() => setIsShareDialogOpen(true)}
@@ -198,4 +204,3 @@ const JobCards = () => {
 };
 
 export default JobCards;
-

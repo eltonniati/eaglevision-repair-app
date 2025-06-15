@@ -8,8 +8,21 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { downloadJobCardPdf } from "./utils/job-pdf-utils";
 import { shareJobCard, emailJobCard } from "./utils/share-utils";
-import { useCompany } from "@/hooks/use-company";
-import { Skeleton } from "@/components/ui/skeleton";
+
+interface JobPreviewModeProps {
+  job: Job;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  deviceName: string;
+  deviceModel: string;
+  deviceCondition: string;
+  problem: string;
+  handlingFees: number;
+  companyName: string;
+  companyLogo: string;
+  onBack: () => void;
+}
 
 export const JobPreviewMode = ({
   job,
@@ -21,13 +34,14 @@ export const JobPreviewMode = ({
   deviceCondition,
   problem,
   handlingFees,
+  companyName,
+  companyLogo,
   onBack,
-}: any) => {
+}: JobPreviewModeProps) => {
   const printRef = useRef<HTMLDivElement>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isMobile = useIsMobile();
-  const { company, loading } = useCompany();
 
   const onPrintButtonClick = async () => {
     console.log("Print button clicked - generating cellphone PDF for job:", job.job_card_number);
@@ -57,23 +71,14 @@ export const JobPreviewMode = ({
     setIsShareDialogOpen(false);
   };
 
-  if (loading) {
-    return (
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2 no-print">
-          <Skeleton className="h-8 w-48" />
-          <div className="flex flex-wrap gap-2">
-            <Skeleton className="h-10 w-20" />
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-44" />
-          </div>
-        </div>
-        <div className="border rounded-lg shadow-sm bg-white p-6">
-          <Skeleton className="h-[842px] w-full" />
-        </div>
-      </div>
-    );
-  }
+  // Create a company object to pass to PrintableJobCardV2
+  const company = {
+    name: companyName,
+    logo_url: companyLogo,
+    address: "",
+    phone: "",
+    email: ""
+  };
 
   return (
     <div className="mb-6">
