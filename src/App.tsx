@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import CompanyProfile from "./pages/CompanyProfile";
 import JobCards from "./pages/JobCards";
 import CreateJobCard from "./pages/CreateJobCard";
+import EditJobCard from "./pages/EditJobCard";
 import JobDetail from "./pages/JobDetail";
 import CreateInvoice from "./pages/CreateInvoice";
 import InvoiceDetail from "./pages/InvoiceDetail";
@@ -64,7 +65,7 @@ const App = () => (
                   } />
                   <Route path="/job-cards/:id/edit" element={
                     <RequireAuth>
-                      <CreateJobCard />
+                      <EditJobCard />
                     </RequireAuth>
                   } />
                   <Route path="/job-cards/:id" element={
