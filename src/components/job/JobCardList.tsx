@@ -1,8 +1,9 @@
+
 import { Link } from "react-router-dom";
 import { Job } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { JobCardItem } from "./JobCardItem";
 
@@ -51,7 +52,8 @@ export const JobCardList = ({ jobs, loading, onPreview }: JobCardListProps) => {
           <JobCardItem job={job} onPreview={onPreview} />
           <div className="absolute top-2 right-2 z-10 flex gap-1">
             <Link to={`/job-cards/${job.id}/edit`}>
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" className="bg-white shadow-sm">
+                <Pencil className="h-4 w-4 mr-1" />
                 Edit
               </Button>
             </Link>

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useJobs } from "@/hooks/use-jobs";
 import { toast } from "sonner";
 import { JobStatus } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useCompanies } from "@/hooks/use-companies";
 
 const statusOptions: JobStatus[] = [
@@ -48,27 +48,38 @@ export default function JobCardEditForm() {
       setIsFetching(false);
       return;
     }
-    setIsFetching(true);
-    getJob(id).then(job => {
-      if (job) {
-        setForm({
-          customerName: job.customer.name,
-          customerPhone: job.customer.phone,
-          customerEmail: job.customer.email || "",
-          deviceName: job.device.name,
-          deviceModel: job.device.model,
-          deviceCondition: job.device.condition,
-          problem: job.details.problem,
-          handlingFees: job.details.handling_fees,
-          status: job.details.status,
-          companyId: job.company_id || "none",
-        });
-      } else {
-        toast.error("Job card not found.");
+    
+    const loadJobForEdit = async () => {
+      setIsFetching(true);
+      try {
+        const job = await getJob(id);
+        if (job) {
+          setForm({
+            customerName: job.customer.name,
+            customerPhone: job.customer.phone,
+            customerEmail: job.customer.email || "",
+            deviceName: job.device.name,
+            deviceModel: job.device.model,
+            deviceCondition: job.device.condition,
+            problem: job.details.problem,
+            handlingFees: job.details.handling_fees,
+            status: job.details.status,
+            companyId: job.company_id || "none",
+          });
+        } else {
+          toast.error("Job card not found.");
+          navigate("/job-cards");
+        }
+      } catch (error) {
+        console.error("Error loading job:", error);
+        toast.error("Failed to load job card.");
         navigate("/job-cards");
+      } finally {
+        setIsFetching(false);
       }
-      setIsFetching(false);
-    });
+    };
+
+    loadJobForEdit();
   }, [id, getJob, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -122,21 +133,22 @@ export default function JobCardEditForm() {
       if (isEdit && id) {
         const result = await updateJob(id, jobData);
         if (result) {
-          toast.success("Job card updated!");
-          navigate(`/job-cards/${id}`);
+          toast.success("Job card updated successfully!");
+          navigate("/job-cards");
         } else {
           toast.error("Failed to update job card");
         }
       } else {
         const result = await createJob(jobData);
         if (result) {
-          toast.success("Job card created!");
+          toast.success("Job card created successfully!");
           navigate("/job-cards");
         } else {
           toast.error("Failed to create job card");
         }
       }
     } catch (error) {
+      console.error("Error saving job card:", error);
       toast.error("Error saving job card");
     } finally {
       setIsSubmitting(false);
@@ -153,8 +165,15 @@ export default function JobCardEditForm() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Job Cards
+        </Button>
+        <h1 className="text-2xl font-bold">{isEdit ? "Edit Job Card" : "Create Job Card"}</h1>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        <h1 className="text-2xl font-bold mb-4">{isEdit ? "Edit Job Card" : "Create Job Card"}</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Customer Name *</Label>
@@ -163,6 +182,7 @@ export default function JobCardEditForm() {
               value={form.customerName}
               onChange={handleChange}
               required
+              placeholder="Enter customer name"
             />
           </div>
           <div>
@@ -172,6 +192,7 @@ export default function JobCardEditForm() {
               value={form.customerPhone}
               onChange={handleChange}
               required
+              placeholder="Enter phone number"
             />
           </div>
           <div className="md:col-span-2">
@@ -181,9 +202,11 @@ export default function JobCardEditForm() {
               value={form.customerEmail}
               onChange={handleChange}
               type="email"
+              placeholder="Enter email address (optional)"
             />
           </div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Device Name *</Label>
@@ -192,6 +215,7 @@ export default function JobCardEditForm() {
               value={form.deviceName}
               onChange={handleChange}
               required
+              placeholder="e.g., iPhone, Samsung Galaxy"
             />
           </div>
           <div>
@@ -201,6 +225,7 @@ export default function JobCardEditForm() {
               value={form.deviceModel}
               onChange={handleChange}
               required
+              placeholder="e.g., 14 Pro, S23 Ultra"
             />
           </div>
           <div className="md:col-span-2">
@@ -210,19 +235,23 @@ export default function JobCardEditForm() {
               value={form.deviceCondition}
               onChange={handleChange}
               required
+              placeholder="Describe the current condition"
             />
           </div>
         </div>
+
         <div>
-          <Label>Problem *</Label>
+          <Label>Problem Description *</Label>
           <Textarea
             name="problem"
             value={form.problem}
             onChange={handleChange}
             required
-            rows={3}
+            rows={4}
+            placeholder="Describe the issue or problem"
           />
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Status</Label>
@@ -248,6 +277,7 @@ export default function JobCardEditForm() {
               step="0.01"
               value={form.handlingFees}
               onChange={handleChange}
+              placeholder="0.00"
             />
           </div>
           <div className="md:col-span-2">
@@ -275,12 +305,20 @@ export default function JobCardEditForm() {
             </Select>
           </div>
         </div>
-        <div className="flex gap-2 justify-end">
+
+        <div className="flex gap-2 justify-end pt-6">
           <Button type="button" variant="outline" onClick={() => navigate("/job-cards")}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (isEdit ? "Updating..." : "Creating...") : isEdit ? "Update Job Card" : "Create Job Card"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isEdit ? "Updating..." : "Creating..."}
+              </>
+            ) : (
+              isEdit ? "Update Job Card" : "Create Job Card"
+            )}
           </Button>
         </div>
       </form>

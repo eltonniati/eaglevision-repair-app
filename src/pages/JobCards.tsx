@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,11 @@ const JobCards = () => {
   const location = useLocation();
   const statusLabel = location?.state?.status || null;
   const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
+
+  // Check if we're in edit mode or create mode
+  const isEditMode = window.location.pathname.includes('/edit');
+  const isCreateMode = window.location.pathname.includes('/new');
 
   // --- NEW: Compute filter based on status ---
   const statusFilter = useMemo(() => {
@@ -64,7 +70,9 @@ const JobCards = () => {
     jobsCount: jobs.length, 
     loading, 
     error,
-    isPreviewMode 
+    isPreviewMode,
+    isEditMode,
+    isCreateMode 
   });
 
   const getCompanyName = (companyId?: string) => {
@@ -163,11 +171,8 @@ const JobCards = () => {
     );
   }
 
-  // Add route-based rendering for "edit"
-  const { id } = useParams<{ id?: string }>();
-  const isEdit = window.location.pathname.match(/\/job-cards\/[^/]+\/edit$/);
-
-  if (isEdit && id) {
+  // Render the edit form if we're in edit or create mode
+  if (isEditMode || isCreateMode) {
     return <JobCardEditForm />;
   }
 
