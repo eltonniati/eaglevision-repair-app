@@ -114,6 +114,7 @@ const JobCards = () => {
       <JobCardsContent
         filteredJobs={filteredJobs}
         loading={loading}
+        companies={companies}
         getCompanyName={getCompanyName}
         getCompanyLogo={getCompanyLogo}
         onPreview={handlePreviewJob}
