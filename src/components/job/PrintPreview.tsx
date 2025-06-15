@@ -21,6 +21,7 @@ interface JobPreviewModeProps {
   handlingFees: number;
   companyName: string;
   onBack: () => void;
+  companyLogoUrl?: string;
 }
 
 export const JobPreviewMode = ({
@@ -35,13 +36,13 @@ export const JobPreviewMode = ({
   handlingFees,
   companyName,
   onBack,
+  companyLogoUrl,
 }: JobPreviewModeProps) => {
   const printRef = useRef<HTMLDivElement>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isMobile = useIsMobile();
 
-  // Print functionality - now generates cellphone-optimized PDF
   const onPrintButtonClick = async () => {
     console.log("Print button clicked - generating cellphone PDF for job:", job.job_card_number);
     setIsGeneratingPdf(true);
@@ -49,7 +50,6 @@ export const JobPreviewMode = ({
     setIsGeneratingPdf(false);
   };
 
-  // Share functionality: Generate & share PDF (on all devices)
   const handleShare = async () => {
     setIsGeneratingPdf(true);
     await shareJobCard(printRef, job.job_card_number || "", customerName);
@@ -57,7 +57,6 @@ export const JobPreviewMode = ({
     setIsShareDialogOpen(false);
   };
 
-  // Email handler
   const handleEmail = async () => {
     setIsGeneratingPdf(true);
     await emailJobCard(printRef, job.job_card_number || "", customerName, customerPhone);
@@ -65,7 +64,6 @@ export const JobPreviewMode = ({
     setIsShareDialogOpen(false);
   };
 
-  // PDF download handler
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
     await downloadJobCardPdf(printRef, job.job_card_number || "");
@@ -106,7 +104,6 @@ export const JobPreviewMode = ({
           </Button>
         </div>
       </div>
-      
       <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
         <div ref={printRef} className="print-area">
           <PrintableJobCard 
@@ -120,10 +117,10 @@ export const JobPreviewMode = ({
             problem={problem}
             handlingFees={handlingFees}
             companyName={companyName}
+            companyLogoUrl={companyLogoUrl}
           />
         </div>
       </div>
-
       <ShareDialog
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
