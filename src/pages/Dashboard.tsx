@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,7 +21,7 @@ import {
 
 export default function Dashboard() {
   const { session } = useAuth();
-  const { jobs, loading: jobsLoading, updateJob, fetchJobs } = useJobs();
+  const { jobs, loading: jobsLoading, updateJob, setJobs } = useJobs();
   const { company, loading: companyLoading } = useCompany();
   const { t, language, setLanguage } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
@@ -118,6 +119,7 @@ export default function Dashboard() {
       // Find the job to get its current data for the update 
       const jobToUpdate = jobs.find(j => j.id === jobId);
       if (!jobToUpdate) return;
+      
       // Only status is changing here (for dashboard quick action)
       const updates = {
         ...jobToUpdate,
@@ -126,11 +128,18 @@ export default function Dashboard() {
           status: originalStatus as import("@/lib/types").JobStatus,
         },
       };
+      
       // Push to Supabase!
-      await updateJob(jobId, updates);
-
-      // Optionally refetch jobs to update numbers right away (Supabase realtime should also keep sync)
-      fetchJobs && fetchJobs();
+      const updatedJob = await updateJob(jobId, updates);
+      
+      if (updatedJob && setJobs) {
+        // Immediately update the local jobs array
+        const updatedJobs = jobs.map(job => 
+          job.id === jobId ? updatedJob : job
+        );
+        setJobs(updatedJobs);
+        console.log("Job status updated successfully:", updatedJob);
+      }
     } catch (error) {
       console.error("Error updating job status:", error);
     }
