@@ -17,8 +17,15 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
   try {
     const element = printRef.current;
     
-    // Apply print-specific styles temporarily
-    const originalStyles = element.getAttribute('style');
+    // Store original styles
+    const originalStyles = {
+      width: element.style.width,
+      height: element.style.height,
+      padding: element.style.padding,
+      margin: element.style.margin
+    };
+
+    // Apply print-specific styles
     element.style.width = `${A4_WIDTH_PX}px`;
     element.style.height = 'auto';
     element.style.padding = '0';
@@ -37,11 +44,10 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     });
 
     // Restore original styles
-    if (originalStyles) {
-      element.setAttribute('style', originalStyles);
-    } else {
-      element.removeAttribute('style');
-    }
+    element.style.width = originalStyles.width;
+    element.style.height = originalStyles.height;
+    element.style.padding = originalStyles.padding;
+    element.style.margin = originalStyles.margin;
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -108,7 +114,8 @@ export const downloadInvoicePdf = async (
 
 export const shareInvoice = async (
   printRef: React.RefObject<HTMLDivElement>,
-  invoiceNumber: string = 'INV'
+  invoiceNumber: string = 'INV',
+  customerName: string = 'Customer'
 ) => {
   const pdf = await generateInvoicePdf(printRef);
   if (!pdf) return false;
@@ -118,6 +125,7 @@ export const shareInvoice = async (
       const blob = pdf.output('blob');
       await navigator.share({
         title: `Invoice ${invoiceNumber}`,
+        text: `Invoice for ${customerName}`,
         files: [new File([blob], `Invoice_${invoiceNumber}.pdf`, { type: 'application/pdf' })]
       });
       return true;
