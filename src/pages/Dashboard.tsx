@@ -123,7 +123,7 @@ export default function Dashboard() {
         ...jobToUpdate,
         details: {
           ...jobToUpdate.details,
-          status: originalStatus,
+          status: originalStatus as import("@/lib/types").JobStatus,
         },
       };
       // Push to Supabase!
@@ -166,12 +166,12 @@ export default function Dashboard() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>{t.selectLanguage}</DropdownMenuLabel>
+              <DropdownMenuLabel>{t.selectLanguage || "Select language"}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {languages.map((lang) => (
                 <DropdownMenuItem 
                   key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
+                  onClick={() => setLanguage(lang.code as any)}
                   className={language === lang.code ? "bg-gray-100" : ""}
                 >
                   {lang.flag} {lang.name}
@@ -313,7 +313,7 @@ export default function Dashboard() {
                                 </Badge>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent>
-                                <DropdownMenuLabel>{t.changeStatus}</DropdownMenuLabel>
+                                <DropdownMenuLabel>Change status</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => handleStatusChange(job.id, t.inProgress)}>
                                   {t.inProgress}
@@ -394,7 +394,7 @@ export default function Dashboard() {
                   </div>
                   {company.logo_url && (
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500">{t.companyLogo}</h3>
+                      <h3 className="text-sm font-medium text-gray-500">Logo</h3>
                       <img 
                         src={company.logo_url} 
                         alt="Company logo" 
