@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { Job, JobStatus } from "@/lib/types";
 import { useJobs } from "@/hooks/use-jobs";
 
 export function useJobEditor(job: Job | null) {
-  const { updateJob } = useJobs();
+  const { updateJob, setJob } = useJobs(); // Added setJob here
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editedProblem, setEditedProblem] = useState("");
@@ -65,12 +66,13 @@ export function useJobEditor(job: Job | null) {
     };
 
     try {
-      const success = await updateJob(job.id!, updatedJob);
+      const result = await updateJob(job.id!, updatedJob);
       
-      if (success) {
+      if (result) {
         toast.success("Job card updated successfully");
         setIsEditMode(false);
         setIsSaving(false);
+        setJob(result); // Update the local job state with the result from the database
         return true;
       } else {
         toast.error("Failed to update job card");
@@ -106,3 +108,4 @@ export function useJobEditor(job: Job | null) {
     handleSave
   };
 }
+
