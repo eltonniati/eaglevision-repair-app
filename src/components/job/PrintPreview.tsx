@@ -1,7 +1,6 @@
-
 import { useRef, useState } from "react";
 import { Job } from "@/lib/types";
-import { PrintableJobCard } from "./PrintableJobCard";
+import { PrintableJobCardV2 } from "./PrintableJobCardV2";
 import { Button } from "@/components/ui/button";
 import { Printer, Share, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -106,7 +105,7 @@ export const JobPreviewMode = ({
       </div>
       <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
         <div ref={printRef} className="print-area">
-          <PrintableJobCard 
+          <PrintableJobCardV2
             job={job}
             customerName={customerName}
             customerPhone={customerPhone}

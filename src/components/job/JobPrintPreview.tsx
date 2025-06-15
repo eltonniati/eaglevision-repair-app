@@ -1,9 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer, Share2 } from "lucide-react";
 import { Job } from "@/lib/types";
 import { downloadJobCardPdf } from "./utils/job-pdf-utils";
-import { PrintableJobCard } from "./PrintableJobCard";
+import { PrintableJobCardV2 } from "./PrintableJobCardV2";
 import { useRef } from "react";
 
 interface JobPrintPreviewProps {
@@ -66,7 +65,7 @@ export function JobPrintPreview({
       </div>
       <div className="print-content bg-white p-6 rounded-lg shadow-sm print:p-0 print:shadow-none">
         <div ref={printRef}>
-          <PrintableJobCard 
+          <PrintableJobCardV2 
             job={job}
             customerName={customerName}
             customerPhone={customerPhone}
