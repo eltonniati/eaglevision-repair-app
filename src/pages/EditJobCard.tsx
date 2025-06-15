@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
@@ -52,14 +51,16 @@ export default function EditJobCard() {
 
   // Load job data when component mounts
   useEffect(() => {
+    let isMounted = true;
+    
     const loadJob = async () => {
-      if (!id) return;
+      if (!id || !isMounted) return;
       
       try {
         setIsLoading(true);
         const job = await getJob(id);
         
-        if (job) {
+        if (job && isMounted) {
           setCustomerName(job.customer.name);
           setCustomerPhone(job.customer.phone);
           setCustomerEmail(job.customer.email || "");
@@ -73,15 +74,23 @@ export default function EditJobCard() {
           setJobCardNumber(job.job_card_number || "");
         }
       } catch (error) {
-        toast.error(t.error);
-        console.error("Error loading job:", error);
+        if (isMounted) {
+          toast.error(t.error);
+          console.error("Error loading job:", error);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadJob();
-  }, [id, getJob, t.error]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

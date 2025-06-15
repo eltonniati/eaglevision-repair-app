@@ -20,9 +20,9 @@ export function useJobDetails() {
     }
     
     // Prevent duplicate fetches for the same job
-    if (fetchingRef.current === id && loading) {
+    if (fetchingRef.current === id) {
       console.log("Already fetching job:", id);
-      return job;
+      return null;
     }
 
     // Cancel any ongoing requests
@@ -44,7 +44,8 @@ export function useJobDetails() {
         .from("jobs")
         .select("*, companies(*)")
         .eq("id", id)
-        .maybeSingle();
+        .maybeSingle()
+        .abortSignal(abortControllerRef.current.signal);
 
       if (error) {
         console.error("Job fetch error:", error);
@@ -84,7 +85,7 @@ export function useJobDetails() {
       fetchingRef.current = null;
       abortControllerRef.current = null;
     }
-  }, []); // Removed job and loading from dependencies to prevent infinite loop
+  }, []);
 
   const clearJobError = useCallback(() => {
     setError(null);
