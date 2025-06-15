@@ -1,22 +1,16 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useJobs } from "@/hooks/use-jobs";
 import { toast } from "sonner";
 import { JobStatus } from "@/lib/types";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useCompanies } from "@/hooks/use-companies";
-
-const statusOptions: JobStatus[] = [
-  "In Progress",
-  "Finished",
-  "Waiting for Parts",
-];
+import { JobFormHeader } from "./form/JobFormHeader";
+import { CustomerDeviceFields } from "./form/CustomerDeviceFields";
+import { ProblemDescriptionField } from "./form/ProblemDescriptionField";
+import { StatusAndFeesFields } from "./form/StatusAndFeesFields";
+import { FormActions } from "./form/FormActions";
 
 export default function JobCardEditForm() {
   const { id } = useParams();
@@ -155,6 +149,8 @@ export default function JobCardEditForm() {
     }
   };
 
+  const handleBack = () => navigate("/job-cards");
+
   if (isFetching || loading) {
     return (
       <div className="flex items-center justify-center h-48">
@@ -165,162 +161,32 @@ export default function JobCardEditForm() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Button variant="ghost" onClick={() => navigate("/job-cards")} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Job Cards
-        </Button>
-        <h1 className="text-2xl font-bold">{isEdit ? "Edit Job Card" : "Create Job Card"}</h1>
-      </div>
+      <JobFormHeader isEdit={isEdit} onBack={handleBack} />
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>Customer Name *</Label>
-            <Input
-              name="customerName"
-              value={form.customerName}
-              onChange={handleChange}
-              required
-              placeholder="Enter customer name"
-            />
-          </div>
-          <div>
-            <Label>Customer Phone *</Label>
-            <Input
-              name="customerPhone"
-              value={form.customerPhone}
-              onChange={handleChange}
-              required
-              placeholder="Enter phone number"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <Label>Customer Email</Label>
-            <Input
-              name="customerEmail"
-              value={form.customerEmail}
-              onChange={handleChange}
-              type="email"
-              placeholder="Enter email address (optional)"
-            />
-          </div>
-        </div>
+        <CustomerDeviceFields form={form} handleChange={handleChange} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>Device Name *</Label>
-            <Input
-              name="deviceName"
-              value={form.deviceName}
-              onChange={handleChange}
-              required
-              placeholder="e.g., iPhone, Samsung Galaxy"
-            />
-          </div>
-          <div>
-            <Label>Device Model *</Label>
-            <Input
-              name="deviceModel"
-              value={form.deviceModel}
-              onChange={handleChange}
-              required
-              placeholder="e.g., 14 Pro, S23 Ultra"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <Label>Device Condition *</Label>
-            <Input
-              name="deviceCondition"
-              value={form.deviceCondition}
-              onChange={handleChange}
-              required
-              placeholder="Describe the current condition"
-            />
-          </div>
-        </div>
+        <ProblemDescriptionField
+          value={form.problem}
+          onChange={handleChange}
+        />
 
-        <div>
-          <Label>Problem Description *</Label>
-          <Textarea
-            name="problem"
-            value={form.problem}
-            onChange={handleChange}
-            required
-            rows={4}
-            placeholder="Describe the issue or problem"
-          />
-        </div>
+        <StatusAndFeesFields
+          status={form.status}
+          handlingFees={form.handlingFees}
+          companyId={form.companyId}
+          companies={companies}
+          companiesLoading={companiesLoading}
+          onStatusChange={handleStatusChange}
+          onFeesChange={handleChange}
+          onCompanyChange={handleCompanyChange}
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>Status</Label>
-            <Select value={form.status} onValueChange={handleStatusChange}>
-              <SelectTrigger>
-                <SelectValue>{form.status}</SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {statusOptions.map(status => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Handling Fees</Label>
-            <Input
-              name="handlingFees"
-              type="number"
-              min="0"
-              step="0.01"
-              value={form.handlingFees}
-              onChange={handleChange}
-              placeholder="0.00"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <Label>Company</Label>
-            <Select
-              value={form.companyId}
-              onValueChange={handleCompanyChange}
-              disabled={companiesLoading}
-            >
-              <SelectTrigger>
-                <SelectValue>
-                  {form.companyId === "none"
-                    ? "No company"
-                    : companies.find(c => c.id === form.companyId)?.name || "Select a company"}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No company</SelectItem>
-                {companies.map(company => (
-                  <SelectItem key={company.id} value={company.id || ""}>
-                    {company.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex gap-2 justify-end pt-6">
-          <Button type="button" variant="outline" onClick={() => navigate("/job-cards")}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {isEdit ? "Updating..." : "Creating..."}
-              </>
-            ) : (
-              isEdit ? "Update Job Card" : "Create Job Card"
-            )}
-          </Button>
-        </div>
+        <FormActions
+          isEdit={isEdit}
+          isSubmitting={isSubmitting}
+          onCancel={handleBack}
+        />
       </form>
     </div>
   );
