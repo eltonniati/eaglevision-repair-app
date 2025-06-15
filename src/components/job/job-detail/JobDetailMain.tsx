@@ -53,6 +53,12 @@ export default function JobDetailMain({ job, companies }: any) {
   };
   const handlePreview = () => setIsPreviewMode(true);
 
+  // Helper function to get company logo
+  const getCompanyLogo = (companyId?: string) => {
+    if (!companyId || !companies.length) return "";
+    return companies.find((c: any) => c.id === companyId)?.logo_url || "";
+  };
+
   // Share/email shortcuts using current form state
   const handleShare = async () => {
     if (!job) return;
@@ -103,6 +109,7 @@ export default function JobDetailMain({ job, companies }: any) {
           problem={editedProblem}
           handlingFees={editedHandlingFees}
           companyName={editedCompanyName}
+          companyLogo={getCompanyLogo(job.company_id)}
           onBack={() => setIsPreviewMode(false)}
         />
       ) : (
