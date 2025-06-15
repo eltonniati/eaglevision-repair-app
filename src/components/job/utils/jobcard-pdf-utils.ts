@@ -30,7 +30,7 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
 
     // Generate canvas with high quality settings
     const canvas = await html2canvas(originalElement, {
-      scale: 3,
+      scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
@@ -50,15 +50,27 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
 
     const imgData = canvas.toDataURL('image/png', 1.0);
     
-    // Calculate dimensions to fit A4
+    // Calculate dimensions to fit A4 with proper margins
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = pdfWidth - 20; // 10mm margin on each side
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const margin = 15; // 15mm margin on all sides
+    const availableWidth = pdfWidth - (margin * 2);
+    const availableHeight = pdfHeight - (margin * 2);
+    
+    // Calculate image dimensions maintaining aspect ratio
+    const imgAspectRatio = canvas.width / canvas.height;
+    let imgWidth = availableWidth;
+    let imgHeight = imgWidth / imgAspectRatio;
+    
+    // If height exceeds available space, scale down
+    if (imgHeight > availableHeight) {
+      imgHeight = availableHeight;
+      imgWidth = imgHeight * imgAspectRatio;
+    }
     
     // Center the image on the page
-    const x = 10; // 10mm left margin
-    const y = Math.max(10, (pdfHeight - imgHeight) / 2); // Center vertically or 10mm from top
+    const x = (pdfWidth - imgWidth) / 2;
+    const y = (pdfHeight - imgHeight) / 2;
     
     pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight, '', 'FAST');
 
