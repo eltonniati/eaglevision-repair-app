@@ -1,5 +1,3 @@
-
-import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 import { Invoice, InvoiceLineItem, InvoiceTax } from "@/lib/types";
@@ -225,6 +223,51 @@ export const downloadInvoicePdf = async (
   }
 };
 
+// Share invoice via native share API or fallback
+export const shareInvoice = async (
+  invoice: Invoice,
+  customerName: string,
+  company?: { name?: string; address?: string; phone?: string; email?: string },
+  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
+) => {
+  try {
+    const text = `Invoice #${invoice.invoice_number} for ${customerName}\nAmount: ${invoice.total}\nDue: ${invoice.due_date}`;
+    
+    if (navigator.share) {
+      const { blob } = await getInvoicePdfAsBlob(invoice, company, job);
+      await navigator.share({
+        title: `Invoice #${invoice.invoice_number}`,
+        text: text,
+        files: [new File([blob], `Invoice_${invoice.invoice_number}.pdf`, { type: 'application/pdf' })]
+      });
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    }
+  } catch (err) {
+    console.error('Error sharing:', err);
+    throw err;
+  }
+};
+
+// Email invoice
+export const emailInvoice = async (
+  invoice: Invoice,
+  customerName: string,
+  customerEmail?: string,
+  company?: { name?: string; address?: string; phone?: string; email?: string },
+  job?: { customer?: { name?: string; phone?: string; email?: string }, job_card_number?: string, device?: { name?: string, model?: string } }
+) => {
+  try {
+    const subject = `Invoice #${invoice.invoice_number} for ${customerName}`;
+    const body = `Invoice #${invoice.invoice_number}\n\nCustomer: ${customerName}\nAmount: ${invoice.total}\nDue Date: ${invoice.due_date}\n\nPlease find attached your invoice.`;
+    
+    window.location.href = `mailto:${customerEmail || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  } catch (error) {
+    console.error("Email error:", error);
+    throw error;
+  }
+};
+
 // Get invoice PDF as blob for sharing/email
 export const getInvoicePdfAsBlob = async (
   invoice: Invoice,
@@ -237,4 +280,3 @@ export const getInvoicePdfAsBlob = async (
     pdf
   };
 };
-
