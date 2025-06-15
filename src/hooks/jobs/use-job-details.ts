@@ -43,8 +43,7 @@ export function useJobDetails() {
         .from("jobs")
         .select("*, companies(*)")
         .eq("id", id)
-        // Correct way to provide fetchOptions including abort signal:
-        .maybeSingle(undefined, { fetchOptions: { signal: abortControllerRef.current.signal } });
+        .maybeSingle();
 
       if (error) {
         console.error("Job fetch error:", error);
