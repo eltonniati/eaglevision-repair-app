@@ -9,6 +9,8 @@ interface JobCardsContentProps {
   filteredJobs: Job[];
   loading: boolean;
   companies: Company[];
+  getCompanyName: (companyId?: string) => string;
+  getCompanyLogo: (companyId?: string) => string;
   onPreview: (job: Job) => void;
   t: any;
 }
@@ -17,6 +19,8 @@ export const JobCardsContent = ({
   filteredJobs, 
   loading, 
   companies,
+  getCompanyName,
+  getCompanyLogo,
   onPreview,
   t 
 }: JobCardsContentProps) => {
