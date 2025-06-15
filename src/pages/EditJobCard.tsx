@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useJobs } from "@/hooks/use-jobs";
 import { useCompanies } from "@/hooks/use-companies";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,7 @@ export default function EditJobCard() {
   const { id } = useParams();
   const { getJob, updateJob } = useJobs();
   const { companies, loading: loadingCompanies } = useCompanies();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,7 +73,7 @@ export default function EditJobCard() {
           setJobCardNumber(job.job_card_number || "");
         }
       } catch (error) {
-        toast.error("Failed to load job data");
+        toast.error(t.error);
         console.error("Error loading job:", error);
       } finally {
         setIsLoading(false);
@@ -79,7 +81,7 @@ export default function EditJobCard() {
     };
 
     loadJob();
-  }, [id, getJob]);
+  }, [id, getJob, t.error]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -119,7 +121,7 @@ export default function EditJobCard() {
       const result = await updateJob(id, updatedJobData);
       
       if (result) {
-        toast.success(`Job card updated successfully: ${jobCardNumber}`);
+        toast.success(`${t.jobCardUpdated}: ${jobCardNumber}`);
         navigate("/job-cards");
       } else {
         toast.error("Failed to update job card");
@@ -141,7 +143,7 @@ export default function EditJobCard() {
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading job data...</p>
+          <p className="text-muted-foreground">{t.loading}</p>
         </div>
       </div>
     );
@@ -156,19 +158,19 @@ export default function EditJobCard() {
         type="button"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Job Cards
+        {t.back} {t.jobCards}
       </Button>
 
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Edit Job Card #{jobCardNumber}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t.edit} {t.jobCards} #{jobCardNumber}</h1>
         <p className="text-gray-500">Update details for this repair job</p>
       </div>
 
       {/* Job Card Actions */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Job Card Actions</CardTitle>
-          <CardDescription>Manage this job card</CardDescription>
+          <CardTitle>{t.jobCardActions}</CardTitle>
+          <CardDescription>{t.manageJobCard}</CardDescription>
         </CardHeader>
         <CardContent>
           <JobCardActions 
@@ -182,40 +184,40 @@ export default function EditJobCard() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Customer Information</CardTitle>
+              <CardTitle>{t.customer} Information</CardTitle>
               <CardDescription>Update the customer's contact details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="customerName">Name *</Label>
+                  <Label htmlFor="customerName">{t.customerName} *</Label>
                   <Input
                     id="customerName"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Customer name"
+                    placeholder={t.customerName}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="customerPhone">Phone *</Label>
+                  <Label htmlFor="customerPhone">{t.customerPhone} *</Label>
                   <Input
                     id="customerPhone"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="Phone number"
+                    placeholder={t.customerPhone}
                     required
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customerEmail">Email (optional)</Label>
+                <Label htmlFor="customerEmail">{t.customerEmail} (optional)</Label>
                 <Input
                   id="customerEmail"
                   type="email"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
-                  placeholder="Email address"
+                  placeholder={t.customerEmail}
                 />
               </div>
             </CardContent>
@@ -223,13 +225,13 @@ export default function EditJobCard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Device Information</CardTitle>
+              <CardTitle>{t.device} Information</CardTitle>
               <CardDescription>Update details about the device being repaired</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="deviceName">Device Name *</Label>
+                  <Label htmlFor="deviceName">{t.deviceName} *</Label>
                   <Input
                     id="deviceName"
                     value={deviceName}
@@ -239,7 +241,7 @@ export default function EditJobCard() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="deviceModel">Model *</Label>
+                  <Label htmlFor="deviceModel">{t.deviceModel} *</Label>
                   <Input
                     id="deviceModel"
                     value={deviceModel}
@@ -250,7 +252,7 @@ export default function EditJobCard() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="deviceCondition">Condition *</Label>
+                <Label htmlFor="deviceCondition">{t.deviceCondition} *</Label>
                 <Input
                   id="deviceCondition"
                   value={deviceCondition}
@@ -264,12 +266,12 @@ export default function EditJobCard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Problem Details</CardTitle>
+              <CardTitle>{t.problem} Details</CardTitle>
               <CardDescription>Update the issue with the device</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="problem">Description of Problem *</Label>
+                <Label htmlFor="problem">{t.description} of {t.problem} *</Label>
                 <Textarea
                   id="problem"
                   value={problem}
@@ -280,7 +282,7 @@ export default function EditJobCard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="handlingFees">Handling Fees (R)</Label>
+                <Label htmlFor="handlingFees">{t.handlingFees} (R)</Label>
                 <Input
                   id="handlingFees"
                   type="number"
@@ -308,15 +310,15 @@ export default function EditJobCard() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status">{t.status}</Label>
                 <Select value={status} onValueChange={(value) => setStatus(value as JobStatus)}>
                   <SelectTrigger id="status">
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder={t.selectStatus} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Finished">Finished</SelectItem>
-                    <SelectItem value="Waiting for Parts">Waiting for Parts</SelectItem>
+                    <SelectItem value="In Progress">{t.inProgress}</SelectItem>
+                    <SelectItem value="Finished">{t.finished}</SelectItem>
+                    <SelectItem value="Waiting for Parts">{t.waitingForParts}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -328,11 +330,11 @@ export default function EditJobCard() {
                 className="w-full sm:w-auto"
               >
                 {isSubmitting ? (
-                  "Saving..."
+                  `${t.save}...`
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Save Changes
+                    {t.save} Changes
                   </>
                 )}
               </Button>
