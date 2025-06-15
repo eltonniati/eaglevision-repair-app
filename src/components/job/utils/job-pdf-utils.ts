@@ -1,49 +1,45 @@
+
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 
-// Utility to wait for all images (especially the logo) to load in an element before rendering
+// Utility to wait for all images to load
 const waitForImagesToLoad = async (element: HTMLElement) => {
   const images = Array.from(element.querySelectorAll("img"));
   await Promise.all(images.map((img) => {
     if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
     return new Promise<void>((resolve) => {
       img.onload = () => resolve();
-      img.onerror = () => resolve(); // Resolve even on error so it doesn't hang
+      img.onerror = () => resolve();
     });
   }));
 };
 
-// PDF generation utility for job cards - optimized for mobile/cellphone format
+// Universal PDF generation that works consistently across all devices
 export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElement>) => {
   if (!printRef.current) return null;
   
   try {
-    // Create a clone of the element to avoid modifying the original
     const originalElement = printRef.current;
     const clonedElement = originalElement.cloneNode(true) as HTMLDivElement;
     
-    // Detect if we're on mobile
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Apply cellphone-optimized styling for PDF generation
+    // Apply consistent mobile-first styling for PDF generation
     clonedElement.style.cssText = `
       width: 375px !important;
-      height: 667px !important;
+      height: auto !important;
       min-height: 667px !important;
       max-width: 375px !important;
-      max-height: 667px !important;
-      padding: 0 !important;
+      padding: 15px !important;
       margin: 0 !important;
       transform: scale(1) !important;
       position: fixed !important;
       top: 0 !important;
-      left: 0 !important;
+      left: -9999px !important;
       background: white !important;
       font-size: 10px !important;
       line-height: 1.3 !important;
       box-sizing: border-box !important;
-      overflow: hidden !important;
+      overflow: visible !important;
       font-family: Arial, sans-serif !important;
       color: black !important;
       z-index: 9999 !important;
@@ -53,7 +49,7 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
       visibility: visible !important;
     `;
 
-    // Apply styles to all child elements - cellphone optimized
+    // Apply consistent styles to all child elements
     const allElements = clonedElement.querySelectorAll('*');
     allElements.forEach((element) => {
       const el = element as HTMLElement;
@@ -62,18 +58,51 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
       el.style.visibility = 'visible';
       el.style.display = el.style.display === 'none' ? 'block' : el.style.display;
       
-      // Optimize for cellphone viewing
+      // Consistent font sizing
       if (el.tagName === 'H1') {
         el.style.fontSize = '16px';
         el.style.fontWeight = 'bold';
+        el.style.textAlign = 'center';
+        el.style.marginBottom = '8px';
       } else if (el.tagName === 'H2') {
-        el.style.fontSize = '14px';
-        el.style.fontWeight = 'bold';
-      } else if (el.tagName === 'H3') {
         el.style.fontSize = '12px';
         el.style.fontWeight = 'bold';
+        el.style.borderBottom = '1px solid #ccc';
+        el.style.paddingBottom = '4px';
+        el.style.marginBottom = '8px';
+      } else if (el.tagName === 'H3') {
+        el.style.fontSize = '11px';
+        el.style.fontWeight = 'bold';
+        el.style.marginBottom = '6px';
       } else if (el.tagName === 'P' || el.tagName === 'SPAN') {
-        el.style.fontSize = '10px';
+        el.style.fontSize = '9px';
+        el.style.marginBottom = '4px';
+      }
+      
+      // Image sizing
+      if (el.tagName === 'IMG') {
+        el.style.maxWidth = '30px';
+        el.style.maxHeight = '30px';
+        el.style.objectFit = 'contain';
+      }
+      
+      // Grid layouts
+      if (el.classList.contains('grid')) {
+        el.style.display = 'grid';
+        el.style.gap = '12px';
+        el.style.marginBottom = '12px';
+      }
+      
+      if (el.classList.contains('grid-cols-2')) {
+        el.style.gridTemplateColumns = '1fr 1fr';
+      }
+      
+      // Card styling
+      if (el.style.backgroundColor === 'rgb(248, 249, 250)' || el.classList.contains('card')) {
+        el.style.backgroundColor = '#f8f9fa';
+        el.style.border = '1px solid #e9ecef';
+        el.style.borderRadius = '4px';
+        el.style.padding = '8px';
       }
       
       // Remove margins that might cause offset
@@ -82,30 +111,25 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
       }
     });
 
-    // Append to body temporarily
+    // Append to body temporarily (positioned off-screen)
     document.body.appendChild(clonedElement);
 
-    // Wait for all images inside clonedElement to load before rendering
+    // Wait for images to load
     await waitForImagesToLoad(clonedElement);
+    await new Promise(resolve => setTimeout(resolve, 200));
 
-    // Wait a little for fonts/styles, if needed
-    await new Promise(resolve => setTimeout(resolve, 150));
-
-    // Generate canvas with cellphone dimensions
-    const canvasWidth = 375;
-    const canvasHeight = 667;
-    
+    // Generate canvas with consistent dimensions
     const canvas = await html2canvas(clonedElement, {
-      scale: 4, // High scale for better quality on mobile
+      scale: 3, // High scale for quality
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
       allowTaint: false,
       foreignObjectRendering: false,
-      width: canvasWidth,
-      height: canvasHeight,
-      windowWidth: canvasWidth,
-      windowHeight: canvasHeight,
+      width: 375,
+      height: Math.max(667, clonedElement.scrollHeight),
+      windowWidth: 375,
+      windowHeight: Math.max(667, clonedElement.scrollHeight),
       x: 0,
       y: 0,
       scrollX: 0,
@@ -115,18 +139,21 @@ export const generateJobCardPdf = async (printRef: React.RefObject<HTMLDivElemen
     // Remove the cloned element
     document.body.removeChild(clonedElement);
 
-    // Create PDF with cellphone format (mobile-friendly dimensions)
+    // Create PDF with consistent mobile format
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: [100, 177], // Cellphone format dimensions
+      format: [100, 177], // Mobile format
       compress: true
     });
 
     const imgData = canvas.toDataURL('image/png', 1.0);
     
-    // Add image to fill the cellphone page dimensions
-    pdf.addImage(imgData, 'PNG', 0, 0, 100, 177, '', 'FAST');
+    // Calculate proper dimensions to fit content
+    const imgWidth = 100;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, '', 'FAST');
 
     return pdf;
   } catch (error) {
@@ -142,7 +169,7 @@ export const downloadJobCardPdf = async (
 ) => {
   const pdf = await generateJobCardPdf(printRef);
   if (pdf) {
-    pdf.save(`JobCard_${jobCardNumber}_Mobile.pdf`);
+    pdf.save(`JobCard_${jobCardNumber}.pdf`);
     toast.success("Job Card PDF downloaded successfully");
     return true;
   }

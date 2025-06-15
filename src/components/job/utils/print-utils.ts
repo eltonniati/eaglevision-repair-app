@@ -1,3 +1,8 @@
+
+import { downloadJobCardPdf } from "./job-pdf-utils";
+import { toast } from "sonner";
+import { isMobileDevice } from "./device-utils";
+
 export const handleJobCardPrint = (content: string, jobNumber?: string) => {
   try {
     const printWindow = window.open('', '_blank');
@@ -27,52 +32,58 @@ export const handleJobCardPrint = (content: string, jobNumber?: string) => {
               line-height: 1.4;
               color: #000;
               background: #fff;
-              font-size: 14px;
+              font-size: 12px;
+              width: 100%;
+              height: 100%;
             }
             
             .print-container {
-              max-width: 210mm;
+              width: 100%;
+              max-width: 375px;
               margin: 0 auto;
-              padding: 15mm;
+              padding: 15px;
               background: white;
-              min-height: 297mm;
+              min-height: 100vh;
+              font-size: 10px;
+              line-height: 1.3;
             }
             
             h1, h2, h3 {
               color: #000 !important;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
             }
             
             h1 {
-              font-size: 24px;
+              font-size: 16px;
               font-weight: bold;
               text-align: center;
               margin-bottom: 5px;
             }
             
             h2 {
-              font-size: 18px;
+              font-size: 12px;
               font-weight: bold;
-              border-bottom: 2px solid #ccc;
-              padding-bottom: 5px;
-              margin-bottom: 15px;
+              border-bottom: 1px solid #ccc;
+              padding-bottom: 4px;
+              margin-bottom: 8px;
             }
             
             h3 {
-              font-size: 16px;
+              font-size: 11px;
               font-weight: bold;
-              margin-bottom: 10px;
+              margin-bottom: 6px;
             }
             
             p {
-              margin-bottom: 8px;
+              margin-bottom: 4px;
               color: #000;
+              font-size: 9px;
             }
             
             .grid {
               display: grid;
-              gap: 20px;
-              margin-bottom: 20px;
+              gap: 12px;
+              margin-bottom: 12px;
             }
             
             .grid-cols-2 {
@@ -81,15 +92,15 @@ export const handleJobCardPrint = (content: string, jobNumber?: string) => {
             
             .card {
               border: 1px solid #ddd;
-              padding: 15px;
-              border-radius: 5px;
-              background: #fff;
+              padding: 8px;
+              border-radius: 4px;
+              background: #f8f9fa;
             }
             
             .card h3 {
               border-bottom: 1px solid #eee;
-              padding-bottom: 8px;
-              margin-bottom: 12px;
+              padding-bottom: 4px;
+              margin-bottom: 6px;
             }
             
             .font-medium {
@@ -101,11 +112,11 @@ export const handleJobCardPrint = (content: string, jobNumber?: string) => {
             }
             
             .mb-8 {
-              margin-bottom: 32px;
+              margin-bottom: 16px;
             }
             
             .mb-4 {
-              margin-bottom: 16px;
+              margin-bottom: 8px;
             }
             
             .whitespace-pre-line {
@@ -114,11 +125,11 @@ export const handleJobCardPrint = (content: string, jobNumber?: string) => {
             
             .border-t {
               border-top: 1px solid #ccc;
-              padding-top: 15px;
+              padding-top: 8px;
             }
             
             .text-sm {
-              font-size: 12px;
+              font-size: 8px;
             }
             
             .text-gray-500 {
@@ -129,17 +140,25 @@ export const handleJobCardPrint = (content: string, jobNumber?: string) => {
               display: none;
             }
             
+            img {
+              max-width: 30px;
+              max-height: 30px;
+              object-fit: contain;
+            }
+            
             @media print {
               body {
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
+                font-size: 10px;
               }
               
               .print-container {
                 margin: 0;
-                padding: 0;
+                padding: 8px;
                 max-width: none;
                 min-height: auto;
+                width: 100%;
               }
               
               .no-print {
@@ -151,6 +170,29 @@ export const handleJobCardPrint = (content: string, jobNumber?: string) => {
               }
               
               page-break-inside: avoid;
+            }
+            
+            @media screen and (max-width: 480px) {
+              .print-container {
+                padding: 10px;
+                font-size: 9px;
+              }
+              
+              h1 {
+                font-size: 14px;
+              }
+              
+              h2 {
+                font-size: 11px;
+              }
+              
+              h3 {
+                font-size: 10px;
+              }
+              
+              p {
+                font-size: 8px;
+              }
             }
           </style>
         </head>
@@ -213,59 +255,62 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
             
             body {
               font-family: 'Arial', sans-serif;
-              line-height: 1.5;
+              line-height: 1.4;
               color: #000;
               background: #fff;
-              font-size: 14px;
+              font-size: 12px;
             }
             
             .print-container {
-              max-width: 210mm;
+              width: 100%;
+              max-width: 375px;
               margin: 0 auto;
-              padding: 15mm;
+              padding: 15px;
               background: white;
-              min-height: 297mm;
+              min-height: 100vh;
             }
             
             h1, h2, h3 {
               color: #000 !important;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
             }
             
             h1 {
-              font-size: 28px;
+              font-size: 18px;
               font-weight: bold;
               margin-bottom: 5px;
             }
             
             h2 {
-              font-size: 18px;
+              font-size: 14px;
               font-weight: bold;
               border-bottom: 1px solid #ccc;
-              padding-bottom: 5px;
-              margin-bottom: 15px;
+              padding-bottom: 4px;
+              margin-bottom: 8px;
             }
             
             h3 {
-              font-size: 16px;
+              font-size: 12px;
               font-weight: bold;
-              margin-bottom: 10px;
+              margin-bottom: 6px;
             }
             
             p {
-              margin-bottom: 8px;
+              margin-bottom: 4px;
               color: #000;
+              font-size: 10px;
             }
             
             table {
               width: 100%;
               border-collapse: collapse;
-              margin: 15px 0;
+              margin: 8px 0;
+              font-size: 9px;
             }
             
             th, td {
               border: 1px solid #ddd;
-              padding: 10px;
+              padding: 4px;
               text-align: left;
               color: #000;
             }
@@ -273,6 +318,7 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
             th {
               background-color: #f5f5f5;
               font-weight: bold;
+              font-size: 8px;
             }
             
             .text-center {
@@ -285,8 +331,8 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
             
             .grid {
               display: grid;
-              gap: 20px;
-              margin-bottom: 20px;
+              gap: 12px;
+              margin-bottom: 12px;
             }
             
             .grid-cols-2 {
@@ -299,26 +345,26 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
             
             .border-b {
               border-bottom: 1px solid #ccc;
-              padding-bottom: 8px;
-              margin-bottom: 12px;
+              padding-bottom: 4px;
+              margin-bottom: 6px;
             }
             
             .border-t {
               border-top: 1px solid #ccc;
-              padding-top: 15px;
+              padding-top: 8px;
             }
             
             .border-t-2 {
               border-top: 2px solid #000;
-              padding-top: 10px;
+              padding-top: 6px;
             }
             
             .text-sm {
-              font-size: 12px;
+              font-size: 8px;
             }
             
             .text-lg {
-              font-size: 18px;
+              font-size: 12px;
             }
             
             .font-bold {
@@ -346,40 +392,40 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
             }
             
             .gap-4 {
-              gap: 16px;
+              gap: 8px;
             }
             
             .mb-8 {
-              margin-bottom: 32px;
-            }
-            
-            .mb-4 {
               margin-bottom: 16px;
             }
             
-            .mb-2 {
+            .mb-4 {
               margin-bottom: 8px;
             }
             
+            .mb-2 {
+              margin-bottom: 4px;
+            }
+            
             .mt-1 {
-              margin-top: 4px;
+              margin-top: 2px;
             }
             
             .mt-8 {
-              margin-top: 32px;
+              margin-top: 16px;
             }
             
             .pt-4 {
-              padding-top: 16px;
+              padding-top: 8px;
             }
             
             .py-2 {
-              padding-top: 8px;
-              padding-bottom: 8px;
+              padding-top: 4px;
+              padding-bottom: 4px;
             }
             
             .w-64 {
-              width: 256px;
+              width: 128px;
             }
             
             .object-contain {
@@ -387,11 +433,11 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
             }
             
             .h-16 {
-              height: 64px;
+              height: 32px;
             }
             
             .w-16 {
-              width: 64px;
+              width: 32px;
             }
             
             .whitespace-pre-line {
@@ -406,13 +452,15 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
               body {
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
+                font-size: 10px;
               }
               
               .print-container {
                 margin: 0;
-                padding: 0;
+                padding: 8px;
                 max-width: none;
                 min-height: auto;
+                width: 100%;
               }
               
               .no-print {
@@ -460,11 +508,7 @@ export const handleInvoicePrint = (content: string, invoiceNumber?: string) => {
   }
 };
 
-import { downloadPdf } from "./pdf-utils";
-import { toast } from "sonner";
-import { isMobileDevice } from "./device-utils";
-
-// Export handlePrint as an alias for handleJobCardPrint for backward compatibility
+// Universal print handler that works consistently across all devices
 export const handlePrint = async (
   printRef: React.RefObject<HTMLDivElement>,
   jobNumber?: string
@@ -473,16 +517,7 @@ export const handlePrint = async (
     throw new Error('Print reference is not available');
   }
 
-  // If on mobile, generate/download PDF instead of direct print
-  if (isMobileDevice()) {
-    await downloadPdf(printRef, jobNumber || "JobCard");
-    toast.info(
-      "For the best results on mobile, use the PDF viewer's print/share button after download."
-    );
-    return;
-  }
-
-  // Legacy desktop print flow
-  const content = printRef.current.innerHTML;
-  return handleJobCardPrint(content, jobNumber);
+  // Always use PDF generation for consistent results
+  await downloadJobCardPdf(printRef, jobNumber || "JobCard");
+  toast.success("PDF generated for printing - use your PDF viewer's print option for best results");
 };
