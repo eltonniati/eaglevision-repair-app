@@ -10,7 +10,6 @@ export function useJobDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fetchingRef = useRef<string | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   const getJob = useCallback(async (id: string) => {
     if (!id) {
@@ -25,18 +24,10 @@ export function useJobDetails() {
       return null;
     }
 
-    // Cancel any ongoing requests
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
     try {
       setLoading(true);
       setError(null);
       fetchingRef.current = id;
-
-      // Create new abort controller for this request
-      abortControllerRef.current = new AbortController();
 
       console.log("Fetching job with ID:", id);
 
@@ -44,8 +35,7 @@ export function useJobDetails() {
         .from("jobs")
         .select("*, companies(*)")
         .eq("id", id)
-        .maybeSingle()
-        .abortSignal(abortControllerRef.current.signal);
+        .maybeSingle();
 
       if (error) {
         console.error("Job fetch error:", error);
@@ -68,12 +58,6 @@ export function useJobDetails() {
       setJob(jobData);
       return jobData;
     } catch (err: any) {
-      // Don't show errors for aborted requests
-      if (err.name === 'AbortError') {
-        console.log("Job fetch aborted");
-        return null;
-      }
-      
       console.error("Get Job Error:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to load job";
       setError(errorMessage);
@@ -83,7 +67,6 @@ export function useJobDetails() {
     } finally {
       setLoading(false);
       fetchingRef.current = null;
-      abortControllerRef.current = null;
     }
   }, []);
 
@@ -92,10 +75,6 @@ export function useJobDetails() {
   }, []);
 
   const clearJob = useCallback(() => {
-    // Cancel any ongoing requests
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
     setJob(null);
     setError(null);
     setLoading(false);
