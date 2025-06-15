@@ -161,6 +161,28 @@ export interface AppTranslations {
   statusUpdatedSuccessfully: string;
   statusUpdateFailed: string;
   refreshJobs: string;
+
+  // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+  failedToLoad: string;
+  fillAllFields: string;
+  noJobId: string;
+  failedToUpdateJobCard: string;
+  errorUpdatingJobCard: string;
+  retry: string;
+  updateJobDetails: string;
+  information: string;
+  updateCustomerDetails: string;
+  optional: string;
+  updateDeviceDetails: string;
+  details: string;
+  updateProblemDetails: string;
+  of: string;
+  describeProblem: string;
+  company: string;
+  loadingCompanies: string;
+  selectCompany: string;
+  noCompany: string;
+  changes: string;
 }
 
 export const translations: Record<Language, AppTranslations> = {
@@ -322,7 +344,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Job not found",
     statusUpdatedSuccessfully: "Status updated successfully",
     statusUpdateFailed: "Failed to update status",
-    refreshJobs: "Refresh Jobs"
+    refreshJobs: "Refresh Jobs",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Failed to load",
+    fillAllFields: "Please fill in all required fields",
+    noJobId: "No job ID found",
+    failedToUpdateJobCard: "Failed to update job card",
+    errorUpdatingJobCard: "An error occurred while updating the job card",
+    retry: "Retry",
+    updateJobDetails: "Update details for this repair job",
+    information: "Information",
+    updateCustomerDetails: "Update the customer's contact details",
+    optional: "optional",
+    updateDeviceDetails: "Update details about the device being repaired",
+    details: "Details",
+    updateProblemDetails: "Update the issue with the device",
+    of: "of",
+    describeProblem: "Describe the issue with the device...",
+    company: "Company",
+    loadingCompanies: "Loading companies...",
+    selectCompany: "Select a company",
+    noCompany: "No company",
+    changes: "Changes"
   },
   fr: {
     // Navigation
@@ -481,7 +525,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Fiche de travail introuvable",
     statusUpdatedSuccessfully: "Statut mis à jour avec succès",
     statusUpdateFailed: "Échec de la mise à jour du statut",
-    refreshJobs: "Actualiser les jobs"
+    refreshJobs: "Actualiser les jobs",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Échec du chargement",
+    fillAllFields: "Veuillez remplir tous les champs requis",
+    noJobId: "Aucun ID de fiche trouvé",
+    failedToUpdateJobCard: "Échec de la mise à jour de la fiche",
+    errorUpdatingJobCard: "Une erreur est survenue lors de la mise à jour",
+    retry: "Réessayer",
+    updateJobDetails: "Mettre à jour les détails de cette réparation",
+    information: "Informations",
+    updateCustomerDetails: "Mettre à jour les coordonnées du client",
+    optional: "facultatif",
+    updateDeviceDetails: "Mettre à jour les détails de l'appareil à réparer",
+    details: "Détails",
+    updateProblemDetails: "Mettre à jour le problème de l'appareil",
+    of: "de",
+    describeProblem: "Décrivez le problème de l'appareil...",
+    company: "Entreprise",
+    loadingCompanies: "Chargement des entreprises...",
+    selectCompany: "Sélectionner une entreprise",
+    noCompany: "Aucune entreprise",
+    changes: "Modifications"
   },
   pt: {
     // Navigation
@@ -640,7 +706,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Cartão de trabalho não encontrado",
     statusUpdatedSuccessfully: "Status atualizado com sucesso",
     statusUpdateFailed: "Falha ao atualizar status",
-    refreshJobs: "Atualizar trabalhos"
+    refreshJobs: "Atualizar trabalhos",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Falha ao carregar",
+    fillAllFields: "Por favor preencha todos os campos obrigatórios",
+    noJobId: "Nenhum ID de cartão encontrado",
+    failedToUpdateJobCard: "Falha ao atualizar cartão de trabalho",
+    errorUpdatingJobCard: "Ocorreu um erro ao atualizar o cartão",
+    retry: "Tentar novamente",
+    updateJobDetails: "Atualizar detalhes deste trabalho de reparo",
+    information: "Informações",
+    updateCustomerDetails: "Atualizar os detalhes de contato do cliente",
+    optional: "opcional",
+    updateDeviceDetails: "Atualizar detalhes sobre o dispositivo sendo reparado",
+    details: "Detalhes",
+    updateProblemDetails: "Atualizar o problema do dispositivo",
+    of: "de",
+    describeProblem: "Descreva o problema do dispositivo...",
+    company: "Empresa",
+    loadingCompanies: "Carregando empresas...",
+    selectCompany: "Selecionar uma empresa",
+    noCompany: "Nenhuma empresa",
+    changes: "Alterações"
   },
   es: {
     // Navigation
@@ -799,7 +887,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Tarjeta de trabajo no encontrada",
     statusUpdatedSuccessfully: "Estado actualizado correctamente",
     statusUpdateFailed: "Fallo al actualizar el estado",
-    refreshJobs: "Actualizar trabajos"
+    refreshJobs: "Actualizar trabajos",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Error al cargar",
+    fillAllFields: "Por favor complete todos los campos requeridos",
+    noJobId: "No se encontró ID de tarjeta",
+    failedToUpdateJobCard: "Error al actualizar tarjeta de trabajo",
+    errorUpdatingJobCard: "Ocurrió un error al actualizar la tarjeta",
+    retry: "Reintentar",
+    updateJobDetails: "Actualizar detalles de este trabajo de reparación",
+    information: "Información",
+    updateCustomerDetails: "Actualizar los detalles de contacto del cliente",
+    optional: "opcional",
+    updateDeviceDetails: "Actualizar detalles sobre el dispositivo que se repara",
+    details: "Detalles",
+    updateProblemDetails: "Actualizar el problema del dispositivo",
+    of: "de",
+    describeProblem: "Describe el problema del dispositivo...",
+    company: "Empresa",
+    loadingCompanies: "Cargando empresas...",
+    selectCompany: "Seleccionar una empresa",
+    noCompany: "Ninguna empresa",
+    changes: "Cambios"
   },
   ln: {
     // Navigation
@@ -958,7 +1068,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Mokanda ya mosála ezwami te",
     statusUpdatedSuccessfully: "Lolenge ebongwani malamu",
     statusUpdateFailed: "Kobongisa lolenge ekweyi",
-    refreshJobs: "Bongisa misala"
+    refreshJobs: "Bongisa misala",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Kozwa ekweyi",
+    fillAllFields: "Tondisa makambo nyonso oyo esengeli",
+    noJobId: "ID ya mokanda ezwami te",
+    failedToUpdateJobCard: "Kobongisa mokanda ekweyi",
+    errorUpdatingJobCard: "Libunga na kobongisa mokanda",
+    retry: "Meka lisusu",
+    updateJobDetails: "Kobongisa makambo ya mosála oyo",
+    information: "Makambo",
+    updateCustomerDetails: "Kobongisa makambo ya mokiliya",
+    optional: "te na makasi",
+    updateDeviceDetails: "Kobongisa makambo ya eloko",
+    details: "Makambo",
+    updateProblemDetails: "Kobongisa mikakatano ya eloko",
+    of: "ya",
+    describeProblem: "Limbola mikakatano ya eloko...",
+    company: "Kompanyi",
+    loadingCompanies: "Kozwa bakompanyi...",
+    selectCompany: "Pona kompanyi",
+    noCompany: "Kompanyi te",
+    changes: "Bobongisi"
   },
   kg: {
     // Navigation
@@ -1117,7 +1249,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Nkarta ya kisalu imonekanga ko",
     statusUpdatedSuccessfully: "Mfumu ibongwani kimbote",
     statusUpdateFailed: "Kubongisa mfumu kunangani",
-    refreshJobs: "Bongisa bisalu"
+    refreshJobs: "Bongisa bisalu",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Kutambula kunangani",
+    fillAllFields: "Tula mambu moso ma nzitukulu",
+    noJobId: "ID ya nkarta imonekanga ko",
+    failedToUpdateJobCard: "Kubongisa nkarta kunangani",
+    errorUpdatingJobCard: "Dizolo mu kubongisa nkarta",
+    retry: "Meka diaka",
+    updateJobDetails: "Bongisa mambu ma kisalu kiayi",
+    information: "Mambu",
+    updateCustomerDetails: "Bongisa mambu ma nteki",
+    optional: "kadi nzitukulu ko",
+    updateDeviceDetails: "Bongisa mambu ma kima",
+    details: "Mambu",
+    updateProblemDetails: "Bongisa mambu ma nganga ya kima",
+    of: "ya",
+    describeProblem: "Songa mambu ma nganga ya kima...",
+    company: "Kompania",
+    loadingCompanies: "Kutambula bankompania...",
+    selectCompany: "Sola kompania",
+    noCompany: "Kompania ko",
+    changes: "Babongisu"
   },
   sw: {
     // Navigation
@@ -1276,7 +1430,29 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Kadi ya kazi haijapatikana",
     statusUpdatedSuccessfully: "Hali imesasishwa",
     statusUpdateFailed: "Imeshindwa kusasisha hali",
-    refreshJobs: "Sasisha kazi"
+    refreshJobs: "Sasisha kazi",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Imeshindwa kupakia",
+    fillAllFields: "Tafadhali jaza vuga vyote vinavyohitajika",
+    noJobId: "Hakuna kitambulisho cha kadi",
+    failedToUpdateJobCard: "Imeshindwa kusasisha kadi ya kazi",
+    errorUpdatingJobCard: "Kosa limejitokeza wakati wa kusasisha kadi",
+    retry: "Jaribu tena",
+    updateJobDetails: "Sasisha maelezo ya kazi hii ya ukarabati",
+    information: "Taarifa",
+    updateCustomerDetails: "Sasisha taarifa za mawasiliano za mteja",
+    optional: "si lazima",
+    updateDeviceDetails: "Sasisha maelezo kuhusu kifaa kinachokarabatiwa",
+    details: "Maelezo",
+    updateProblemDetails: "Sasisha tatizo la kifaa",
+    of: "ya",
+    describeProblem: "Eleza tatizo la kifaa...",
+    company: "Kampuni",
+    loadingCompanies: "Inapakia makampuni...",
+    selectCompany: "Chagua kampuni",
+    noCompany: "Hakuna kampuni",
+    changes: "Mabadiliko"
   },
   ts: {
     // Navigation
@@ -1435,6 +1611,28 @@ export const translations: Record<Language, AppTranslations> = {
     jobNotFound: "Mukanda wa kisalu wumonekanga bu",
     statusUpdatedSuccessfully: "Mfumu yatuswa cibotu",
     statusUpdateFailed: "Kutuswa mfumu kunangani",
-    refreshJobs: "Tusa misalu"
+    refreshJobs: "Tusa misalu",
+
+    // NEW MISSING TRANSLATIONS FOR EDIT JOB CARD
+    failedToLoad: "Kutambula kugunile",
+    fillAllFields: "Tula mambu moso malavekiwaka",
+    noJobId: "ID ya mukanda yimonekanga bu",
+    failedToUpdateJobCard: "Kubongisa mukanda kugunile",
+    errorUpdatingJobCard: "Chibana cimbanuke wakati wa kubongisa mukanda",
+    retry: "Ringeta nakambe",
+    updateJobDetails: "Bongisa mambu ma kisalu caki",
+    information: "Mambu",
+    updateCustomerDetails: "Bongisa mambu ma kutumila ma muetu",
+    optional: "yakadi nzitukulu",
+    updateDeviceDetails: "Bongisa mambu ma cintu cilabongisiwaka",
+    details: "Mambu",
+    updateProblemDetails: "Bongisa mambu ma kufana ya cintu",
+    of: "ya",
+    describeProblem: "Hlamusela mambu ma kufana ya cintu...",
+    company: "Kompanyi",
+    loadingCompanies: "Ku tambula mankompanyi...",
+    selectCompany: "Sola kompanyi",
+    noCompany: "Kompanyi leyi nga riki",
+    changes: "Mabongiso"
   }
 };
