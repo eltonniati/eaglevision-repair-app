@@ -90,6 +90,20 @@ export const JobDetails = ({
 }: JobDetailsProps) => {
   const { t } = useLanguage();
 
+  // Handle status change and auto-save when not in edit mode
+  const handleStatusChangeAndSave = async (newStatus: JobStatus) => {
+    console.log("Status changing from", editedStatus, "to", newStatus);
+    onStatusChange(newStatus);
+    
+    // If not in edit mode, automatically save the status change
+    if (!isEditMode) {
+      setTimeout(async () => {
+        const success = await onSave();
+        console.log("Auto-save status change result:", success);
+      }, 100); // Small delay to ensure state update
+    }
+  };
+
   return (
     <div className="grid gap-8 md:grid-cols-3">
       <Card className="md:col-span-2">
@@ -254,7 +268,19 @@ export const JobDetails = ({
                 </SelectContent>
               </Select>
             ) : (
-              <Badge>{editedStatus}</Badge>
+              <div className="space-y-2">
+                <Badge className="mb-2">{editedStatus}</Badge>
+                <Select value={editedStatus} onValueChange={handleStatusChangeAndSave}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t.selectStatus || "Select a status"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="In Progress">{t.inProgress}</SelectItem>
+                    <SelectItem value="Finished">{t.completed}</SelectItem>
+                    <SelectItem value="Waiting for Parts">{t.waitingForParts}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </div>
 
