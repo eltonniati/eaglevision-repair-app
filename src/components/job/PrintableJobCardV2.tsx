@@ -39,24 +39,23 @@ export const PrintableJobCardV2 = ({
       className="w-full bg-white text-black print-container" 
       style={{ 
         width: '100%',
-        maxWidth: '375px',
-        margin: '0 auto',
-        padding: '15px',
-        fontSize: '10px',
-        lineHeight: '1.3',
+        minHeight: '100vh',
+        margin: '0',
+        padding: '20px',
+        fontSize: '12px',
+        lineHeight: '1.4',
         fontFamily: 'Arial, sans-serif',
         boxSizing: 'border-box',
         background: 'white',
         color: 'black',
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start'
+        flexDirection: 'column'
       }}
     >
       <div style={{ 
         border: '2px solid #333',
-        padding: '12px',
-        height: '100%',
+        padding: '20px',
+        height: 'calc(100vh - 40px)',
         width: '100%',
         boxSizing: 'border-box',
         background: 'white',
@@ -69,20 +68,20 @@ export const PrintableJobCardV2 = ({
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'flex-start', 
-          marginBottom: '16px',
+          marginBottom: '24px',
           width: '100%',
-          minHeight: '50px',
-          paddingBottom: '12px',
-          borderBottom: '1px solid #ddd'
+          minHeight: '80px',
+          paddingBottom: '16px',
+          borderBottom: '2px solid #333'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {company?.logo_url && (
               <img 
                 src={company.logo_url}
                 alt="Company Logo" 
                 style={{ 
-                  height: '30px', 
-                  width: '30px', 
+                  height: '60px', 
+                  width: '60px', 
                   objectFit: 'contain',
                   border: '1px solid #eee',
                   borderRadius: '4px'
@@ -94,15 +93,15 @@ export const PrintableJobCardV2 = ({
             )}
             <div>
               <h1 style={{ 
-                fontSize: '16px', 
+                fontSize: '28px', 
                 fontWeight: 'bold', 
-                margin: '0 0 4px 0',
+                margin: '0 0 8px 0',
                 color: '#000',
-                letterSpacing: '1px',
-                textAlign: 'center'
+                letterSpacing: '2px',
+                textAlign: 'left'
               }}>JOB CARD</h1>
               <p style={{ 
-                fontSize: '12px', 
+                fontSize: '18px', 
                 fontWeight: '600', 
                 margin: 0,
                 color: '#555'
@@ -110,13 +109,19 @@ export const PrintableJobCardV2 = ({
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: '0 0 4px 0', fontSize: '9px', color: '#000' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#000' }}>
               <strong>Created:</strong> 
-              <span style={{ marginLeft: '4px' }}>{format(new Date(job?.created_at || new Date()), "MMM d, yyyy")}</span>
+              <span style={{ marginLeft: '8px' }}>{format(new Date(job?.created_at || new Date()), "MMM d, yyyy")}</span>
             </p>
-            <p style={{ margin: '0 0 4px 0', fontSize: '9px', color: '#000' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#000' }}>
               <strong>Status:</strong> 
-              <span style={{ marginLeft: '4px', padding: '2px 4px', backgroundColor: '#f0f0f0', borderRadius: '2px' }}>{job.details.status}</span>
+              <span style={{ 
+                marginLeft: '8px', 
+                padding: '4px 8px', 
+                backgroundColor: '#f0f0f0', 
+                borderRadius: '4px',
+                fontSize: '12px'
+              }}>{job.details.status}</span>
             </p>
           </div>
         </div>
@@ -125,121 +130,166 @@ export const PrintableJobCardV2 = ({
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr', 
-          gap: '12px',
-          marginBottom: '12px',
+          gap: '20px',
+          marginBottom: '20px',
           width: '100%'
         }}>
           <div style={{ 
-            padding: '8px',
+            padding: '16px',
             backgroundColor: '#f8f9fa',
-            borderRadius: '4px',
-            border: '1px solid #e9ecef'
+            borderRadius: '8px',
+            border: '1px solid #e9ecef',
+            minHeight: '120px'
           }}>
             <h2 style={{ 
-              fontSize: '11px', 
+              fontSize: '16px', 
               fontWeight: 'bold', 
-              borderBottom: '1px solid #ccc',
-              paddingBottom: '4px',
-              marginBottom: '6px',
+              borderBottom: '2px solid #333',
+              paddingBottom: '8px',
+              marginBottom: '12px',
               color: '#000'
-            }}>Company</h2>
-            <div style={{ lineHeight: '1.4' }}>
-              <p style={{ margin: '0 0 3px 0', fontWeight: 'bold', fontSize: '9px', color: '#000' }}>{company?.name ?? "Company Name"}</p>
+            }}>Company Information</h2>
+            <div style={{ lineHeight: '1.6' }}>
+              <p style={{ margin: '0 0 6px 0', fontWeight: 'bold', fontSize: '14px', color: '#000' }}>{company?.name ?? "Company Name"}</p>
               {company?.address && (
-                <p style={{ margin: '0 0 2px 0', fontSize: '8px', color: '#333' }}>{company.address}</p>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#333' }}>{company.address}</p>
               )}
               {company?.phone && (
-                <p style={{ margin: '0 0 2px 0', fontSize: '8px', color: '#333' }}>{company.phone}</p>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#333' }}>Phone: {company.phone}</p>
               )}
               {company?.email && (
-                <p style={{ margin: '0', fontSize: '8px', color: '#333' }}>{company.email}</p>
+                <p style={{ margin: '0', fontSize: '12px', color: '#333' }}>Email: {company.email}</p>
               )}
             </div>
           </div>
           <div style={{ 
-            padding: '8px',
+            padding: '16px',
             backgroundColor: '#f8f9fa',
-            borderRadius: '4px',
-            border: '1px solid #e9ecef'
+            borderRadius: '8px',
+            border: '1px solid #e9ecef',
+            minHeight: '120px'
           }}>
             <h2 style={{ 
-              fontSize: '11px', 
+              fontSize: '16px', 
               fontWeight: 'bold', 
-              borderBottom: '1px solid #ccc',
-              paddingBottom: '4px',
-              marginBottom: '6px',
+              borderBottom: '2px solid #333',
+              paddingBottom: '8px',
+              marginBottom: '12px',
               color: '#000'
-            }}>Customer</h2>
-            <div style={{ lineHeight: '1.4' }}>
-              <p style={{ margin: '0 0 3px 0', fontWeight: 'bold', fontSize: '9px', color: '#000' }}>{customerName}</p>
-              <p style={{ margin: '0 0 2px 0', fontSize: '8px', color: '#333' }}>{customerPhone}</p>
-              {customerEmail && <p style={{ margin: '0', fontSize: '8px', color: '#333' }}>{customerEmail}</p>}
+            }}>Customer Information</h2>
+            <div style={{ lineHeight: '1.6' }}>
+              <p style={{ margin: '0 0 6px 0', fontWeight: 'bold', fontSize: '14px', color: '#000' }}>{customerName}</p>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#333' }}>Phone: {customerPhone}</p>
+              {customerEmail && <p style={{ margin: '0', fontSize: '12px', color: '#333' }}>Email: {customerEmail}</p>}
             </div>
           </div>
         </div>
 
         {/* Device Info */}
         <div style={{ 
-          marginBottom: '12px',
-          padding: '8px',
+          marginBottom: '20px',
+          padding: '16px',
           backgroundColor: '#f8f9fa',
-          borderRadius: '4px',
-          border: '1px solid #e9ecef'
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          minHeight: '100px'
         }}>
           <h2 style={{ 
-            fontSize: '11px', 
+            fontSize: '16px', 
             fontWeight: 'bold', 
-            borderBottom: '1px solid #ccc',
-            paddingBottom: '4px',
-            marginBottom: '6px',
+            borderBottom: '2px solid #333',
+            paddingBottom: '8px',
+            marginBottom: '12px',
             color: '#000'
           }}>Device Details</h2>
-          <p style={{ margin: '0 0 3px 0', fontSize: '8px', color: '#000', lineHeight: '1.4' }}>
-            <strong>Name:</strong> <span style={{ marginLeft: '4px' }}>{deviceName}</span>
-          </p>
-          <p style={{ margin: '0 0 2px 0', fontSize: '8px', color: '#000' }}>
-            <strong>Model:</strong> <span style={{ marginLeft: '4px' }}>{deviceModel}</span>
-          </p>
-          <p style={{ margin: '0', fontSize: '8px', color: '#000' }}>
-            <strong>Condition:</strong> <span style={{ marginLeft: '4px' }}>{deviceCondition}</span>
-          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <p style={{ margin: '0', fontSize: '12px', color: '#000', lineHeight: '1.6' }}>
+              <strong>Device Name:</strong><br />
+              <span style={{ fontSize: '14px', color: '#333' }}>{deviceName}</span>
+            </p>
+            <p style={{ margin: '0', fontSize: '12px', color: '#000' }}>
+              <strong>Model:</strong><br />
+              <span style={{ fontSize: '14px', color: '#333' }}>{deviceModel}</span>
+            </p>
+            <p style={{ margin: '0', fontSize: '12px', color: '#000' }}>
+              <strong>Condition:</strong><br />
+              <span style={{ fontSize: '14px', color: '#333' }}>{deviceCondition}</span>
+            </p>
+          </div>
         </div>
 
-        {/* Problem and Fees */}
+        {/* Problem Description - takes more space */}
         <div style={{ 
-          marginBottom: '12px',
-          padding: '8px',
+          marginBottom: '20px',
+          padding: '16px',
           backgroundColor: '#f8f9fa',
-          borderRadius: '4px',
-          border: '1px solid #e9ecef'
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          flex: '1',
+          minHeight: '150px'
         }}>
           <h2 style={{ 
-            fontSize: '11px', 
+            fontSize: '16px', 
             fontWeight: 'bold', 
-            borderBottom: '1px solid #ccc',
-            paddingBottom: '4px',
-            marginBottom: '6px',
+            borderBottom: '2px solid #333',
+            paddingBottom: '8px',
+            marginBottom: '12px',
             color: '#000'
-          }}>Job Details</h2>
-          <p style={{ margin: '0 0 3px 0', fontSize: '8px', color: '#000', lineHeight: '1.4' }}>
-            <strong>Problem:</strong> <span style={{ marginLeft: '4px' }}>{problem}</span>
-          </p>
-          <p style={{ margin: '0', fontSize: '8px', color: '#000' }}>
-            <strong>Handling Fees:</strong> <span style={{ marginLeft: '4px' }}>{formatCurrency(handlingFees)}</span>
-          </p>
+          }}>Problem Description & Details</h2>
+          <div style={{ marginBottom: '16px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#000', fontWeight: 'bold' }}>
+              Reported Problem:
+            </p>
+            <div style={{ 
+              padding: '12px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              minHeight: '60px',
+              fontSize: '14px',
+              color: '#333',
+              lineHeight: '1.5'
+            }}>
+              {problem}
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <p style={{ margin: '0', fontSize: '12px', color: '#000' }}>
+              <strong>Handling Fees:</strong><br />
+              <span style={{ fontSize: '18px', color: '#333', fontWeight: 'bold' }}>{formatCurrency(handlingFees)}</span>
+            </p>
+            <p style={{ margin: '0', fontSize: '12px', color: '#000' }}>
+              <strong>Job Status:</strong><br />
+              <span style={{ 
+                fontSize: '14px', 
+                color: '#333',
+                padding: '4px 8px',
+                backgroundColor: '#e9ecef',
+                borderRadius: '4px',
+                display: 'inline-block'
+              }}>{job.details.status}</span>
+            </p>
+          </div>
         </div>
 
         {/* Footer */}
         <div style={{ 
           textAlign: 'center',
-          fontSize: '7px',
+          fontSize: '11px',
           color: '#666',
-          borderTop: '1px solid #ccc',
-          paddingTop: '8px',
+          borderTop: '2px solid #333',
+          paddingTop: '12px',
           marginTop: 'auto',
-          backgroundColor: '#f8f9fa'
+          backgroundColor: '#f8f9fa',
+          padding: '12px',
+          borderRadius: '4px'
         }}>
-          <p style={{ margin: '0' }}>Generated: {format(new Date(), "MMM d, yyyy HH:mm")}</p>
+          <p style={{ margin: '0', fontWeight: 'bold' }}>
+            Generated on: {format(new Date(), "MMM d, yyyy 'at' HH:mm")}
+          </p>
+          <p style={{ margin: '4px 0 0 0', fontSize: '10px' }}>
+            This job card serves as official documentation of the repair service request.
+          </p>
         </div>
       </div>
     </div>

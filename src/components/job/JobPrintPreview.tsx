@@ -74,8 +74,8 @@ export function JobPrintPreview({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center no-print">
+    <div className="min-h-screen flex flex-col">
+      <div className="flex justify-between items-center p-4 bg-white border-b no-print">
         <Button variant="ghost" onClick={onBack} disabled={isGeneratingPdf}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
@@ -104,8 +104,12 @@ export function JobPrintPreview({
         </div>
       </div>
       
-      <div className="print-content bg-white rounded-lg shadow-sm print:shadow-none">
-        <div ref={printRef}>
+      <div className="flex-1 bg-gray-100 print:bg-white">
+        <div 
+          ref={printRef} 
+          className="w-full h-full bg-white print:bg-white"
+          style={{ minHeight: 'calc(100vh - 80px)' }}
+        >
           <PrintableJobCard 
             job={job}
             company={company}
