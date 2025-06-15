@@ -5,7 +5,7 @@ import { Job, JobStatus } from "@/lib/types";
 import { useJobs } from "@/hooks/use-jobs";
 
 export function useJobEditor(job: Job | null) {
-  const { updateJob, setJob } = useJobs(); // Added setJob here
+  const { updateJob, setJob, jobs, setJobs } = useJobs();
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editedProblem, setEditedProblem] = useState("");
@@ -67,12 +67,18 @@ export function useJobEditor(job: Job | null) {
 
     try {
       const result = await updateJob(job.id!, updatedJob);
-      
+
       if (result) {
+        console.log("[JobEditor] Saved job:", result);
         toast.success("Job card updated successfully");
         setIsEditMode(false);
         setIsSaving(false);
         setJob(result); // Update the local job state with the result from the database
+        // ----- Update jobs array as well to reflect change in list views -----
+        if (jobs && setJobs) {
+          const newJobs = jobs.map(j => (j.id === result.id ? result : j));
+          setJobs(newJobs);
+        }
         return true;
       } else {
         toast.error("Failed to update job card");
@@ -108,4 +114,3 @@ export function useJobEditor(job: Job | null) {
     handleSave
   };
 }
-
