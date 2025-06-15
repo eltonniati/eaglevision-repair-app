@@ -17,6 +17,7 @@ interface JobPreviewModeProps {
   problem: string;
   handlingFees: number;
   companyName: string;
+  companyLogo: string;
   onBack: () => void;
 }
 
@@ -31,6 +32,7 @@ export const JobPreviewMode = ({
   problem,
   handlingFees,
   companyName,
+  companyLogo,
   onBack
 }: JobPreviewModeProps) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -92,6 +94,7 @@ export const JobPreviewMode = ({
         problem={problem}
         handlingFees={handlingFees}
         companyName={companyName}
+        companyLogo={companyLogo}
         status={job.details.status}
         onBack={onBack}
         onShare={() => setIsShareDialogOpen(true)}
