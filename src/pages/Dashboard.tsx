@@ -20,7 +20,7 @@ import {
 
 export default function Dashboard() {
   const { session } = useAuth();
-  const { jobs, loading: jobsLoading } = useJobs();
+  const { jobs, loading: jobsLoading, updateJobStatus } = useJobs();
   const { company, loading: companyLoading } = useCompany();
   const { t, language, setLanguage } = useLanguage();
   const [jobsByStatus, setJobsByStatus] = useState<{ [key: string]: number }>({});
@@ -47,24 +47,35 @@ export default function Dashboard() {
     "Waiting for Parts": t.waitingForParts
   };
 
+  // Reverse mapping for status translations
+  const reverseStatusTranslations = {
+    [t.inProgress]: "In Progress",
+    [t.completed]: "Completed",
+    [t.waitingForParts]: "Waiting for Parts"
+  };
+
   useEffect(() => {
     if (!jobsLoading && jobs) {
-      const statusCounts: { [key: string]: number } = {
-        [t.inProgress]: 0,
-        [t.completed]: 0,
-        [t.waitingForParts]: 0,
-      };
-
-      jobs.forEach((job) => {
-        const translatedStatus = statusTranslations[job.details.status] || job.details.status;
-        if (statusCounts[translatedStatus] !== undefined) {
-          statusCounts[translatedStatus]++;
-        }
-      });
-
-      setJobsByStatus(statusCounts);
+      updateStatusCounts();
     }
   }, [jobs, jobsLoading, t]);
+
+  const updateStatusCounts = () => {
+    const statusCounts: { [key: string]: number } = {
+      [t.inProgress]: 0,
+      [t.completed]: 0,
+      [t.waitingForParts]: 0,
+    };
+
+    jobs.forEach((job) => {
+      const translatedStatus = statusTranslations[job.details.status] || job.details.status;
+      if (statusCounts[translatedStatus] !== undefined) {
+        statusCounts[translatedStatus]++;
+      }
+    });
+
+    setJobsByStatus(statusCounts);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -100,12 +111,21 @@ export default function Dashboard() {
     }
   };
 
+  const handleStatusChange = async (jobId: string, newStatus: string) => {
+    try {
+      // Convert translated status back to original status
+      const originalStatus = reverseStatusTranslations[newStatus] || newStatus;
+      await updateJobStatus(jobId, originalStatus);
+      updateStatusCounts(); // Refresh the counts after update
+    } catch (error) {
+      console.error("Error updating job status:", error);
+    }
+  };
+
   const isLoading = jobsLoading || companyLoading;
   const recentJobs = jobs.slice(0, 5);
 
-  // Helper to handle metric card click
   const handleCardClick = (status: string | null) => {
-    // status: null means "all" (total job cards)
     navigate("/job-cards", { state: status ? { status } : undefined });
   };
 
@@ -116,17 +136,17 @@ export default function Dashboard() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t.dashboard}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t.dashboard}</h1>
           <p className="text-gray-500 mt-1">
             {company?.name ? `${t.welcomeTitle} ${company.name}` : t.welcomeSubtitle}
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
                 <Languages className="h-4 w-4" />
                 <span>{currentLanguage.flag} {currentLanguage.name}</span>
               </Button>
@@ -134,57 +154,15 @@ export default function Dashboard() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>{t.selectLanguage}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => setLanguage("en")}
-                className={language === "en" ? "bg-gray-100" : ""}
-              >
-                🇬🇧 English
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("fr")}
-                className={language === "fr" ? "bg-gray-100" : ""}
-              >
-                🇫🇷 Français
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("pt")}
-                className={language === "pt" ? "bg-gray-100" : ""}
-              >
-                🇵🇹 Português
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("es")}
-                className={language === "es" ? "bg-gray-100" : ""}
-              >
-                🇪🇸 Español
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>{t.congoleseLanguages}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => setLanguage("ln")}
-                className={language === "ln" ? "bg-gray-100" : ""}
-              >
-                🇨🇩 Lingála
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("kg")}
-                className={language === "kg" ? "bg-gray-100" : ""}
-              >
-                🇨🇩 Kikóngó
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("sw")}
-                className={language === "sw" ? "bg-gray-100" : ""}
-              >
-                🇨🇩 Swahili
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("ts")}
-                className={language === "ts" ? "bg-gray-100" : ""}
-              >
-                🇨🇩 Tshiluba
-              </DropdownMenuItem>
+              {languages.map((lang) => (
+                <DropdownMenuItem 
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={language === lang.code ? "bg-gray-100" : ""}
+                >
+                  {lang.flag} {lang.name}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -192,20 +170,20 @@ export default function Dashboard() {
             <Button 
               onClick={() => navigate("/company-profile")}
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <Settings className="h-4 w-4" />
               {t.updateProfile}
             </Button>
           )}
           <Button 
-            onClick={() => navigate("/job-cards")}
-            className="flex items-center gap-2"
+            onClick={() => navigate("/job-cards/new")}
+            className="flex items-center gap-2 w-full sm:w-auto"
           >
             <PlusCircle className="h-4 w-4" />
             {t.createJobCard}
           </Button>
-          <SignOutButton />
+          <SignOutButton className="w-full sm:w-auto" />
         </div>
       </div>
 
@@ -273,7 +251,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <CardTitle>{t.recentJobCards}</CardTitle>
                 <Button 
                   variant="ghost" 
@@ -302,23 +280,51 @@ export default function Dashboard() {
                     return (
                       <div 
                         key={job.id} 
-                        className="flex items-center justify-between p-4 border rounded-md hover:bg-gray-50 cursor-pointer"
-                        onClick={() => navigate(`/job-cards/${job.id}`)}
+                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-md hover:bg-gray-50"
                       >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <span className="font-medium text-gray-900">
-                              {job.job_card_number}
+                        <div className="flex-1 mb-2 sm:mb-0">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span 
+                              className="font-medium text-gray-900 cursor-pointer hover:underline"
+                              onClick={() => navigate(`/job-cards/${job.id}`)}
+                            >
+                              #{job.job_card_number}
                             </span>
-                            <Badge className={`${getStatusColor(job.details.status)}`}>
-                              {translatedStatus}
-                            </Badge>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Badge 
+                                  className={`${getStatusColor(job.details.status)} cursor-pointer`}
+                                >
+                                  {translatedStatus}
+                                </Badge>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuLabel>{t.changeStatus}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleStatusChange(job.id, t.inProgress)}>
+                                  {t.inProgress}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(job.id, t.completed)}>
+                                  {t.completed}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(job.id, t.waitingForParts)}>
+                                  {t.waitingForParts}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                           <div className="mt-1 text-sm text-gray-500">
                             {t.customer}: {job.customer.name} • {t.device}: {job.device.name} {job.device.model}
                           </div>
                         </div>
-                        <ArrowRightIcon className="h-4 w-4 text-gray-400" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => navigate(`/job-cards/${job.id}`)}
+                          className="text-gray-500 hover:text-gray-900"
+                        >
+                          <ArrowRightIcon className="h-4 w-4" />
+                        </Button>
                       </div>
                     );
                   })}
@@ -331,7 +337,7 @@ export default function Dashboard() {
                     {t.createFirstJobCard}
                   </p>
                   <Button 
-                    onClick={() => navigate("/job-cards")}
+                    onClick={() => navigate("/job-cards/new")}
                     className="mt-4"
                   >
                     <PlusCircle className="h-4 w-4 mr-2" />
@@ -372,6 +378,19 @@ export default function Dashboard() {
                     <p className="text-gray-900">{company.phone}</p>
                     <p className="text-gray-900">{company.email}</p>
                   </div>
+                  {company.logo_url && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">{t.companyLogo}</h3>
+                      <img 
+                        src={company.logo_url} 
+                        alt="Company logo" 
+                        className="h-16 object-contain mt-2"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-6">
