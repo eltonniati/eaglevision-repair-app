@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Job } from "@/lib/types";
@@ -44,8 +43,7 @@ export function useJobDetails() {
         .from("jobs")
         .select("*, companies(*)")
         .eq("id", id)
-        .maybeSingle()
-        .abortSignal(abortControllerRef.current.signal);
+        .maybeSingle();
 
       if (error) {
         console.error("Job fetch error:", error);
