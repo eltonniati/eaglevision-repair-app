@@ -1,5 +1,5 @@
 
-import { Job } from "@/lib/types";
+import { Job, Company } from "@/lib/types";
 import { PrintableJobCardV2 } from "./PrintableJobCardV2";
 import { forwardRef } from "react";
 
@@ -13,7 +13,7 @@ interface PrintPreviewContentProps {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  // Removed companyName, companyLogoUrl
+  company: Company | null;
 }
 
 export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewContentProps>(({
@@ -26,6 +26,7 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
   deviceCondition,
   problem,
   handlingFees,
+  company,
 }, ref) => {
   return (
     <div className="border rounded-lg shadow-sm bg-white p-0" id="print-content">
@@ -40,6 +41,7 @@ export const PrintPreviewContent = forwardRef<HTMLDivElement, PrintPreviewConten
           deviceCondition={deviceCondition}
           problem={problem}
           handlingFees={handlingFees}
+          company={company}
         />
       </div>
     </div>

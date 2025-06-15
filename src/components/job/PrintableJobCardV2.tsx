@@ -1,6 +1,5 @@
-
 import { format } from "date-fns";
-import { Job } from "@/lib/types";
+import { Job, Company } from "@/lib/types";
 import { useCompany } from "@/hooks/use-company";
 
 interface PrintableJobCardV2Props {
@@ -13,7 +12,7 @@ interface PrintableJobCardV2Props {
   deviceCondition: string;
   problem: string;
   handlingFees: number;
-  // Removed companyName, companyLogoUrl
+  company: Company | null;
 }
 
 const formatCurrency = (amount: number) => {
@@ -33,9 +32,8 @@ export const PrintableJobCardV2 = ({
   deviceCondition, 
   problem,
   handlingFees,
+  company,
 }: PrintableJobCardV2Props) => {
-  const { company } = useCompany(); // Always use current company
-  // Detect mobile for responsive styling
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   return (

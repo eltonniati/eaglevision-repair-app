@@ -1,3 +1,4 @@
+
 import { useRef, useState } from "react";
 import { Job } from "@/lib/types";
 import { PrintableJobCardV2 } from "./PrintableJobCardV2";
@@ -7,19 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 import { downloadJobCardPdf } from "./utils/job-pdf-utils";
 import { shareJobCard, emailJobCard } from "./utils/share-utils";
-
-interface JobPreviewModeProps {
-  job: Job;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  deviceName: string;
-  deviceModel: string;
-  deviceCondition: string;
-  problem: string;
-  handlingFees: number;
-  onBack: () => void;
-}
+import { useCompany } from "@/hooks/use-company";
 
 export const JobPreviewMode = ({
   job,
@@ -37,6 +26,7 @@ export const JobPreviewMode = ({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isMobile = useIsMobile();
+  const { company } = useCompany();
 
   const onPrintButtonClick = async () => {
     console.log("Print button clicked - generating cellphone PDF for job:", job.job_card_number);
@@ -111,6 +101,7 @@ export const JobPreviewMode = ({
             deviceCondition={deviceCondition}
             problem={problem}
             handlingFees={handlingFees}
+            company={company}
           />
         </div>
       </div>
