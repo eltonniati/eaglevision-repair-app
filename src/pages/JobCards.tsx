@@ -21,7 +21,7 @@ const getJobStatusByLabel = (label: string, t: any) => {
 };
 
 const JobCards = () => {
-  const { jobs, loading, error } = useJobs();
+  const { jobs, loading, error, clearJob } = useJobs();
   const { companies, loading: companiesLoading } = useCompanies();
   const { t } = useLanguage();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -49,6 +49,16 @@ const JobCards = () => {
     // Focus/scroll to top when filter changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [statusLabel]);
+
+  // Clear job data when component unmounts or navigates away
+  useEffect(() => {
+    return () => {
+      if (selectedJob) {
+        setSelectedJob(null);
+        setIsPreviewMode(false);
+      }
+    };
+  }, [selectedJob]);
 
   console.log("JobCards component state:", { 
     jobsCount: jobs.length, 
@@ -113,14 +123,25 @@ const JobCards = () => {
 
   // Callback to go to dashboard from print preview/share dialog
   const backToDashboard = () => {
+    // Clear job data before navigating
+    if (clearJob) {
+      clearJob();
+    }
+    setSelectedJob(null);
+    setIsPreviewMode(false);
     navigate("/dashboard");
+  };
+
+  const handleBackToJobList = () => {
+    setSelectedJob(null);
+    setIsPreviewMode(false);
   };
 
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         {/* Back to Dashboard Button */}
-        <Button variant="ghost" className="mb-4" onClick={() => navigate("/dashboard")}>
+        <Button variant="ghost" className="mb-4" onClick={backToDashboard}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t.back} {t.dashboard}
         </Button>
@@ -145,7 +166,7 @@ const JobCards = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
       {/* Back to Dashboard Button */}
-      <Button variant="ghost" className="mb-4" onClick={() => navigate("/dashboard")}>
+      <Button variant="ghost" className="mb-4" onClick={backToDashboard}>
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t.back} {t.dashboard}
       </Button>
@@ -164,7 +185,7 @@ const JobCards = () => {
           companyName={getCompanyName(selectedJob.company_id)}
           companyLogo={getCompanyLogo(selectedJob.company_id)}
           status={selectedJob.details.status}
-          onBack={backToDashboard}
+          onBack={handleBackToJobList}
           onShare={() => setIsShareDialogOpen(true)}
         />
       ) : (
@@ -191,8 +212,8 @@ const JobCards = () => {
         open={isShareDialogOpen}
         onOpenChange={(open: boolean) => {
           setIsShareDialogOpen(open);
-          if (!open) {
-            navigate("/dashboard");
+          if (!open && isPreviewMode) {
+            handleBackToJobList();
           }
         }}
         onShare={handleShare}

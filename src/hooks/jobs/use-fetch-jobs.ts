@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Job } from "@/lib/types";
@@ -10,6 +10,8 @@ export function useFetchJobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const fetchingRef = useRef<boolean>(false);
+  const channelRef = useRef<any>(null);
 
   const fetchJobs = useCallback(async () => {
     if (!user) {
@@ -18,9 +20,16 @@ export function useFetchJobs() {
       return;
     }
 
+    // Prevent duplicate concurrent fetches
+    if (fetchingRef.current) {
+      console.log("Already fetching jobs, skipping...");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
+      fetchingRef.current = true;
       
       console.log("Fetching jobs for user:", user.id);
 
@@ -40,6 +49,7 @@ export function useFetchJobs() {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
     } finally {
       setLoading(false);
+      fetchingRef.current = false;
     }
   }, [user]);
 
@@ -48,7 +58,15 @@ export function useFetchJobs() {
 
     if (!user?.id) return;
 
-    const channel = supabase
+    // Clean up existing channel
+    if (channelRef.current) {
+      channelRef.current.unsubscribe();
+    }
+
+    // Set up real-time subscription with throttling
+    let throttleTimeout: NodeJS.Timeout;
+    
+    channelRef.current = supabase
       .channel('jobs-realtime')
       .on('postgres_changes', {
         event: '*',
@@ -56,15 +74,25 @@ export function useFetchJobs() {
         table: 'jobs',
         filter: `user_id=eq.${user.id}`
       }, () => {
-        console.log("Real-time update received, refetching jobs");
-        fetchJobs();
+        console.log("Real-time update received");
+        // Throttle updates to prevent excessive refetching
+        clearTimeout(throttleTimeout);
+        throttleTimeout = setTimeout(() => {
+          if (!fetchingRef.current) {
+            fetchJobs();
+          }
+        }, 1000);
       })
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+      }
+      clearTimeout(throttleTimeout);
+      fetchingRef.current = false;
     };
-  }, [fetchJobs]);
+  }, [fetchJobs, user?.id]);
 
   return {
     jobs,

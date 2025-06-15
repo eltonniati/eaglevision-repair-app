@@ -6,7 +6,7 @@ import { useJobDetails } from "./jobs/use-job-details";
 export function useJobs() {
   const { jobs, loading: fetchLoading, error: fetchError, fetchJobs, setJobs } = useFetchJobs();
   const { loading: actionLoading, error: actionError, createJob, updateJob, deleteJob } = useJobActions();
-  const { job, loading: detailLoading, error: detailError, getJob, setJob } = useJobDetails();
+  const { job, loading: detailLoading, error: detailError, getJob, setJob, clearJob } = useJobDetails();
 
   const loading = fetchLoading || actionLoading || detailLoading;
   const error = fetchError || actionError || detailError;
@@ -22,6 +22,7 @@ export function useJobs() {
     fetchJobs,
     getJob,
     setJob,
-    setJobs
+    setJobs,
+    clearJob
   };
 }
