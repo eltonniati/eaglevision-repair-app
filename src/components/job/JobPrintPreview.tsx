@@ -5,7 +5,7 @@ import { Job, Company } from "@/lib/types";
 import { useRef, useState } from "react";
 import { PrintableJobCard } from "./PrintableJobCard";
 import { downloadJobCardPdf } from "./utils/jobcard-pdf-utils";
-import { shareJobCard, emailJobCard } from "./utils/jobcard-share-utils";
+import { shareJobCard, emailJobCard, shareViaWhatsApp } from "./utils/jobcard-share-utils";
 import { ShareDialog } from "@/components/invoice/ShareDialog";
 
 interface JobPrintPreviewProps {
@@ -63,6 +63,16 @@ export function JobPrintPreview({
     }
   };
 
+  const handleWhatsApp = async (): Promise<void> => {
+    setIsGeneratingPdf(true);
+    try {
+      await shareViaWhatsApp(printRef, job.job_card_number || "", job.customer.name, job.customer.phone);
+    } finally {
+      setIsGeneratingPdf(false);
+      setIsShareDialogOpen(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center no-print">
@@ -81,7 +91,7 @@ export function JobPrintPreview({
             ) : (
               <Share2 className="mr-2 h-4 w-4" />
             )}
-            Share
+            Share PDF
           </Button>
           <Button onClick={handlePrintClick} disabled={isGeneratingPdf}>
             {isGeneratingPdf ? (
@@ -108,6 +118,7 @@ export function JobPrintPreview({
         onOpenChange={setIsShareDialogOpen}
         onShare={handleShare}
         onEmail={handleEmail}
+        onWhatsApp={handleWhatsApp}
         isGeneratingPdf={isGeneratingPdf}
         invoiceNumber={job.job_card_number || ""}
         invoiceName={`${job.customer.name}'s ${job.device.name}`}
