@@ -35,6 +35,8 @@ export const PrintableJobCardV2 = ({
   company,
 }: PrintableJobCardV2Props) => {
   const isMobile = typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // Use a placeholder logo if logo_url missing/broken
+  const fallbackLogo = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=300&q=80"; // Placeholder image
 
   return (
     <div 
@@ -82,22 +84,23 @@ export const PrintableJobCardV2 = ({
           borderBottom: '1px solid #ddd'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '3vw' : '12px' }}>
-            {company?.logo_url && (
-              <img 
-                src={company.logo_url}
-                alt="Company Logo" 
-                style={{ 
-                  height: isMobile ? '10vw' : '45px', 
-                  width: isMobile ? '10vw' : '45px', 
-                  objectFit: 'contain',
-                  border: '1px solid #eee',
-                  borderRadius: '4px'
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            )}
+            <img 
+              src={company?.logo_url || fallbackLogo}
+              alt="Company Logo" 
+              style={{ 
+                height: isMobile ? '10vw' : '45px', 
+                width: isMobile ? '10vw' : '45px', 
+                objectFit: 'contain',
+                border: '1px solid #eee',
+                borderRadius: '4px',
+                background: '#fafafa'
+              }}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                // Only change if not already the placeholder
+                if (target && !target.src.includes(fallbackLogo)) target.src = fallbackLogo;
+              }}
+            />
             <div>
               <h1 style={{ 
                 fontSize: isMobile ? '7vw' : '28px', 
