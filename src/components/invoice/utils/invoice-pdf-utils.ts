@@ -2,84 +2,87 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 
-// PDF generation utility for invoices
+// Constants for A4 dimensions in mm and pixels
+const A4_WIDTH_MM = 210;
+const A4_HEIGHT_MM = 297;
+const A4_WIDTH_PX = 794; // 210mm at 96dpi
+const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
+
 export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElement>) => {
-  if (!printRef.current) return null;
-  
+  if (!printRef.current) {
+    toast.error("No invoice content found");
+    return null;
+  }
+
   try {
     // Create a clone of the element to avoid modifying the original
     const originalElement = printRef.current;
     const clonedElement = originalElement.cloneNode(true) as HTMLDivElement;
     
-    // Detect if we're on mobile
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Apply proper styling for PDF generation - optimized for mobile viewing
+    // Apply A4 paper styling
     clonedElement.style.cssText = `
-      width: ${isMobile ? '375px' : '794px'} !important;
-      height: ${isMobile ? '667px' : '1123px'} !important;
-      min-height: ${isMobile ? '667px' : '1123px'} !important;
-      max-width: ${isMobile ? '375px' : '794px'} !important;
-      max-height: ${isMobile ? '667px' : '1123px'} !important;
-      padding: 0 !important;
+      width: ${A4_WIDTH_PX}px !important;
+      min-width: ${A4_WIDTH_PX}px !important;
+      max-width: ${A4_WIDTH_PX}px !important;
+      height: ${A4_HEIGHT_PX}px !important;
+      min-height: ${A4_HEIGHT_PX}px !important;
+      max-height: ${A4_HEIGHT_PX}px !important;
+      padding: 20px !important;
       margin: 0 !important;
-      transform: scale(1) !important;
-      position: fixed !important;
+      box-sizing: border-box !important;
+      position: absolute !important;
       top: 0 !important;
       left: 0 !important;
       background: white !important;
-      font-size: ${isMobile ? '8px' : '12px'} !important;
-      line-height: 1.2 !important;
-      box-sizing: border-box !important;
+      font-size: 12px !important;
+      line-height: 1.4 !important;
       overflow: hidden !important;
       font-family: Arial, sans-serif !important;
       color: black !important;
       z-index: 9999 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-start !important;
+      display: block !important;
       visibility: visible !important;
     `;
 
-    // Apply styles to all child elements with mobile optimization
+    // Apply consistent styling to all child elements
     const allElements = clonedElement.querySelectorAll('*');
     allElements.forEach((element) => {
       const el = element as HTMLElement;
-      el.style.color = 'black';
+      el.style.boxSizing = 'border-box';
+      el.style.margin = '0';
+      el.style.padding = '0';
+      el.style.color = 'inherit';
       el.style.backgroundColor = 'transparent';
       el.style.visibility = 'visible';
-      el.style.display = el.style.display === 'none' ? 'block' : el.style.display;
       
-      // Remove any left margins that might cause offset
-      if (el.style.marginLeft) {
-        el.style.marginLeft = '0';
+      // Special handling for specific elements
+      if (el.tagName === 'TABLE') {
+        el.style.width = '100%';
+        el.style.borderCollapse = 'collapse';
       }
-      if (el.style.paddingLeft && el !== clonedElement) {
-        el.style.paddingLeft = el.style.paddingLeft;
+      
+      if (el.tagName === 'IMG') {
+        el.style.maxWidth = '100%';
+        el.style.height = 'auto';
       }
     });
 
     // Append to body temporarily
     document.body.appendChild(clonedElement);
 
-    // Wait for styles to apply and fonts to load
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait for styles to apply
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    // Generate canvas with device-appropriate dimensions
-    const canvasWidth = isMobile ? 375 : 794;
-    const canvasHeight = isMobile ? 667 : 1123;
-    
+    // Generate canvas with A4 dimensions
     const canvas = await html2canvas(clonedElement, {
-      scale: isMobile ? 4 : 2,
+      scale: 2, // Higher quality
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
-      allowTaint: false,
-      foreignObjectRendering: false,
-      width: canvasWidth,
-      height: canvasHeight,
-      windowWidth: canvasWidth,
-      windowHeight: canvasHeight,
+      width: A4_WIDTH_PX,
+      height: A4_HEIGHT_PX,
+      windowWidth: A4_WIDTH_PX,
+      windowHeight: A4_HEIGHT_PX,
       x: 0,
       y: 0,
       scrollX: 0,
@@ -89,22 +92,17 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     // Remove the cloned element
     document.body.removeChild(clonedElement);
 
-    // Create PDF with appropriate dimensions
+    // Create PDF with A4 dimensions
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: isMobile ? [100, 177] : 'a4',
+      format: 'a4',
       compress: true
     });
 
+    // Add image to fill the A4 page completely
     const imgData = canvas.toDataURL('image/png', 1.0);
-    
-    // Add image to fill the page dimensions completely
-    if (isMobile) {
-      pdf.addImage(imgData, 'PNG', 0, 0, 100, 177, '', 'FAST');
-    } else {
-      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST');
-    }
+    pdf.addImage(imgData, 'PNG', 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM, '', 'FAST');
 
     return pdf;
   } catch (error) {
@@ -116,25 +114,69 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
 
 export const downloadInvoicePdf = async (
   printRef: React.RefObject<HTMLDivElement>, 
-  invoiceNumber: string
+  invoiceNumber: string = 'INV'
 ) => {
-  const pdf = await generateInvoicePdf(printRef);
-  if (pdf) {
-    pdf.save(`Invoice_${invoiceNumber}.pdf`);
-    toast.success("PDF downloaded successfully");
-    return true;
+  try {
+    const pdf = await generateInvoicePdf(printRef);
+    if (pdf) {
+      pdf.save(`Invoice_${invoiceNumber}.pdf`);
+      toast.success("PDF downloaded successfully");
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Download error:", error);
+    toast.error("Failed to download PDF");
+    return false;
   }
-  return false;
 };
 
 export const getInvoicePdfAsBlob = async (
   printRef: React.RefObject<HTMLDivElement>
 ) => {
-  const pdf = await generateInvoicePdf(printRef);
-  if (!pdf) return null;
-  
-  return {
-    blob: pdf.output('blob'),
-    pdf
-  };
+  try {
+    const pdf = await generateInvoicePdf(printRef);
+    if (!pdf) return null;
+    
+    return {
+      blob: pdf.output('blob'),
+      pdf
+    };
+  } catch (error) {
+    console.error("Blob generation error:", error);
+    return null;
+  }
+};
+
+export const shareInvoice = async (
+  printRef: React.RefObject<HTMLDivElement>,
+  invoiceNumber: string = 'INV'
+) => {
+  try {
+    const result = await getInvoicePdfAsBlob(printRef);
+    if (!result) return false;
+
+    if (navigator.share) {
+      await navigator.share({
+        title: `Invoice ${invoiceNumber}`,
+        files: [new File(
+          [result.blob], 
+          `Invoice_${invoiceNumber}.pdf`, 
+          { type: 'application/pdf' }
+        )]
+      });
+      return true;
+    } else {
+      // Fallback for browsers without Web Share API
+      const url = URL.createObjectURL(result.blob);
+      window.open(url, '_blank');
+      return true;
+    }
+  } catch (error) {
+    console.error("Share error:", error);
+    if (error.name !== 'AbortError') {
+      toast.error("Failed to share invoice");
+    }
+    return false;
+  }
 };
