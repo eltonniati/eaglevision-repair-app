@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Job } from "@/lib/types";
@@ -44,8 +43,8 @@ export function useJobDetails() {
         .from("jobs")
         .select("*, companies(*)")
         .eq("id", id)
-        .maybeSingle()
-        .signal(abortControllerRef.current.signal);
+        // Correct way to provide fetchOptions including abort signal:
+        .maybeSingle(undefined, { fetchOptions: { signal: abortControllerRef.current.signal } });
 
       if (error) {
         console.error("Job fetch error:", error);
