@@ -22,8 +22,7 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       width: element.style.width,
       height: element.style.height,
       padding: element.style.padding,
-      margin: element.style.margin,
-      transform: element.style.transform
+      margin: element.style.margin
     };
 
     // Apply print-specific styles
@@ -31,19 +30,14 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     element.style.height = 'auto';
     element.style.padding = '0';
     element.style.margin = '0';
-    element.style.transform = 'none';
-
-    // Calculate scale to fit content width
-    const contentWidth = element.scrollWidth;
-    const scale = A4_WIDTH_PX / contentWidth;
 
     const canvas = await html2canvas(element, {
-      scale: scale * 2, // Higher quality
+      scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
       width: A4_WIDTH_PX,
-      height: element.scrollHeight * scale,
+      height: element.scrollHeight,
       windowWidth: A4_WIDTH_PX,
       scrollX: 0,
       scrollY: 0,
@@ -54,7 +48,6 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
     element.style.height = originalStyles.height;
     element.style.padding = originalStyles.padding;
     element.style.margin = originalStyles.margin;
-    element.style.transform = originalStyles.transform;
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -63,45 +56,39 @@ export const generateInvoicePdf = async (printRef: React.RefObject<HTMLDivElemen
       compress: true
     });
 
-    // Calculate image dimensions to fit A4
-    const imgWidth = A4_WIDTH_MM;
+    // Calculate aspect ratio to fit A4
     const imgHeight = (canvas.height * A4_WIDTH_MM) / canvas.width;
-
-    // Add image to PDF with 10mm margins
-    const x = 10; // Left margin
-    const y = 10; // Top margin
-    const width = A4_WIDTH_MM - 20; // Account for margins
-    const height = imgHeight > (A4_HEIGHT_MM - 20) ? (A4_HEIGHT_MM - 20) : imgHeight;
-
+    
+    // Add image to PDF
     pdf.addImage(
       canvas.toDataURL('image/png'),
       'PNG',
-      x,
-      y,
-      width,
-      height,
+      0,
+      0,
+      A4_WIDTH_MM,
+      imgHeight > A4_HEIGHT_MM ? A4_HEIGHT_MM : imgHeight,
       '',
       'FAST'
     );
 
-    // Add additional pages if content is taller than available space
-    let heightLeft = imgHeight - height;
-    let position = y + height;
-    const pageHeight = A4_HEIGHT_MM - 20; // Account for margins
+    // Add additional pages if content is taller than A4
+    let heightLeft = imgHeight;
+    let position = 0;
+    const pageHeight = A4_HEIGHT_MM;
 
-    while (heightLeft > 0) {
+    while (heightLeft >= pageHeight) {
+      position = heightLeft - pageHeight;
       pdf.addPage();
       pdf.addImage(
         canvas.toDataURL('image/png'),
         'PNG',
-        x,
-        y - (position - y),
-        width,
+        0,
+        -position,
+        A4_WIDTH_MM,
         imgHeight,
         '',
         'FAST'
       );
-      position += pageHeight;
       heightLeft -= pageHeight;
     }
 
