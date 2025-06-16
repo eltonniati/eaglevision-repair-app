@@ -141,121 +141,114 @@ const InvoiceDetail = () => {
           </div>
         </div>
         
-        {/* Printable invoice content with A4 dimensions */}
+        {/* Printable invoice content with proper A4 dimensions and margins */}
         <div 
           ref={printableRef}
-          className="bg-white p-8 shadow-none print:p-0"
+          className="bg-white p-6 print:p-0"
           style={{
             width: '210mm',
             minHeight: '297mm',
-            margin: '0 auto'
+            margin: '0 auto',
+            boxSizing: 'border-box'
           }}
         >
-          <Card className="border-none shadow-none">
-            <CardHeader className="flex flex-row items-start justify-between p-0 pb-6">
+          <div className="p-6 print:p-10" style={{ boxSizing: 'border-box' }}>
+            <div className="flex justify-between items-start mb-8">
               <div>
-                <CardTitle className="text-2xl">Invoice #{databaseInvoice.invoice_number}</CardTitle>
-                <CardDescription className="text-sm">
+                <h1 className="text-2xl font-bold">Invoice #{databaseInvoice.invoice_number}</h1>
+                <p className="text-sm text-gray-600">
                   Created on {format(new Date(databaseInvoice.created_at), "MMMM d, yyyy")}
                   {databaseInvoice.due_date && ` • Due by ${format(new Date(databaseInvoice.due_date), "MMMM d, yyyy")}`}
-                </CardDescription>
+                </p>
               </div>
               <StatusBadge status={databaseInvoice.status} />
-            </CardHeader>
+            </div>
 
-            <CardContent className="space-y-8 p-0">
-              {/* Bill To and From sections */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Bill From</h3>
-                  <div className="space-y-1 text-sm">
-                    <p className="font-medium">Your Company Name</p>
-                    <p>123 Business Street</p>
-                    <p>City, State 10001</p>
-                    <p>Phone: (123) 456-7890</p>
-                    <p>Email: contact@company.com</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Bill To</h3>
-                  <div className="space-y-1 text-sm">
-                    <p className="font-medium">{databaseInvoice.bill_description}</p>
-                    {databaseInvoice.job_id && <p>Job #: {databaseInvoice.job_id}</p>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Line Items Table */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h3 className="text-lg font-semibold mb-4">Items</h3>
-                <Table className="border">
-                  <TableHeader className="bg-gray-50">
-                    <TableRow>
-                      <TableHead className="font-bold">Description</TableHead>
-                      <TableHead className="text-right font-bold">Quantity</TableHead>
-                      <TableHead className="text-right font-bold">Unit Price</TableHead>
-                      <TableHead className="text-right font-bold">Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {databaseInvoice.line_items.map((item, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell>{item.description}</TableCell>
-                        <TableCell className="text-right">{item.quantity}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.unit_price)}</TableCell>
-                        <TableCell className="text-right font-medium">{formatCurrency(item.amount)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <h2 className="text-lg font-semibold mb-2">From</h2>
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium">Your Company</p>
+                  <p>123 Business Rd</p>
+                  <p>City, State 10001</p>
+                  <p>Phone: (123) 456-7890</p>
+                  <p>Email: billing@company.com</p>
+                </div>
               </div>
 
-              {/* Summary Section */}
-              <div className="ml-auto w-full md:w-1/2">
-                <h3 className="text-lg font-semibold mb-4">Summary</h3>
-                <div className="space-y-3 text-sm">
+              <div>
+                <h2 className="text-lg font-semibold mb-2">Bill To</h2>
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium">{databaseInvoice.bill_description}</p>
+                  {databaseInvoice.job_id && <p>Job #: {databaseInvoice.job_id}</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h2 className="text-lg font-semibold mb-4">Items</h2>
+              <Table className="border">
+                <TableHeader className="bg-gray-50">
+                  <TableRow>
+                    <TableHead className="w-1/2 font-bold">Description</TableHead>
+                    <TableHead className="text-right font-bold">Qty</TableHead>
+                    <TableHead className="text-right font-bold">Price</TableHead>
+                    <TableHead className="text-right font-bold">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {databaseInvoice.line_items.map((item, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>{item.description}</TableCell>
+                      <TableCell className="text-right">{item.quantity}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(item.unit_price)}</TableCell>
+                      <TableCell className="text-right font-medium">{formatCurrency(item.amount)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <div className="flex justify-end mb-8">
+              <div className="w-full md:w-1/2">
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <Label className="text-muted-foreground">Subtotal</Label>
-                    <p className="font-medium">{formatCurrency(databaseInvoice.subtotal)}</p>
+                    <span>Subtotal:</span>
+                    <span className="font-medium">{formatCurrency(databaseInvoice.subtotal)}</span>
                   </div>
-                  
                   {databaseInvoice.taxes.map((tax, index) => (
                     <div key={index} className="flex justify-between">
-                      <Label className="text-muted-foreground">{tax.name} ({tax.rate}%)</Label>
-                      <p className="font-medium">{formatCurrency(tax.amount)}</p>
+                      <span>{tax.name} ({tax.rate}%):</span>
+                      <span className="font-medium">{formatCurrency(tax.amount)}</span>
                     </div>
                   ))}
-                  
-                  <div className="flex justify-between border-t pt-3 mt-2">
-                    <Label className="font-bold">Total</Label>
-                    <p className="text-lg font-bold">{formatCurrency(databaseInvoice.total)}</p>
+                  <div className="flex justify-between border-t pt-2 mt-2">
+                    <span className="font-bold">Total:</span>
+                    <span className="text-lg font-bold">{formatCurrency(databaseInvoice.total)}</span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Notes and Terms */}
-              {databaseInvoice.notes && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Notes</h3>
-                  <p className="text-sm">{databaseInvoice.notes}</p>
-                </div>
-              )}
-
-              {databaseInvoice.terms && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Terms & Conditions</h3>
-                  <p className="text-sm">{databaseInvoice.terms}</p>
-                </div>
-              )}
-
-              {/* Footer */}
-              <div className="border-t pt-4 mt-8 text-center text-xs text-muted-foreground">
-                <p>Thank you for your business!</p>
-                <p className="mt-1">Please make payments payable to Your Company Name</p>
+            {databaseInvoice.notes && (
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold mb-2">Notes</h2>
+                <p className="text-sm whitespace-pre-wrap">{databaseInvoice.notes}</p>
               </div>
-            </CardContent>
-          </Card>
+            )}
+
+            {databaseInvoice.terms && (
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold mb-2">Terms</h2>
+                <p className="text-sm whitespace-pre-wrap">{databaseInvoice.terms}</p>
+              </div>
+            )}
+
+            <div className="border-t pt-4 text-center text-sm text-gray-600">
+              <p>Thank you for your business!</p>
+              <p>Please make payments payable to Your Company</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
