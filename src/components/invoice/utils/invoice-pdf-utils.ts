@@ -2,11 +2,10 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 
-// A4 dimensions in mm and pixels
 const A4_WIDTH_MM = 210;
 const A4_HEIGHT_MM = 297;
-const A4_WIDTH_PX = 794; // 210mm at 96dpi
-const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
 
 export const getInvoicePdfAsBlob = async (printRef: React.RefObject<HTMLDivElement>) => {
   if (!printRef.current) {
@@ -17,7 +16,6 @@ export const getInvoicePdfAsBlob = async (printRef: React.RefObject<HTMLDivEleme
   try {
     const element = printRef.current;
     
-    // Store original styles
     const originalStyles = {
       width: element.style.width,
       height: element.style.height,
@@ -26,14 +24,12 @@ export const getInvoicePdfAsBlob = async (printRef: React.RefObject<HTMLDivEleme
       overflow: element.style.overflow
     };
 
-    // Apply print-specific styles
     element.style.width = `${A4_WIDTH_PX}px`;
     element.style.height = 'auto';
     element.style.padding = '0';
     element.style.margin = '0';
     element.style.overflow = 'visible';
 
-    // Add a small delay to ensure styles are applied
     await new Promise(resolve => setTimeout(resolve, 100));
 
     const canvas = await html2canvas(element, {
@@ -50,7 +46,6 @@ export const getInvoicePdfAsBlob = async (printRef: React.RefObject<HTMLDivEleme
       letterRendering: true
     });
 
-    // Restore original styles
     element.style.width = originalStyles.width;
     element.style.height = originalStyles.height;
     element.style.padding = originalStyles.padding;
@@ -64,10 +59,8 @@ export const getInvoicePdfAsBlob = async (printRef: React.RefObject<HTMLDivEleme
       compress: true
     });
 
-    // Calculate aspect ratio to fit A4
     const imgHeight = (canvas.height * A4_WIDTH_MM) / canvas.width;
     
-    // Add image to PDF
     pdf.addImage(
       canvas.toDataURL('image/png', 1.0),
       'PNG',
@@ -79,7 +72,6 @@ export const getInvoicePdfAsBlob = async (printRef: React.RefObject<HTMLDivEleme
       'FAST'
     );
 
-    // Add additional pages if content is taller than A4
     let heightLeft = imgHeight - A4_HEIGHT_MM;
     let position = 0;
     
@@ -150,21 +142,17 @@ export const shareInvoice = async (
       toast.success("Invoice shared successfully");
       return true;
     } else {
-      // Enhanced fallback for WhatsApp and other platforms
       const pdfUrl = URL.createObjectURL(blob);
       const text = `Invoice #${invoiceNumber} for ${customerName}`;
       
-      // For mobile devices
       if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n\nPDF will open in new tab for sharing')}`;
         window.open(whatsappUrl, '_blank');
         
-        // Small delay before opening PDF
         setTimeout(() => {
           window.open(pdfUrl, '_blank');
         }, 1000);
       } else {
-        // For desktop
         const whatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, '_blank');
         window.open(pdfUrl, '_blank');
@@ -176,39 +164,6 @@ export const shareInvoice = async (
   } catch (error) {
     console.error("Sharing error:", error);
     toast.error("Failed to share invoice");
-    return false;
-  }
-};
-
-export const emailInvoice = async (
-  printRef: React.RefObject<HTMLDivElement>,
-  invoiceNumber: string,
-  customerName: string,
-  customerEmail?: string
-) => {
-  const pdfResult = await getInvoicePdfAsBlob(printRef);
-  if (!pdfResult) return false;
-
-  try {
-    const { blob } = pdfResult;
-    const pdfUrl = URL.createObjectURL(blob);
-    
-    const subject = `Invoice #${invoiceNumber} - ${customerName}`;
-    const body = `Please find attached the invoice details.\n\nInvoice: #${invoiceNumber}\nCustomer: ${customerName}`;
-    const mailtoUrl = `mailto:${customerEmail || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    window.location.href = mailtoUrl;
-    
-    // Open PDF in new tab for manual attachment
-    setTimeout(() => {
-      window.open(pdfUrl, '_blank');
-    }, 500);
-    
-    toast.info("Email client opened. PDF opened in new tab for manual attachment.");
-    return true;
-  } catch (error) {
-    console.error("Email error:", error);
-    toast.error("Failed to prepare email");
     return false;
   }
 };
